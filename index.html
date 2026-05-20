@@ -465,21 +465,20 @@
     @keyframes dots { 0%,20%{content:'.'} 40%,60%{content:'..'} 80%,100%{content:'...'} }
 
     /* 반응형 */
-    @media(max-width: 1024px) {
-      .panel { width: 300px; }
+    @media(max-width: 1200px) {
+      .panel { width: 320px; }
     }
-
+    @media(max-width: 1024px) {
+      .panel { width: 280px; }
+      .card-name { font-size: 12px; }
+      .card-addr { font-size: 11px; }
+    }
     @media(max-width: 700px) {
-      /* 모바일: 패널 숨기고 하단 목록 버튼 표시 */
       .panel { display: none; }
       .logo { font-size: 18px; }
       .search-wrap { max-width: none; }
       .btn-add span:last-child, .btn-comm span:last-child { display: none; }
-
-      /* 모바일 하단 목록 버튼 */
-      .mobile-list-btn {
-        display: flex !important;
-      }
+      .mobile-list-btn { display: flex !important; }
     }
 
     /* 모바일 하단 목록 패널 */
