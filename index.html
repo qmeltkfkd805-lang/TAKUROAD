@@ -833,13 +833,15 @@ function switchTab(tab, btn) {
 async function loadTab(tab) {
   const body = document.getElementById('commBody');
   if (tab === '저장') { renderSavedList(); return; }
-  body.innerHTML = '<div class="loading">불러오는 중</div>';
+  renderPostList([], tab); // 바로 글쓰기 버튼 표시
   try {
-    const { data: posts, error } = await db.from('posts').select('*').eq('type', tab).order('created_at', { ascending: false });
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+    const fetch = db.from('posts').select('*').eq('type', tab).order('created_at', { ascending: false });
+    const { data: posts, error } = await Promise.race([fetch, timeout]);
     if (error) throw error;
     renderPostList(posts || [], tab);
   } catch(e) {
-    renderPostList([], tab); // 에러나도 글쓰기 버튼은 보여줌
+    renderPostList([], tab);
   }
 }
 
