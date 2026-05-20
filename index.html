@@ -213,7 +213,7 @@
     .cat-btn[data-cat="쿠지샵"].active   { background: #e03535; box-shadow: 0 0 12px rgba(224,53,53,.2); color:#fff; }
 
     /* ── 본문 ── */
-    .main { flex: 1; display: flex; overflow: hidden; position: relative; height: 0; }
+    .main { flex: 1 1 0; display: flex; overflow: hidden; position: relative; height: 0; }
     #map { flex: 1; height: 100%; }
 
     /* ── 사이드패널 ── */
@@ -232,17 +232,14 @@
     .panel-header p { display: none; }
 
     .place-list {
-      position: absolute;
-      top: 45px;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      flex: 1 1 0;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 10px 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      height: 0;
     }
     .place-list::-webkit-scrollbar { width: 4px; }
     .place-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
