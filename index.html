@@ -227,11 +227,23 @@
       overflow: hidden;
       position: relative;
     }
-    .panel-header { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+    .panel-header { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; position: relative; z-index: 1; }
     .panel-header h2 { font-size: 14px; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 6px; }
     .panel-header p { display: none; }
 
-    .place-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .place-list {
+      position: absolute;
+      top: 45px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
     .place-list::-webkit-scrollbar { width: 4px; }
     .place-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
