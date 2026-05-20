@@ -661,6 +661,16 @@ window.onload = function () {
   document.getElementById('searchInput').addEventListener('input', handleSearchInput);
   document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
   document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) closeSearchDrop(); });
+
+  // 패널 위에서 휠 이벤트가 지도로 안 가게 막기
+  const panel = document.querySelector('.panel');
+  if (panel) {
+    panel.addEventListener('wheel', e => {
+      e.stopPropagation();
+      const list = document.getElementById('placeList');
+      list.scrollTop += e.deltaY;
+    }, { passive: false });
+  }
 };
 
 function renderAll() {
