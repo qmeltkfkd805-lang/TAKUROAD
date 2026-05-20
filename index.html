@@ -243,7 +243,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r);
-      padding: 12px 13px;
+      padding: 12px 13px 12px 16px;
       cursor: pointer;
       transition: all .18s;
       position: relative;
@@ -255,9 +255,9 @@
       content: '';
       position: absolute;
       top: 0; left: 0;
-      width: 3px; height: 100%;
+      width: 4px; height: 100%;
       background: var(--card-accent, var(--accent));
-      border-radius: 3px 0 0 3px;
+      border-radius: var(--r) 0 0 var(--r);
     }
     .place-card:hover { border-color: var(--card-accent, var(--accent)); box-shadow: var(--sh-md); transform: translateY(-1px); }
     .place-card.active { border-color: var(--card-accent, var(--accent)); box-shadow: 0 0 0 2px var(--accent-l); }
