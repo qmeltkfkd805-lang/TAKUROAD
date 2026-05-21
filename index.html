@@ -636,9 +636,8 @@ async function selectPlace(id) {
 
 async function showDetail(p) {
   const color = CAT_COLOR[p.cat] || '#e8006f';
-  const { data: reviews } = await db.from('reviews').select('*').eq('place_id', p.id).order('created_at', { ascending: false });
-  const rv = reviews || [];
-  const avg = rv.length ? rv.reduce((s, r) => s + r.stars, 0) / rv.length : 0;
+
+  // 기본 정보 즉시 표시
   document.getElementById('detailContent').innerHTML = `
     <div class="detail-cat" style="color:${color}">${CAT_ICON[p.cat]} <strong>${p.cat}</strong></div>
     <div class="detail-name">${p.name}</div>
@@ -647,20 +646,14 @@ async function showDetail(p) {
       <button class="da-btn ${isSaved(p.id)?'saved':''}" id="dSaveBtn" onclick="handleDetailSave(${p.id})">${isSaved(p.id)?'🔖 저장됨':'🏷️ 저장'}</button>
     </div>
     <div class="detail-stars-row">
-      <span class="stars">${starStr(Math.round(avg))}</span>
-      <span class="cnt">${avg>0?avg.toFixed(1)+' · 리뷰 '+rv.length+'개':'아직 리뷰가 없어요'}</span>
+      <span class="stars" id="detailStars">☆☆☆☆☆</span>
+      <span class="cnt" id="detailCnt">리뷰 불러오는 중…</span>
     </div>
     <div class="detail-desc">${p.desc||'설명이 없어요.'}</div>
     <div class="detail-tags">${p.tags.map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
     <div class="review-section">
-      <h3>💬 리뷰 (${rv.length})</h3>
-      <div class="review-list">
-        ${rv.map(r=>`
-          <div class="review-item">
-            <div class="rv-top"><span class="rv-nick">${r.nick}</span><span class="rv-stars">${starStr(r.stars)}</span><button class="rv-likes" onclick="likeReview('${r.id}',this)">❤️ ${r.likes||0}</button></div>
-            <div class="rv-text">${r.content}</div>
-          </div>`).join('')||'<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 리뷰를 남겨보세요!</p>'}
-      </div>
+      <h3>💬 리뷰</h3>
+      <div class="review-list" id="reviewList"><p style="font-size:12px;color:var(--muted);padding:4px 0">불러오는 중…</p></div>
       <div class="review-form">
         <div class="star-picker" id="starPicker"><span onclick="setStar(1)">★</span><span onclick="setStar(2)">★</span><span onclick="setStar(3)">★</span><span onclick="setStar(4)">★</span><span onclick="setStar(5)">★</span></div>
         <input type="text" id="rv-nick" placeholder="닉네임 (미입력시 익명)" />
@@ -670,6 +663,26 @@ async function showDetail(p) {
     </div>`;
   document.getElementById('detailPanel').classList.add('open');
   window._pickedStar = 0;
+
+  // 리뷰 비동기 로딩
+  try {
+    const { data: reviews } = await db.from('reviews').select('*').eq('place_id', p.id).order('created_at', { ascending: false });
+    const rv = reviews || [];
+    const avg = rv.length ? rv.reduce((s, r) => s + r.stars, 0) / rv.length : 0;
+    const starsEl = document.getElementById('detailStars');
+    const cntEl = document.getElementById('detailCnt');
+    const listEl = document.getElementById('reviewList');
+    if (starsEl) starsEl.textContent = starStr(Math.round(avg));
+    if (cntEl) cntEl.textContent = avg > 0 ? avg.toFixed(1) + ' · 리뷰 ' + rv.length + '개' : '아직 리뷰가 없어요';
+    if (listEl) listEl.innerHTML = rv.map(r => `
+      <div class="review-item">
+        <div class="rv-top"><span class="rv-nick">${r.nick}</span><span class="rv-stars">${starStr(r.stars)}</span><button class="rv-likes" onclick="likeReview('${r.id}',this)">❤️ ${r.likes||0}</button></div>
+        <div class="rv-text">${r.content}</div>
+      </div>`).join('') || '<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 리뷰를 남겨보세요!</p>';
+  } catch(e) {
+    const cntEl = document.getElementById('detailCnt');
+    if (cntEl) cntEl.textContent = '리뷰를 불러올 수 없어요';
+  }
 }
 
 function handleDetailSave(id) {
