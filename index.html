@@ -629,6 +629,8 @@ async function selectPlace(id) {
   if (card) { card.classList.add('active'); card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   map.setCenter(new kakao.maps.LatLng(p.lat, p.lng));
   map.setLevel(4);
+  // 샵 목록 패널 닫기
+  document.getElementById('listPanel').classList.remove('open');
   await showDetail(p);
 }
 
