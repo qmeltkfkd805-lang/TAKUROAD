@@ -502,12 +502,33 @@ window.onload = function () {
     map = new kakao.maps.Map(document.getElementById('map'), {
       center: new kakao.maps.LatLng(37.5519, 127.0005), level: 8
     });
-    renderAll();
+    // 저장된 데이터 없으면 더미 데이터 좌표 자동 보정
+    if (!localStorage.getItem('takuroad_places')) {
+      geocodeDummy().then(() => renderAll());
+    } else {
+      renderAll();
+    }
   });
   document.getElementById('searchInput').addEventListener('input', handleSearchInput);
   document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
   document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) closeSearchDrop(); });
 };
+
+async function geocodeDummy() {
+  const geocoder = new kakao.maps.services.Geocoder();
+  for (const p of places) {
+    await new Promise(resolve => {
+      geocoder.addressSearch(p.addr, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          p.lat = parseFloat(result[0].y);
+          p.lng = parseFloat(result[0].x);
+        }
+        resolve();
+      });
+    });
+  }
+  savePlaces();
+}
 
 function renderAll() {
   clearMarkers();
