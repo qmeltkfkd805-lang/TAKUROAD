@@ -35,90 +35,24 @@
       --pink-l: rgba(219,39,119,.1);
       --red: #dc2626;
       --red-l: rgba(220,38,38,.1);
-
-      /* 카테고리 색 */
-      --c-anime: #e8006f;
-      --c-figure: #7c3aed;
-      --c-card: #b45309;
-      --c-used: #059669;
-      --c-popup: #0099cc;
-      --c-doujin: #db2777;
+      --c-anime: #e8006f; --c-figure: #7c3aed; --c-card: #b45309;
+      --c-used: #059669; --c-popup: #0099cc; --c-doujin: #db2777;
       --c-game: #ea580c;
-
       --sh-sm: 0 2px 8px rgba(124,58,237,.08);
       --sh-md: 0 4px 24px rgba(124,58,237,.12);
       --sh-lg: 0 12px 48px rgba(124,58,237,.15);
       --sh-glow: 0 0 20px rgba(232,0,111,.2);
       --r: 12px; --r-sm: 7px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-    body {
-      font-family: 'Noto Sans KR', 'Noto Sans JP', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    
-
-    /* ── 헤더 ── */
-    header {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      padding: 0 16px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-      z-index: 100;
-      position: relative;
-    }
-    header::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--purple), transparent);
-    }
-
-    .logo {
-      font-family: 'Cute Font', cursive;
-      font-size: 34px;
-      color: var(--accent);
-      white-space: nowrap;
-      text-shadow: 2px 2px 0px rgba(232,0,111,.2);
-      letter-spacing: 2px;
-      flex-shrink: 0;
-      -webkit-text-stroke: 0.5px var(--accent-d);
-    }
-    .logo-sub {
-      font-size: 10px;
-      color: var(--muted);
-      font-family: 'DotGothic16', monospace;
-      margin-top: -4px;
-      letter-spacing: 2px;
-    }
-    .logo-wrap { display: flex; flex-direction: column; }
-
+    /* 헤더 */
+    header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; z-index: 100; position: relative; }
+    header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--purple), transparent); }
+    .logo { font-family: 'Cute Font', cursive; font-size: 34px; color: var(--accent); white-space: nowrap; letter-spacing: 2px; flex-shrink: 0; -webkit-text-stroke: 0.5px var(--accent-d); }
     .search-wrap { flex: 1; position: relative; max-width: 380px; }
-    .search-wrap input {
-      width: 100%;
-      padding: 8px 36px 8px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 24px;
-      font-size: 14px;
-      font-family: inherit;
-      background: var(--surface);
-      color: var(--text);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-    }
+    .search-wrap input { width: 100%; padding: 8px 36px 8px 14px; border: 1.5px solid var(--border); border-radius: 24px; font-size: 14px; font-family: inherit; background: var(--surface); color: var(--text); outline: none; transition: border-color .2s; }
     .search-wrap input::placeholder { color: var(--muted); }
     .search-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-l); }
     .search-wrap .s-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); font-size: 16px; }
@@ -126,442 +60,277 @@
     .search-dropdown.open { display: block; }
     .s-item { padding: 10px 14px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background .15s; }
     .s-item:hover { background: var(--surface); }
-    .s-item .si { font-size: 16px; }
-    .s-item .sn { font-weight: 700; color: var(--text); }
-    .s-item .sa { font-size: 11px; color: var(--muted); }
+    .s-item .si { font-size: 16px; } .s-item .sn { font-weight: 700; color: var(--text); } .s-item .sa { font-size: 11px; color: var(--muted); }
     .no-result { padding: 14px; text-align: center; font-size: 13px; color: var(--muted); }
-
     .header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .btn-comm { background: var(--cyan-l); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
+    .btn-comm:hover { background: var(--cyan); color: #fff; }
+    .btn-add { background: var(--accent); color: #fff; border: none; border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
+    .btn-add:hover { background: var(--accent-d); }
 
-    .btn-comm {
-      background: var(--cyan-l);
-      color: var(--cyan);
-      border: 1px solid var(--cyan);
-      border-radius: 20px;
-      padding: 7px 14px;
-      font-size: 13px;
-      font-family: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all .2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .btn-comm:hover { background: var(--cyan); color: var(--bg); box-shadow: 0 0 12px rgba(0,229,255,.4); }
-
-    .btn-add {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 20px;
-      padding: 7px 14px;
-      font-size: 13px;
-      font-family: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all .2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 0 12px rgba(255,77,141,.3);
-    }
-    .btn-add:hover { background: var(--accent-d); box-shadow: 0 0 20px rgba(255,77,141,.5); }
-
-    /* ── 카테고리 바 ── */
-    .cat-bar {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      padding: 8px 16px;
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;
-      flex-shrink: 0;
-      scrollbar-width: none;
-    }
+    /* 카테고리 바 */
+    .cat-bar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 7px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
     .cat-bar::-webkit-scrollbar { display: none; }
-
-    .cat-btn {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 13px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 12px;
-      font-family: inherit;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all .18s;
-      color: var(--muted);
-      font-weight: 700;
-    }
+    .cat-btn { display: flex; align-items: center; gap: 5px; padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; transition: all .18s; color: var(--muted); font-weight: 700; }
     .cat-btn:hover { border-color: var(--accent); color: var(--text); }
     .cat-btn.active { border-color: transparent; color: #fff; }
+    .cat-btn[data-cat="전체"].active { background: linear-gradient(135deg,var(--accent),var(--purple)); }
+    .cat-btn[data-cat="애니/만화"].active { background: var(--c-anime); }
+    .cat-btn[data-cat="피규어"].active { background: var(--c-figure); }
+    .cat-btn[data-cat="카드/TCG"].active { background: var(--c-card); }
+    .cat-btn[data-cat="중고/빈티지"].active { background: var(--c-used); }
+    .cat-btn[data-cat="팝업스토어"].active { background: var(--c-popup); }
+    .cat-btn[data-cat="동인샵"].active { background: var(--c-doujin); }
+    .cat-btn[data-cat="게임샵"].active { background: var(--c-game); }
+    .cat-btn[data-cat="쿠지샵"].active { background: #e03535; }
 
-    .cat-btn[data-cat="전체"].active    { background: linear-gradient(135deg,var(--accent),var(--purple)); box-shadow: 0 0 12px rgba(255,77,141,.3); }
-    .cat-btn[data-cat="애니/만화"].active { background: var(--c-anime); box-shadow: 0 0 12px rgba(255,77,141,.3); color:#fff; }
-    .cat-btn[data-cat="피규어"].active   { background: var(--c-figure); box-shadow: 0 0 12px rgba(179,136,255,.3); color:#fff; }
-    .cat-btn[data-cat="카드/TCG"].active { background: var(--c-card); box-shadow: 0 0 12px rgba(180,83,9,.2); color:#fff; }
-    .cat-btn[data-cat="중고/빈티지"].active{ background: var(--c-used); box-shadow: 0 0 12px rgba(5,150,105,.2); color:#fff; }
-    .cat-btn[data-cat="팝업스토어"].active { background: var(--c-popup); box-shadow: 0 0 12px rgba(0,153,204,.2); color:#fff; }
-    .cat-btn[data-cat="동인샵"].active   { background: var(--c-doujin); box-shadow: 0 0 12px rgba(255,121,198,.3); color:#fff; }
-    .cat-btn[data-cat="게임샵"].active   { background: var(--c-game); box-shadow: 0 0 12px rgba(255,159,67,.3); color:#fff; }
-    .cat-btn[data-cat="쿠지샵"].active   { background: #e03535; box-shadow: 0 0 12px rgba(224,53,53,.2); color:#fff; }
-
-    /* ── 본문 ── */
+    /* 본문 */
     .main { flex: 1 1 0; display: flex; overflow: hidden; position: relative; height: 0; }
     #map { flex: 1; height: 100%; }
-
-    /* ── 사이드패널 ── */
-    .panel {
-      width: 360px;
-      height: 100%;
-      background: var(--bg2);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .panel-header { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; position: relative; z-index: 1; }
-    .panel-header h2 { font-size: 14px; font-weight: 900; color: var(--text); display: flex; align-items: center; gap: 6px; }
-    .panel-header p { display: none; }
-
-    .place-list {
-      flex: 1 1 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      height: 0;
-      width: 100%;
-    }
-    .place-list::-webkit-scrollbar { width: 4px; }
-    .place-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    /* ── 장소 카드 ── */
-    .place-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 14px 16px 14px 18px;
-      cursor: pointer;
-      transition: all .18s;
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .place-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 4px; height: 100%;
-      background: var(--card-accent, var(--accent));
-      border-radius: var(--r) 0 0 var(--r);
-    }
-    .place-card:hover { border-color: var(--card-accent, var(--accent)); box-shadow: var(--sh-md); transform: translateY(-1px); }
-    .place-card.active { border-color: var(--card-accent, var(--accent)); box-shadow: 0 0 0 2px var(--accent-l); }
-
-    .card-top { display: flex; align-items: flex-start; gap: 10px; }
-    .card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .card-info { flex: 1; min-width: 0; }
-    .card-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
-    .card-addr { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .save-btn { background: none; border: none; cursor: pointer; font-size: 15px; padding: 2px; transition: transform .15s; flex-shrink: 0; }
-    .save-btn:hover { transform: scale(1.3); }
-    .card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; width: 100%; }
-    .tag { font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: 700; white-space: nowrap; flex-shrink: 0; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
-    .tag-cat { background: var(--accent-l); color: var(--accent); border: 1px solid rgba(255,77,141,.2); }
-    .tag-info { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-
-    /* ── 마커 ── */
-    .taku-marker { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .marker-bubble { color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 10px; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,.5); font-family: 'Noto Sans KR', sans-serif; border: 1px solid rgba(255,255,255,.2); }
-    .marker-tail { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; margin-top: -1px; }
-
-    /* ── 상세패널 ── */
-    .detail-panel {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-radius: var(--r) var(--r) 0 0;
-      box-shadow: var(--sh-lg);
-      padding: 20px;
-      transform: translateY(100%);
-      transition: transform .3s cubic-bezier(.32,.72,0,1);
-      z-index: 200;
-      max-height: 72dvh;
-      overflow-y: auto;
-    }
-    .detail-panel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple));
-    }
-    .detail-panel.open { transform: translateY(0); }
-    .detail-panel::-webkit-scrollbar { width: 3px; }
-    .detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    .detail-close { position: absolute; top: 14px; right: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 28px; height: 28px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .15s; }
-    .detail-close:hover { color: var(--text); border-color: var(--accent); }
-    .detail-cat { font-size: 11px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
-    .detail-name { font-size: 20px; font-weight: 900; margin-bottom: 4px; line-height: 1.3; }
-    .detail-addr { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-    .detail-actions { display: flex; gap: 8px; margin-bottom: 14px; }
-    .da-btn { display: flex; align-items: center; gap: 5px; padding: 6px 13px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); font-size: 12px; font-family: inherit; cursor: pointer; transition: all .18s; color: var(--muted); font-weight: 700; }
-    .da-btn.saved { border-color: var(--accent); color: var(--accent); background: var(--accent-l); }
-    .da-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .detail-stars-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .detail-stars-row .stars { font-size: 16px; color: var(--yellow); }
-    .detail-stars-row .cnt { font-size: 12px; color: var(--muted); }
-    .detail-desc { font-size: 13px; line-height: 1.7; background: var(--surface2); border-radius: var(--r-sm); padding: 12px; margin-bottom: 14px; border: 1px solid var(--border); color: var(--text); }
-    .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-
-    /* 리뷰 */
-    .review-section h3 { font-size: 13px; font-weight: 900; margin-bottom: 10px; color: var(--text); display: flex; align-items: center; gap: 5px; }
-    .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
-    .review-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; font-size: 13px; }
-    .rv-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .rv-nick { font-weight: 700; font-size: 12px; color: var(--cyan); }
-    .rv-stars { color: var(--yellow); font-size: 11px; }
-    .rv-likes { margin-left: auto; font-size: 12px; color: var(--muted); cursor: pointer; transition: color .15s; background: none; border: none; font-family: inherit; padding: 0; }
-    .rv-likes:hover { color: var(--accent); }
-    .rv-text { line-height: 1.5; color: var(--text); }
-    .review-form { display: flex; flex-direction: column; gap: 8px; }
-    .star-picker { display: flex; gap: 4px; }
-    .star-picker span { font-size: 22px; cursor: pointer; color: var(--border); transition: color .15s; user-select: none; }
-    .star-picker span.on { color: var(--yellow); text-shadow: 0 0 8px rgba(255,224,102,.5); }
-    .review-form textarea, .review-form input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s; }
-    .review-form textarea { resize: none; }
-    .review-form textarea:focus, .review-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-l); }
-    .btn-review { background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 9px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; transition: all .2s; box-shadow: 0 0 10px rgba(255,77,141,.3); }
-    .btn-review:hover { background: var(--accent-d); box-shadow: 0 0 16px rgba(255,77,141,.5); }
-
-    /* ── 오버레이 공통 ── */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 600; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s; backdrop-filter: blur(4px); }
-    .overlay.open { opacity: 1; pointer-events: all; }
-
-    /* ── 커뮤니티 패널 ── */
-    .comm-panel {
-      background: var(--surface);
-      border-radius: var(--r) var(--r) 0 0;
-      width: 100%; max-width: 680px;
-      height: 88dvh;
-      display: flex; flex-direction: column;
-      transform: translateY(40px);
-      transition: transform .3s cubic-bezier(.32,.72,0,1);
-      border-top: 2px solid transparent;
-      border-image: linear-gradient(90deg,var(--accent),var(--cyan),var(--purple)) 1;
-      position: relative;
-    }
-    .comm-panel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple));
-      border-radius: var(--r) var(--r) 0 0;
-    }
-    .overlay.open .comm-panel, .overlay.open .write-panel, .overlay.open .add-modal { transform: translateY(0); }
-    .comm-head { padding: 18px 20px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .comm-head-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .comm-head-top h2 { font-size: 18px; font-weight: 900; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .icon-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .15s; }
-    .icon-close:hover { border-color: var(--accent); color: var(--text); }
-    .comm-tabs { display: flex; margin-bottom: -1px; overflow-x: auto; scrollbar-width: none; }
-    .comm-tabs::-webkit-scrollbar { display: none; }
-    .comm-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
-    .comm-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .comm-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
-    .comm-body::-webkit-scrollbar { width: 3px; }
-    .comm-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-    /* 게시판 */
-    .post-write-btn { width: 100%; padding: 13px; border: none; border-radius: var(--r); background: var(--accent); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 14px; transition: all .18s; text-align: center; box-shadow: var(--sh-glow); letter-spacing: 0.5px; }
-    .post-write-btn:hover { background: var(--accent-d); box-shadow: 0 0 20px rgba(232,0,111,.3); }
-    .post-list { display: flex; flex-direction: column; gap: 10px; }
-    .post-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; transition: all .18s; }
-    .post-card:hover { border-color: var(--accent); box-shadow: var(--sh-sm); }
-    .post-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .post-type { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
-    .pt-후기 { background: var(--accent-l); color: var(--accent); border: 1px solid rgba(255,77,141,.2); }
-    .pt-추천 { background: var(--yellow-l); color: var(--yellow); border: 1px solid rgba(255,224,102,.2); }
-    .pt-QnA { background: var(--cyan-l); color: var(--cyan); border: 1px solid rgba(0,229,255,.2); }
-    .pt-요청 { background: var(--purple-l); color: var(--purple); border: 1px solid rgba(179,136,255,.2); }
-    .post-nick { font-size: 11px; color: var(--cyan); font-weight: 700; }
-    .post-date { font-size: 10px; color: var(--muted); margin-left: auto; }
-    .post-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: var(--text); }
-    .post-preview { font-size: 12px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .post-foot { display: flex; align-items: center; margin-top: 10px; }
-    .like-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: inherit; transition: color .15s; padding: 0; }
-    .like-btn:hover, .like-btn.liked { color: var(--accent); }
-
-    /* ── 글쓰기 ── */
-    .write-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 680px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
-    .write-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,var(--accent),var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
-    .write-panel h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-    .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r-sm); font-size: 14px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s; }
-    .form-group textarea { resize: none; }
-    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-l); }
-    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--muted); }
-    .type-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .type-btn { padding: 6px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface2); font-size: 12px; font-family: inherit; cursor: pointer; color: var(--muted); font-weight: 700; transition: all .15s; }
-    .type-btn.active { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
-    .btn-submit { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 13px; font-size: 15px; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 4px; transition: all .2s; box-shadow: 0 0 16px rgba(255,77,141,.3); letter-spacing: 1px; }
-    .btn-submit:hover { background: var(--accent-d); box-shadow: 0 0 24px rgba(255,77,141,.5); }
-
-    /* ── 장소추가 모달 ── */
-    .add-modal { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 520px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
-    .add-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
-    .add-modal h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
-    .cat-select-row { display: flex; gap: 6px; flex-wrap: wrap; }
-    .cat-sel-btn { padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface2); font-size: 12px; font-family: inherit; cursor: pointer; color: var(--muted); font-weight: 700; transition: all .15s; }
-    .cat-sel-btn.active { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
-    .tag-input-row { display: flex; gap: 8px; }
-    .tag-input-row input { flex: 1; }
-    .btn-tag-add { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 0 12px; font-size: 13px; cursor: pointer; color: var(--muted); white-space: nowrap; font-family: inherit; transition: all .15s; }
-    .btn-tag-add:hover { border-color: var(--accent); color: var(--accent); }
-    .tags-preview { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
-    .tag-del { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 4px; transition: all .15s; }
-    .tag-del:hover { border-color: var(--red); color: var(--red); }
-    .map-pick-box { border: 1px dashed var(--border); border-radius: var(--r-sm); padding: 10px; text-align: center; font-size: 13px; color: var(--muted); cursor: pointer; transition: all .2s; }
-    .map-pick-box:hover { border-color: var(--cyan); color: var(--cyan); }
-    .map-pick-box.picked { border-style: solid; border-color: var(--cyan); color: var(--cyan); background: var(--cyan-l); }
 
     /* 픽모드 */
     .pick-mode-bar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 24px; z-index: 300; box-shadow: var(--sh-glow); display: none; align-items: center; gap: 8px; white-space: nowrap; }
     .pick-mode-bar.on { display: flex; }
     .pick-mode-bar button { background: rgba(255,255,255,.2); border: none; border-radius: 12px; color: #fff; padding: 3px 9px; font-size: 12px; cursor: pointer; font-family: inherit; }
 
-    /* 저장목록 */
-    .saved-list { display: flex; flex-direction: column; gap: 8px; }
-    .saved-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all .18s; }
-    .saved-item:hover { border-color: var(--accent); }
-    .saved-icon { font-size: 20px; }
-    .saved-info { flex: 1; min-width: 0; }
-    .saved-name { font-size: 13px; font-weight: 700; color: var(--text); }
-    .saved-addr { font-size: 11px; color: var(--muted); }
-    .unsave-btn { background: none; border: none; font-size: 16px; cursor: pointer; padding: 4px; opacity: .5; transition: opacity .15s; }
-    .unsave-btn:hover { opacity: 1; }
+    /* 마커 */
+    .taku-marker { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .marker-bubble { color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 10px; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,.3); font-family: 'Noto Sans KR', sans-serif; }
+    .marker-tail { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; margin-top: -1px; }
 
-    /* 공통 */
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
-    .empty-state .ei { font-size: 36px; margin-bottom: 10px; }
-    .empty-state p { font-size: 13px; line-height: 1.6; }
-    .loading { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; font-family: 'DotGothic16', monospace; }
-    .loading::after { content: '...'; animation: dots 1.2s infinite; }
-    @keyframes dots { 0%,20%{content:'.'} 40%,60%{content:'..'} 80%,100%{content:'...'} }
-
-    /* 반응형 */
-    @media(max-width: 1200px) {
-      .panel { width: 320px; }
-    }
-    @media(max-width: 1024px) {
-      .panel { width: 280px; }
-    }
-    @media(max-width: 800px) {
-      .panel { width: 220px; }
-      .card-name { font-size: 12px; }
-      .card-addr { font-size: 10px; }
-      .tag { font-size: 9px; padding: 2px 5px; }
-    }
-    @media(max-width: 600px) {
-      .panel { width: 180px; }
-      .card-icon { width: 30px; height: 30px; font-size: 15px; }
-    }
-    .panel { display: none !important; }
-
-    /* 모바일 하단 목록 패널 */
-    .mobile-list-btn {
-      display: flex;
+    /* 샵 목록 버튼 (FAB) */
+    .list-fab {
       position: fixed;
-      bottom: 30px;
+      bottom: 28px;
       left: 50%;
       transform: translateX(-50%);
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 24px;
-      padding: 10px 20px;
-      font-size: 14px;
+      border-radius: 28px;
+      padding: 13px 26px;
+      font-size: 15px;
       font-family: inherit;
-      font-weight: 700;
+      font-weight: 900;
       cursor: pointer;
       z-index: 300;
-      box-shadow: var(--sh-glow);
-      gap: 6px;
-      align-items: center;
-      white-space: nowrap;
-    }
-
-    /* 샵 목록 패널 - 모바일/PC 공통 */
-    .mobile-panel {
+      box-shadow: 0 4px 20px rgba(232,0,111,.4);
       display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all .2s;
+      letter-spacing: 0.5px;
+    }
+    .list-fab:hover { background: var(--accent-d); transform: translateX(-50%) translateY(-2px); }
+
+    /* 샵 목록 패널 */
+    .list-panel {
       position: fixed;
       bottom: 0; left: 0; right: 0;
       background: var(--surface);
       border-radius: 20px 20px 0 0;
       box-shadow: var(--sh-lg);
-      z-index: 400;
+      z-index: 500;
       height: 85dvh;
+      display: flex;
       flex-direction: column;
       transform: translateY(100%);
-      transition: transform .3s cubic-bezier(.32,.72,0,1);
+      transition: transform .35s cubic-bezier(.32,.72,0,1);
     }
-    .mobile-panel::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple));
-      border-radius: 20px 20px 0 0;
-    }
-    .mobile-panel.open { transform: translateY(0); }
-    .mobile-panel-head {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .mobile-panel-head h3 { font-size: 14px; font-weight: 900; }
-    .mobile-panel-close {
-      background: var(--bg);
-      border: none;
-      border-radius: 50%;
-      width: 28px; height: 28px;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--muted);
-    }
-    .mobile-place-list {
+    .list-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: 20px 20px 0 0; }
+    .list-panel.open { transform: translateY(0); }
+
+    .list-panel-head { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .list-panel-head h2 { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .list-panel-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .15s; }
+    .list-panel-close:hover { border-color: var(--accent); color: var(--accent); }
+
+    .list-panel-body {
       flex: 1 1 0;
       overflow-y: auto;
-      padding: 12px 16px;
+      padding: 12px 16px 80px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       height: 0;
+    }
+    .list-panel-body::-webkit-scrollbar { width: 4px; }
+    .list-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* 샵 카드 - 새로 디자인 */
+    .shop-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    .shop-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--card-color, var(--accent)); border-radius: var(--r) 0 0 var(--r); }
+    .shop-card:hover { border-color: var(--card-color, var(--accent)); box-shadow: var(--sh-md); transform: translateY(-1px); }
+    .shop-card.active { border-color: var(--card-color, var(--accent)); box-shadow: 0 0 0 3px var(--accent-l); }
+
+    .shop-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .shop-body { flex: 1; min-width: 0; }
+    .shop-top { display: flex; align-items: flex-start; gap: 8px; }
+    .shop-info { flex: 1; min-width: 0; }
+    .shop-name { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .shop-addr { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .shop-save { background: none; border: none; cursor: pointer; font-size: 18px; padding: 2px; flex-shrink: 0; transition: transform .15s; }
+    .shop-save:hover { transform: scale(1.2); }
+    .shop-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+    .shop-tag { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 700; }
+    .shop-tag-cat { border: 1px solid transparent; }
+    .shop-tag-info { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+    /* 상세패널 */
+    .detail-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: var(--r) var(--r) 0 0; box-shadow: var(--sh-lg); padding: 20px; transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); z-index: 600; max-height: 75dvh; overflow-y: auto; }
+    .detail-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
+    .detail-panel.open { transform: translateY(0); }
+    .detail-panel::-webkit-scrollbar { width: 3px; }
+    .detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .detail-close { position: absolute; top: 14px; right: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+    .detail-cat { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .detail-name { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+    .detail-addr { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .detail-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+    .da-btn { display: flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface2); font-size: 13px; font-family: inherit; cursor: pointer; transition: all .18s; color: var(--muted); font-weight: 700; }
+    .da-btn.saved { border-color: var(--accent); color: var(--accent); background: var(--accent-l); }
+    .da-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .detail-stars-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .detail-stars-row .stars { font-size: 18px; color: var(--yellow); }
+    .detail-stars-row .cnt { font-size: 13px; color: var(--muted); }
+    .detail-desc { font-size: 14px; line-height: 1.7; background: var(--surface2); border-radius: var(--r-sm); padding: 12px; margin-bottom: 14px; border: 1px solid var(--border); }
+    .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tag { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 700; }
+    .tag-cat { background: var(--accent-l); color: var(--accent); }
+    .tag-info { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+    /* 리뷰 */
+    .review-section h3 { font-size: 14px; font-weight: 900; margin-bottom: 10px; }
+    .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .review-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; }
+    .rv-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .rv-nick { font-weight: 700; font-size: 12px; color: var(--cyan); }
+    .rv-stars { color: var(--yellow); font-size: 11px; }
+    .rv-likes { margin-left: auto; font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; transition: color .15s; }
+    .rv-likes:hover { color: var(--accent); }
+    .rv-text { font-size: 13px; line-height: 1.5; color: var(--text); }
+    .review-form { display: flex; flex-direction: column; gap: 8px; }
+    .star-picker { display: flex; gap: 4px; }
+    .star-picker span { font-size: 24px; cursor: pointer; color: var(--border); transition: color .15s; user-select: none; }
+    .star-picker span.on { color: var(--yellow); }
+    .review-form textarea, .review-form input[type="text"] { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s; }
+    .review-form textarea { resize: none; }
+    .review-form textarea:focus, .review-form input:focus { border-color: var(--accent); }
+    .btn-review { background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 10px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; }
+    .btn-review:hover { background: var(--accent-d); }
+
+    /* 오버레이 */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 700; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s; backdrop-filter: blur(4px); }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    /* 커뮤니티 */
+    .comm-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 680px; height: 88dvh; display: flex; flex-direction: column; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; }
+    .comm-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
+    .overlay.open .comm-panel, .overlay.open .write-panel, .overlay.open .add-modal { transform: translateY(0); }
+    .comm-head { padding: 18px 20px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .comm-head-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .comm-head-top h2 { font-size: 18px; font-weight: 900; background: linear-gradient(90deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .icon-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+    .icon-close:hover { border-color: var(--accent); }
+    .comm-tabs { display: flex; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
+    .comm-tabs::-webkit-scrollbar { display: none; }
+    .comm-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
+    .comm-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .comm-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+    .comm-body::-webkit-scrollbar { width: 4px; }
+    .comm-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .post-write-btn { width: 100%; padding: 13px; border: none; border-radius: var(--r); background: var(--accent); color: #fff; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 14px; text-align: center; box-shadow: var(--sh-glow); }
+    .post-write-btn:hover { background: var(--accent-d); }
+    .post-list { display: flex; flex-direction: column; gap: 10px; }
+    .post-card { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
+    .post-card:hover { border-color: var(--accent); }
+    .post-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .post-type { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+    .pt-후기 { background: var(--accent-l); color: var(--accent); }
+    .pt-추천 { background: var(--yellow-l); color: var(--yellow); }
+    .pt-QnA { background: var(--cyan-l); color: var(--cyan); }
+    .pt-요청 { background: var(--purple-l); color: var(--purple); }
+    .post-nick { font-size: 12px; color: var(--cyan); font-weight: 700; }
+    .post-date { font-size: 10px; color: var(--muted); margin-left: auto; }
+    .post-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: var(--text); }
+    .post-preview { font-size: 12px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .post-foot { display: flex; margin-top: 10px; }
+    .like-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
+    .like-btn:hover, .like-btn.liked { color: var(--accent); }
+
+    /* 글쓰기 */
+    .write-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 680px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
+    .write-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,var(--accent),var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
+    .write-panel h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 14px; font-family: inherit; background: var(--surface2); color: var(--text); outline: none; transition: border-color .2s; }
+    .form-group textarea { resize: none; }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--muted); }
+    .type-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .type-btn { padding: 6px 14px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--surface2); font-size: 12px; font-family: inherit; cursor: pointer; color: var(--muted); font-weight: 700; }
+    .type-btn.active { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+    .btn-submit { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 13px; font-size: 15px; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 4px; }
+    .btn-submit:hover { background: var(--accent-d); }
+
+    /* 장소추가 */
+    .add-modal { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 520px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
+    .add-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
+    .add-modal h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+    .cat-select-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cat-sel-btn { padding: 5px 12px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--surface2); font-size: 12px; font-family: inherit; cursor: pointer; color: var(--muted); font-weight: 700; }
+    .cat-sel-btn.active { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+    .tag-input-row { display: flex; gap: 8px; }
+    .tag-input-row input { flex: 1; }
+    .btn-tag-add { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 0 12px; font-size: 13px; cursor: pointer; color: var(--muted); white-space: nowrap; font-family: inherit; }
+    .tags-preview { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+    .tag-del { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 2px 8px; font-size: 11px; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .tag-del:hover { border-color: var(--red); color: var(--red); }
+    .map-pick-box { border: 1.5px dashed var(--border); border-radius: var(--r-sm); padding: 10px; text-align: center; font-size: 13px; color: var(--muted); cursor: pointer; }
+    .map-pick-box:hover { border-color: var(--cyan); color: var(--cyan); }
+    .map-pick-box.picked { border-style: solid; border-color: var(--cyan); color: var(--cyan); background: var(--cyan-l); }
+
+    /* 저장목록 */
+    .saved-list { display: flex; flex-direction: column; gap: 8px; }
+    .saved-item { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--r); padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .saved-item:hover { border-color: var(--accent); }
+    .saved-icon { font-size: 20px; }
+    .saved-info { flex: 1; min-width: 0; }
+    .saved-name { font-size: 14px; font-weight: 700; }
+    .saved-addr { font-size: 12px; color: var(--muted); }
+    .unsave-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 4px; opacity: .5; }
+    .unsave-btn:hover { opacity: 1; }
+
+    /* 공통 */
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+    .empty-state .ei { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; line-height: 1.6; }
+
+    /* 반응형 */
+    @media(max-width: 600px) {
+      .logo { font-size: 24px; }
+      .btn-add span:last-child, .btn-comm span:last-child { display: none; }
+      .search-wrap { max-width: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- 헤더 -->
 <header>
   <div class="logo">TAKUROAD</div>
   <div class="search-wrap">
@@ -575,7 +344,6 @@
   </div>
 </header>
 
-<!-- 카테고리 바 -->
 <div class="cat-bar">
   <button class="cat-btn active" data-cat="전체" onclick="filterCat('전체',this)">✨ 전체</button>
   <button class="cat-btn" data-cat="애니/만화" onclick="filterCat('애니/만화',this)">🌸 애니/만화</button>
@@ -588,35 +356,32 @@
   <button class="cat-btn" data-cat="게임샵" onclick="filterCat('게임샵',this)">🎮 게임샵</button>
 </div>
 
-<!-- 본문 -->
 <div class="main">
   <div id="map"></div>
   <div class="pick-mode-bar" id="pickModeBar">📍 지도를 클릭해 위치를 선택하세요 <button onclick="cancelPickMode()">취소</button></div>
-
-  <!-- 사이드패널 -->
-  <div class="panel">
-    <div class="panel-header">
-      <h2>🏪 샵 목록</h2>
-      <p id="panelDesc">LOADING SPOTS...</p>
-    </div>
-    <div class="place-list" id="placeList"></div>
-  </div>
-
-  <!-- 모바일 상세패널 -->
   <div class="detail-panel" id="detailPanel">
     <button class="detail-close" onclick="closeDetail()">✕</button>
     <div id="detailContent"></div>
   </div>
 </div>
 
-<!-- 커뮤니티 오버레이 -->
+<!-- 샵 목록 FAB 버튼 -->
+<button class="list-fab" id="listFab" onclick="toggleListPanel()">🏪 샵 목록 보기</button>
+
+<!-- 샵 목록 패널 -->
+<div class="list-panel" id="listPanel">
+  <div class="list-panel-head">
+    <h2>🏪 샵 목록 <span id="listCount" style="font-size:13px;color:var(--muted);font-weight:500;margin-left:4px;"></span></h2>
+    <button class="list-panel-close" onclick="toggleListPanel()">✕</button>
+  </div>
+  <div class="list-panel-body" id="listPanelBody"></div>
+</div>
+
+<!-- 커뮤니티 -->
 <div class="overlay" id="commOverlay" onclick="handleOverlay(event,'commOverlay')">
   <div class="comm-panel">
     <div class="comm-head">
-      <div class="comm-head-top">
-        <h2>커뮤니티</h2>
-        <button class="icon-close" onclick="closeComm()">✕</button>
-      </div>
+      <div class="comm-head-top"><h2>커뮤니티</h2><button class="icon-close" onclick="closeComm()">✕</button></div>
       <div class="comm-tabs">
         <button class="comm-tab active" onclick="switchTab('후기',this)">✍️ 후기</button>
         <button class="comm-tab" onclick="switchTab('추천',this)">⭐ 성지순례 추천</button>
@@ -625,11 +390,11 @@
         <button class="comm-tab" onclick="switchTab('저장',this)">🔖 저장목록</button>
       </div>
     </div>
-    <div class="comm-body" id="commBody"><div class="loading">불러오는 중</div></div>
+    <div class="comm-body" id="commBody"></div>
   </div>
 </div>
 
-<!-- 글쓰기 오버레이 -->
+<!-- 글쓰기 -->
 <div class="overlay" id="writeOverlay" onclick="handleOverlay(event,'writeOverlay')">
   <div class="write-panel">
     <h2>글 쓰기 <button class="icon-close" onclick="closeWrite()">✕</button></h2>
@@ -649,7 +414,7 @@
   </div>
 </div>
 
-<!-- 장소추가 오버레이 -->
+<!-- 장소추가 -->
 <div class="overlay" id="addOverlay" onclick="handleOverlay(event,'addOverlay')">
   <div class="add-modal">
     <h2>새 성지 추가 <button class="icon-close" onclick="closeAddModal()">✕</button></h2>
@@ -683,48 +448,42 @@
 </div>
 
 <script>
-// ── Supabase ──────────────────────────────────────────────
 const SUPA_URL = 'https://fscozisoyzccaniptqrb.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzY296aXNveXpjY2FuaXB0cXJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1NjczNTcsImV4cCI6MjA5NDE0MzM1N30.q6KmSSN8hj-_i6Uck6YdLJASUiRLUoCglniTTw9FVXg';
 const db = supabase.createClient(SUPA_URL, SUPA_KEY);
-
 let SID = localStorage.getItem('takuroad_sid');
 if (!SID) { SID = 'u_' + Math.random().toString(36).slice(2); localStorage.setItem('takuroad_sid', SID); }
 
-// ── 카테고리 설정 ─────────────────────────────────────────
-const CAT_ICON  = { '애니/만화':'🌸', '피규어':'🗿', '카드/TCG':'🃏', '중고/빈티지':'📦', '팝업스토어':'🎪', '동인샵':'🖨️', '게임샵':'🎮', '쿠지샵':'🎰' };
-const CAT_COLOR = { '애니/만화':'#e8006f', '피규어':'#7c3aed', '카드/TCG':'#b45309', '중고/빈티지':'#059669', '팝업스토어':'#0099cc', '동인샵':'#db2777', '게임샵':'#ea580c', '쿠지샵':'#e03535' };
-const CAT_BG    = { '애니/만화':'rgba(232,0,111,.1)', '피규어':'rgba(124,58,237,.1)', '카드/TCG':'rgba(180,83,9,.1)', '중고/빈티지':'rgba(5,150,105,.1)', '팝업스토어':'rgba(0,153,204,.1)', '동인샵':'rgba(219,39,119,.1)', '게임샵':'rgba(234,88,12,.1)', '쿠지샵':'rgba(224,53,53,.1)' };
+const CAT_ICON  = {'애니/만화':'🌸','피규어':'🗿','카드/TCG':'🃏','중고/빈티지':'📦','팝업스토어':'🎪','동인샵':'🖨️','게임샵':'🎮','쿠지샵':'🎰'};
+const CAT_COLOR = {'애니/만화':'#e8006f','피규어':'#7c3aed','카드/TCG':'#b45309','중고/빈티지':'#059669','팝업스토어':'#0099cc','동인샵':'#db2777','게임샵':'#ea580c','쿠지샵':'#e03535'};
+const CAT_BG    = {'애니/만화':'rgba(232,0,111,.12)','피규어':'rgba(124,58,237,.12)','카드/TCG':'rgba(180,83,9,.12)','중고/빈티지':'rgba(5,150,105,.12)','팝업스토어':'rgba(0,153,204,.12)','동인샵':'rgba(219,39,119,.12)','게임샵':'rgba(234,88,12,.12)','쿠지샵':'rgba(224,53,53,.12)'};
 
-// ── 더미 데이터 ───────────────────────────────────────────
 const DUMMY = [
-  { id:1, name:'애니메이트 홍대점', cat:'애니/만화', addr:'서울 마포구 양화로 188 AK플라자 홍대 5층', lat:37.5565, lng:126.9228, desc:'국내 최대 애니메이트 직영점. AK플라자 홍대 5층. 굿즈, 피규어, 코믹스 등 방대한 재고 보유', tags:['홍대','주술회전','원피스','BL'] },
-  { id:11, name:'애니메이트 잠실롯데점', cat:'애니/만화', addr:'서울 송파구 올림픽로 240 롯데월드 쇼핑몰동 B1층', lat:37.5112, lng:127.0983, desc:'롯데월드몰 지하 1층. 영업시간 10:00~20:50', tags:['잠실','롯데월드','피규어','굿즈'] },
-  { id:12, name:'애니메이트 부산점', cat:'애니/만화', addr:'부산 부산진구 중앙대로 672 삼정타워 11층', lat:35.1566, lng:129.0597, desc:'부산 서면 삼정타워 11층. 부산 최대 규모 서브컬처 매장. 애니메이트 카페도 운영 중', tags:['부산','서면','카페','남녀모두'] },
-  { id:13, name:'애니메이트 수원점(팝업)', cat:'애니/만화', addr:'경기 수원시 팔달구 덕영대로 924 AK플라자 수원 5층', lat:37.2682, lng:127.0009, desc:'AK플라자 수원 5층. 경기도 최초 애니메이트. 상설 팝업스토어 형태로 운영', tags:['수원','팝업','경기도'] },
-  { id:2, name:'보물섬 신촌점', cat:'중고/빈티지', addr:'서울 서대문구 신촌로 101', lat:37.5554, lng:126.9366, desc:'중고 피규어, 굿즈, 게임 전문. 희귀 빈티지 아이템도 종종 입고', tags:['중고','피규어','희귀템','네고가능'] },
-  { id:3, name:'핫토이 강남 공식', cat:'피규어', addr:'서울 강남구 강남대로 396', lat:37.5047, lng:127.0248, desc:'핫토이 공식 쇼룸 겸 판매점. 1/6 스케일 무비 마스터피스 실물 체험', tags:['핫토이','마블','스타워즈','고가품'] },
-  { id:4, name:'TCG Shop 마포', cat:'카드/TCG', addr:'서울 마포구 와우산로 35', lat:37.5528, lng:126.9251, desc:'포켓몬 TCG, 유희왕, MTG 전문점. 봉투 뜯기 이벤트도 자주 열림', tags:['포켓몬','유희왕','MTG','대회'] },
-  { id:5, name:'코믹스 동인몰 홍대', cat:'동인샵', addr:'서울 마포구 어울마당로 35', lat:37.5539, lng:126.9237, desc:'동인지, 동인굿즈, 팬아트 전문. 개인 작가 위탁판매도 진행', tags:['동인지','팬아트','위탁','BL'] },
-  { id:6, name:'레트로 게임샵 을지로', cat:'게임샵', addr:'서울 중구 을지로3가 33', lat:37.5663, lng:126.9916, desc:'패미컴부터 PS3까지 레트로 게임 전문. 희귀 타이틀도 다수 보유', tags:['레트로','닌텐도','소니','희귀'] },
-  { id:7, name:'건담베이스 용산 아이파크몰', cat:'피규어', addr:'서울 용산구 한강대로23길 55 아이파크몰 6층', lat:37.5298, lng:126.9642, desc:'국내 건담베이스 플래그십 스토어. 반다이 공식 건프라 전문점. 타마시이네이션즈 피규어도 취급', tags:['건프라','반다이','용산','플래그십'] },
-  { id:14, name:'건담베이스 코엑스', cat:'피규어', addr:'서울 강남구 봉은사로 524 스타필드 코엑스몰', lat:37.5126, lng:127.0594, desc:'스타필드 코엑스몰 내 건담베이스. 강남 접근성 최고', tags:['건프라','코엑스','강남','반다이'] },
-  { id:15, name:'건담베이스 수원', cat:'피규어', addr:'경기 수원시 팔달구 덕영대로 924 AK플라자 수원', lat:37.2682, lng:127.0009, desc:'AK플라자 수원점 내 건담베이스. 경기 남부권 거점', tags:['건프라','수원','경기'] },
-  { id:16, name:'건담베이스 스타필드 고양', cat:'피규어', addr:'경기 고양시 덕양구 고양대로 1955 스타필드 고양', lat:37.6564, lng:126.8329, desc:'스타필드 고양점 건담베이스. 오픈런 줄 비교적 적어 구매하기 편한 편', tags:['건프라','고양','스타필드'] },
-  { id:17, name:'건담베이스 판교', cat:'피규어', addr:'경기 성남시 분당구 판교역로 146 현대백화점 판교점 5층', lat:37.3948, lng:127.1107, desc:'2025년 2월 오픈. 현대백화점 판교점 5층. 경기 남부 신규 거점', tags:['건프라','판교','현대백화점','신규'] },
-  { id:18, name:'건담베이스 대전', cat:'피규어', addr:'대전 서구 계룡로553번길 18 갤러리아 타임월드', lat:36.3504, lng:127.3845, desc:'대전 갤러리아 타임월드 내 건담베이스. 충청권 유일 매장', tags:['건프라','대전','충청'] },
-  { id:19, name:'건담베이스 대구', cat:'피규어', addr:'대구 북구 유통단지로7길 29 엑스코', lat:35.8730, lng:128.6026, desc:'대구 엑스코 내 건담베이스. 경북권 유일 매장', tags:['건프라','대구','경북'] },
-  { id:20, name:'건담베이스 센텀시티', cat:'피규어', addr:'부산 해운대구 센텀남대로 59 신세계백화점 센텀시티', lat:35.1688, lng:129.1316, desc:'신세계 센텀시티 내 건담베이스. 부산 동부권 거점', tags:['건프라','부산','센텀시티'] },
-  { id:21, name:'건담베이스 서면', cat:'피규어', addr:'부산 부산진구 중앙대로 672 삼정타워', lat:35.1566, lng:129.0597, desc:'삼정타워 내 건담베이스. 애니메이트 부산점과 같은 건물', tags:['건프라','부산','서면'] },
-  { id:22, name:'핫토이 코리아 (MCS 용산)', cat:'피규어', addr:'서울 용산구 한강대로23길 55 아이파크몰 6층', lat:37.5299, lng:126.9643, desc:'핫토이 코리아 공식 쇼룸. 마블, 스타워즈 등 1/6 스케일 무비 마스터피스 실물 체험 및 구매 가능', tags:['핫토이','마블','스타워즈','1/6스케일'] },
-  { id:23, name:'이치방쿠지 제일복권 용산', cat:'쿠지샵', addr:'서울 용산구 한강대로23길 55 아이파크몰', lat:37.5297, lng:126.9641, desc:'대원미디어 공식 이치방쿠지 판매점. 최신 쿠지 상시 운영. 경품 실물 전시', tags:['이치방쿠지','제일복권','반다이','원피스'] },
-  { id:8, name:'원피스 팝업 성수', cat:'팝업스토어', addr:'서울 성동구 왕십리로2길 20', lat:37.5448, lng:127.0560, desc:'원피스 25주년 기념 팝업스토어. 한정 굿즈 및 포토존 운영', tags:['원피스','한정','팝업','포토존'] },
-  { id:9, name:'이치방쿠지 전문점 홍대', cat:'쿠지샵', addr:'서울 마포구 홍익로 20', lat:37.5558, lng:126.9240, desc:'반다이 이치방쿠지 전문 판매점. 최신 쿠지 상시 운영, 낱개 구매도 가능', tags:['이치방쿠지','반다이','낱개가능','원피스'] },
+  {id:1,name:'애니메이트 홍대점',cat:'애니/만화',addr:'서울 마포구 양화로 188 AK플라자 홍대 5층',lat:37.5565,lng:126.9228,desc:'국내 최대 애니메이트 직영점. 굿즈, 피규어, 코믹스 등 방대한 재고 보유',tags:['홍대','주술회전','원피스','BL']},
+  {id:11,name:'애니메이트 잠실롯데점',cat:'애니/만화',addr:'서울 송파구 올림픽로 240 롯데월드 쇼핑몰동 B1층',lat:37.5112,lng:127.0983,desc:'롯데월드몰 지하 1층. 영업시간 10:00~20:50',tags:['잠실','롯데월드','피규어','굿즈']},
+  {id:12,name:'애니메이트 부산점',cat:'애니/만화',addr:'부산 부산진구 중앙대로 672 삼정타워 11층',lat:35.1566,lng:129.0597,desc:'부산 서면 삼정타워 11층. 부산 최대 규모 서브컬처 매장',tags:['부산','서면','카페','남녀모두']},
+  {id:13,name:'애니메이트 수원점(팝업)',cat:'애니/만화',addr:'경기 수원시 팔달구 덕영대로 924 AK플라자 수원 5층',lat:37.2682,lng:127.0009,desc:'AK플라자 수원 5층. 경기도 최초 애니메이트',tags:['수원','팝업','경기도']},
+  {id:2,name:'보물섬 신촌점',cat:'중고/빈티지',addr:'서울 서대문구 신촌로 101',lat:37.5554,lng:126.9366,desc:'중고 피규어, 굿즈, 게임 전문. 희귀 빈티지 아이템도 종종 입고',tags:['중고','피규어','희귀템','네고가능']},
+  {id:3,name:'핫토이 코리아 (MCS 용산)',cat:'피규어',addr:'서울 용산구 한강대로23길 55 아이파크몰 6층',lat:37.5299,lng:126.9643,desc:'핫토이 코리아 공식 쇼룸. 마블, 스타워즈 등 1/6 스케일 실물 체험 및 구매 가능',tags:['핫토이','마블','스타워즈','1/6스케일']},
+  {id:4,name:'TCG Shop 마포',cat:'카드/TCG',addr:'서울 마포구 와우산로 35',lat:37.5528,lng:126.9251,desc:'포켓몬 TCG, 유희왕, MTG 전문점. 봉투 뜯기 이벤트도 자주 열림',tags:['포켓몬','유희왕','MTG','대회']},
+  {id:5,name:'코믹스 동인몰 홍대',cat:'동인샵',addr:'서울 마포구 어울마당로 35',lat:37.5539,lng:126.9237,desc:'동인지, 동인굿즈, 팬아트 전문. 개인 작가 위탁판매도 진행',tags:['동인지','팬아트','위탁','BL']},
+  {id:6,name:'레트로 게임샵 을지로',cat:'게임샵',addr:'서울 중구 을지로3가 33',lat:37.5663,lng:126.9916,desc:'패미컴부터 PS3까지 레트로 게임 전문. 희귀 타이틀도 다수 보유',tags:['레트로','닌텐도','소니','희귀']},
+  {id:7,name:'건담베이스 용산 아이파크몰',cat:'피규어',addr:'서울 용산구 한강대로23길 55 아이파크몰 6층',lat:37.5298,lng:126.9642,desc:'국내 건담베이스 플래그십 스토어. 반다이 공식 건프라 전문점',tags:['건프라','반다이','용산','플래그십']},
+  {id:14,name:'건담베이스 코엑스',cat:'피규어',addr:'서울 강남구 봉은사로 524 스타필드 코엑스몰',lat:37.5126,lng:127.0594,desc:'스타필드 코엑스몰 내 건담베이스. 강남 접근성 최고',tags:['건프라','코엑스','강남','반다이']},
+  {id:15,name:'건담베이스 수원',cat:'피규어',addr:'경기 수원시 팔달구 덕영대로 924 AK플라자 수원',lat:37.2682,lng:127.0009,desc:'AK플라자 수원점 내 건담베이스. 경기 남부권 거점',tags:['건프라','수원','경기']},
+  {id:16,name:'건담베이스 스타필드 고양',cat:'피규어',addr:'경기 고양시 덕양구 고양대로 1955 스타필드 고양',lat:37.6564,lng:126.8329,desc:'스타필드 고양점 건담베이스',tags:['건프라','고양','스타필드']},
+  {id:17,name:'건담베이스 판교',cat:'피규어',addr:'경기 성남시 분당구 판교역로 146 현대백화점 판교점 5층',lat:37.3948,lng:127.1107,desc:'현대백화점 판교점 5층. 경기 남부 신규 거점',tags:['건프라','판교','현대백화점','신규']},
+  {id:18,name:'건담베이스 대전',cat:'피규어',addr:'대전 서구 계룡로553번길 18 갤러리아 타임월드',lat:36.3504,lng:127.3845,desc:'대전 갤러리아 타임월드 내 건담베이스. 충청권 유일 매장',tags:['건프라','대전','충청']},
+  {id:19,name:'건담베이스 대구',cat:'피규어',addr:'대구 북구 유통단지로7길 29 엑스코',lat:35.8730,lng:128.6026,desc:'대구 엑스코 내 건담베이스. 경북권 유일 매장',tags:['건프라','대구','경북']},
+  {id:20,name:'건담베이스 센텀시티',cat:'피규어',addr:'부산 해운대구 센텀남대로 59 신세계백화점 센텀시티',lat:35.1688,lng:129.1316,desc:'신세계 센텀시티 내 건담베이스. 부산 동부권 거점',tags:['건프라','부산','센텀시티']},
+  {id:21,name:'건담베이스 서면',cat:'피규어',addr:'부산 부산진구 중앙대로 672 삼정타워',lat:35.1566,lng:129.0597,desc:'삼정타워 내 건담베이스. 애니메이트 부산점과 같은 건물',tags:['건프라','부산','서면']},
+  {id:23,name:'이치방쿠지 제일복권 용산',cat:'쿠지샵',addr:'서울 용산구 한강대로23길 55 아이파크몰',lat:37.5297,lng:126.9641,desc:'대원미디어 공식 이치방쿠지 판매점. 최신 쿠지 상시 운영',tags:['이치방쿠지','제일복권','반다이','원피스']},
+  {id:8,name:'원피스 팝업 성수',cat:'팝업스토어',addr:'서울 성동구 왕십리로2길 20',lat:37.5448,lng:127.0560,desc:'원피스 25주년 기념 팝업스토어. 한정 굿즈 및 포토존 운영',tags:['원피스','한정','팝업','포토존']},
+  {id:9,name:'이치방쿠지 전문점 홍대',cat:'쿠지샵',addr:'서울 마포구 홍익로 20',lat:37.5558,lng:126.9240,desc:'반다이 이치방쿠지 전문 판매점. 최신 쿠지 상시 운영, 낱개 구매도 가능',tags:['이치방쿠지','반다이','낱개가능','원피스']},
 ];
 
 let places = JSON.parse(localStorage.getItem('takuroad_places') || 'null') || DUMMY;
 function savePlaces() { localStorage.setItem('takuroad_places', JSON.stringify(places)); }
-
 let savedIds = JSON.parse(localStorage.getItem('takuroad_saves') || '[]');
 const isSaved = id => savedIds.includes(id);
 function toggleSave(id) {
@@ -732,7 +491,7 @@ function toggleSave(id) {
   localStorage.setItem('takuroad_saves', JSON.stringify(savedIds));
 }
 
-// ── 지도 ──────────────────────────────────────────────────
+// 지도
 let map, markers = [], currentCat = '전체', activePlaceId = null;
 
 window.onload = function () {
@@ -745,65 +504,65 @@ window.onload = function () {
   document.getElementById('searchInput').addEventListener('input', handleSearchInput);
   document.getElementById('searchInput').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
   document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) closeSearchDrop(); });
-
-  // 패널 위에서 휠 이벤트가 지도로 안 가게 막기
-  const panel = document.querySelector('.panel');
-  if (panel) {
-    panel.addEventListener('wheel', e => {
-      e.stopPropagation();
-      const list = document.getElementById('placeList');
-      list.scrollTop += e.deltaY;
-    }, { passive: false });
-  }
 };
 
 function renderAll() {
   clearMarkers();
   const filtered = currentCat === '전체' ? places : places.filter(p => p.cat === currentCat);
-  const list = document.getElementById('placeList');
-  list.innerHTML = '';
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state"><div class="ei">🗾</div><p>이 카테고리에 성지가 없어요.<br/>첫 번째로 추가해보세요!</p></div>`;
-  }
-  filtered.forEach(p => { addMarker(p); list.appendChild(makeCard(p)); });
-
-  // 모바일 목록도 동기화
-  const mobileList = document.getElementById('mobilePlaceList');
-  if (mobileList) {
-    mobileList.innerHTML = '';
-    filtered.forEach(p => { mobileList.appendChild(makeCard(p)); });
-  }
-  const pd = document.getElementById('panelDesc');
-  if (pd) pd.textContent = currentCat === '전체' ? `TOTAL ${filtered.length} SPOTS` : `${currentCat} · ${filtered.length}개`;
+  filtered.forEach(p => addMarker(p));
+  renderListPanel(filtered);
 }
 
-function makeCard(p) {
-  const color = CAT_COLOR[p.cat] || '#ff4d8d';
+// 샵 목록 패널 렌더링
+function renderListPanel(filtered) {
+  const body = document.getElementById('listPanelBody');
+  const count = document.getElementById('listCount');
+  if (count) count.textContent = filtered.length + '개';
+  if (!filtered.length) {
+    body.innerHTML = `<div class="empty-state"><div class="ei">🗾</div><p>이 카테고리에 성지가 없어요.<br/>첫 번째로 추가해보세요!</p></div>`;
+    return;
+  }
+  body.innerHTML = '';
+  filtered.forEach(p => body.appendChild(makeShopCard(p)));
+}
+
+// 새로 만든 샵 카드 함수
+function makeShopCard(p) {
+  const color = CAT_COLOR[p.cat] || '#e8006f';
+  const bg = CAT_BG[p.cat] || 'rgba(232,0,111,.12)';
   const div = document.createElement('div');
-  div.className = 'place-card' + (p.id === activePlaceId ? ' active' : '');
-  div.id = 'card-' + p.id;
-  div.style.setProperty('--card-accent', color);
-  div.onclick = () => selectPlace(p.id);
+  div.className = 'shop-card' + (p.id === activePlaceId ? ' active' : '');
+  div.id = 'shopcard-' + p.id;
+  div.style.setProperty('--card-color', color);
+  div.onclick = () => { selectPlace(p.id); };
   div.innerHTML = `
-    <div class="card-top">
-      <div class="card-icon" style="background:${CAT_BG[p.cat]}">${CAT_ICON[p.cat]}</div>
-      <div class="card-info">
-        <div class="card-name">${p.name}</div>
-        <div class="card-addr">${p.addr}</div>
+    <div class="shop-icon" style="background:${bg}">${CAT_ICON[p.cat]}</div>
+    <div class="shop-body">
+      <div class="shop-top">
+        <div class="shop-info">
+          <div class="shop-name">${p.name}</div>
+          <div class="shop-addr">📍 ${p.addr}</div>
+        </div>
+        <button class="shop-save" onclick="event.stopPropagation();handleSaveBtn(${p.id},this)">${isSaved(p.id)?'🔖':'🏷️'}</button>
       </div>
-      <button class="save-btn" onclick="event.stopPropagation();handleSaveBtn(${p.id},this)" title="저장">${isSaved(p.id) ? '🔖' : '🏷️'}</button>
-    </div>
-    <div class="card-tags">
-      <span class="tag tag-cat" style="background:${CAT_BG[p.cat]};color:${color};border-color:${color}30">${p.cat}</span>
-      ${p.tags.slice(0, 3).map(t => `<span class="tag tag-info">${t}</span>`).join('')}
+      <div class="shop-tags">
+        <span class="shop-tag shop-tag-cat" style="background:${bg};color:${color};border-color:${color}40">${p.cat}</span>
+        ${p.tags.slice(0,3).map(t=>`<span class="shop-tag shop-tag-info">${t}</span>`).join('')}
+      </div>
     </div>`;
   return div;
 }
 
 function handleSaveBtn(id, btn) { toggleSave(id); btn.textContent = isSaved(id) ? '🔖' : '🏷️'; }
 
+// 샵 목록 패널 토글
+function toggleListPanel() {
+  const panel = document.getElementById('listPanel');
+  panel.classList.toggle('open');
+}
+
 function addMarker(p) {
-  const color = CAT_COLOR[p.cat] || '#ff4d8d';
+  const color = CAT_COLOR[p.cat] || '#e8006f';
   const content = `<div class="taku-marker"><div class="marker-bubble" style="background:${color}">${CAT_ICON[p.cat]} ${p.name}</div><div class="marker-tail" style="border-top:6px solid ${color};border-left:5px solid transparent;border-right:5px solid transparent"></div></div>`;
   const overlay = new kakao.maps.CustomOverlay({ position: new kakao.maps.LatLng(p.lat, p.lng), content, yAnchor: 1 });
   overlay.setMap(map);
@@ -814,15 +573,14 @@ function addMarker(p) {
     el.addEventListener('click', () => selectPlace(p.id));
   }, 100);
 }
-
 function clearMarkers() { markers.forEach(m => m.overlay.setMap(null)); markers = []; }
 
 async function selectPlace(id) {
   activePlaceId = id;
   const p = places.find(x => x.id === id);
   if (!p) return;
-  document.querySelectorAll('.place-card').forEach(c => c.classList.remove('active'));
-  const card = document.getElementById('card-' + id);
+  document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('shopcard-' + id);
   if (card) { card.classList.add('active'); card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   map.setCenter(new kakao.maps.LatLng(p.lat, p.lng));
   map.setLevel(4);
@@ -830,46 +588,34 @@ async function selectPlace(id) {
 }
 
 async function showDetail(p) {
-  const color = CAT_COLOR[p.cat] || '#ff4d8d';
+  const color = CAT_COLOR[p.cat] || '#e8006f';
   const { data: reviews } = await db.from('reviews').select('*').eq('place_id', p.id).order('created_at', { ascending: false });
   const rv = reviews || [];
   const avg = rv.length ? rv.reduce((s, r) => s + r.stars, 0) / rv.length : 0;
-
   document.getElementById('detailContent').innerHTML = `
-    <div class="detail-cat" style="color:${color}">${CAT_ICON[p.cat]} <span style="font-weight:900">${p.cat}</span></div>
+    <div class="detail-cat" style="color:${color}">${CAT_ICON[p.cat]} <strong>${p.cat}</strong></div>
     <div class="detail-name">${p.name}</div>
     <div class="detail-addr">📍 ${p.addr}</div>
     <div class="detail-actions">
-      <button class="da-btn ${isSaved(p.id) ? 'saved' : ''}" id="dSaveBtn" onclick="handleDetailSave(${p.id})">
-        ${isSaved(p.id) ? '🔖 저장됨' : '🏷️ 저장'}
-      </button>
+      <button class="da-btn ${isSaved(p.id)?'saved':''}" id="dSaveBtn" onclick="handleDetailSave(${p.id})">${isSaved(p.id)?'🔖 저장됨':'🏷️ 저장'}</button>
     </div>
     <div class="detail-stars-row">
       <span class="stars">${starStr(Math.round(avg))}</span>
-      <span class="cnt">${avg > 0 ? avg.toFixed(1) + ' · 리뷰 ' + rv.length + '개' : '아직 리뷰가 없어요'}</span>
+      <span class="cnt">${avg>0?avg.toFixed(1)+' · 리뷰 '+rv.length+'개':'아직 리뷰가 없어요'}</span>
     </div>
-    <div class="detail-desc">${p.desc || '설명이 없어요.'}</div>
-    <div class="detail-tags">
-      ${p.tags.map(t => `<span class="tag tag-info">${t}</span>`).join('')}
-    </div>
+    <div class="detail-desc">${p.desc||'설명이 없어요.'}</div>
+    <div class="detail-tags">${p.tags.map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
     <div class="review-section">
       <h3>💬 리뷰 (${rv.length})</h3>
       <div class="review-list">
-        ${rv.map(r => `
+        ${rv.map(r=>`
           <div class="review-item">
-            <div class="rv-top">
-              <span class="rv-nick">${r.nick}</span>
-              <span class="rv-stars">${starStr(r.stars)}</span>
-              <button class="rv-likes" onclick="likeReview('${r.id}',this)">❤️ ${r.likes || 0}</button>
-            </div>
+            <div class="rv-top"><span class="rv-nick">${r.nick}</span><span class="rv-stars">${starStr(r.stars)}</span><button class="rv-likes" onclick="likeReview('${r.id}',this)">❤️ ${r.likes||0}</button></div>
             <div class="rv-text">${r.content}</div>
-          </div>`).join('') || '<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 리뷰를 남겨보세요!</p>'}
+          </div>`).join('')||'<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 리뷰를 남겨보세요!</p>'}
       </div>
       <div class="review-form">
-        <div class="star-picker" id="starPicker">
-          <span onclick="setStar(1)">★</span><span onclick="setStar(2)">★</span>
-          <span onclick="setStar(3)">★</span><span onclick="setStar(4)">★</span><span onclick="setStar(5)">★</span>
-        </div>
+        <div class="star-picker" id="starPicker"><span onclick="setStar(1)">★</span><span onclick="setStar(2)">★</span><span onclick="setStar(3)">★</span><span onclick="setStar(4)">★</span><span onclick="setStar(5)">★</span></div>
         <input type="text" id="rv-nick" placeholder="닉네임 (미입력시 익명)" />
         <textarea id="rv-text" rows="2" placeholder="방문 후기를 남겨주세요 🎌"></textarea>
         <button class="btn-review" onclick="submitReview(${p.id},'${p.name}')">리뷰 등록</button>
@@ -882,244 +628,155 @@ async function showDetail(p) {
 function handleDetailSave(id) {
   toggleSave(id);
   const btn = document.getElementById('dSaveBtn');
-  if (btn) { btn.className = 'da-btn ' + (isSaved(id) ? 'saved' : ''); btn.textContent = isSaved(id) ? '🔖 저장됨' : '🏷️ 저장'; }
+  if (btn) { btn.className='da-btn '+(isSaved(id)?'saved':''); btn.textContent=isSaved(id)?'🔖 저장됨':'🏷️ 저장'; }
   renderAll();
 }
-
-function setStar(n) {
-  window._pickedStar = n;
-  document.querySelectorAll('#starPicker span').forEach((s, i) => s.classList.toggle('on', i < n));
-}
-
+function setStar(n) { window._pickedStar=n; document.querySelectorAll('#starPicker span').forEach((s,i)=>s.classList.toggle('on',i<n)); }
 async function submitReview(placeId, placeName) {
-  const nick = document.getElementById('rv-nick').value.trim() || '익명';
-  const content = document.getElementById('rv-text').value.trim();
-  const stars = window._pickedStar || 0;
-  if (!content) { alert('리뷰 내용을 입력해주세요'); return; }
-  if (!stars) { alert('별점을 선택해주세요'); return; }
-  const { error } = await db.from('reviews').insert({ place_id: placeId, place_name: placeName, nick, stars, content, likes: 0 });
-  if (error) { alert('등록 실패: ' + error.message); return; }
-  const p = places.find(x => x.id === placeId);
-  if (p) await showDetail(p);
+  const nick=document.getElementById('rv-nick').value.trim()||'익명';
+  const content=document.getElementById('rv-text').value.trim();
+  const stars=window._pickedStar||0;
+  if(!content){alert('리뷰 내용을 입력해주세요');return;}
+  if(!stars){alert('별점을 선택해주세요');return;}
+  const {error}=await db.from('reviews').insert({place_id:placeId,place_name:placeName,nick,stars,content,likes:0});
+  if(error){alert('등록 실패: '+error.message);return;}
+  const p=places.find(x=>x.id===placeId);
+  if(p) await showDetail(p);
 }
-
 async function likeReview(reviewId, el) {
-  const { data } = await db.from('reviews').select('likes').eq('id', reviewId).single();
-  if (!data) return;
-  const n = (data.likes || 0) + 1;
-  await db.from('reviews').update({ likes: n }).eq('id', reviewId);
-  el.textContent = '❤️ ' + n;
+  const {data}=await db.from('reviews').select('likes').eq('id',reviewId).single();
+  if(!data) return;
+  const n=(data.likes||0)+1;
+  await db.from('reviews').update({likes:n}).eq('id',reviewId);
+  el.textContent='❤️ '+n;
 }
+function starStr(n){n=Math.max(0,Math.min(5,n));return'★'.repeat(n)+'☆'.repeat(5-n);}
+function closeDetail(){document.getElementById('detailPanel').classList.remove('open');activePlaceId=null;document.querySelectorAll('.shop-card').forEach(c=>c.classList.remove('active'));}
 
-function starStr(n) { n = Math.max(0, Math.min(5, n)); return '★'.repeat(n) + '☆'.repeat(5 - n); }
-function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); activePlaceId = null; document.querySelectorAll('.place-card').forEach(c => c.classList.remove('active')); }
-
-// ── 카테고리 ──────────────────────────────────────────────
-function toggleMobilePanel() {
-  document.getElementById('mobilePanel').classList.toggle('open');
-}
-
+// 카테고리
 function filterCat(cat, btn) {
-  currentCat = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  currentCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   closeDetail();
   renderAll();
 }
 
-// ── 검색 ──────────────────────────────────────────────────
+// 검색
 function handleSearchInput() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const dd = document.getElementById('searchDropdown');
-  if (!q) { dd.classList.remove('open'); return; }
-  const res = places.filter(p => p.name.toLowerCase().includes(q) || p.addr.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)));
-  dd.innerHTML = res.length
-    ? res.map(p => `<div class="s-item" onclick="selectPlace(${p.id});closeSearchDrop();document.getElementById('searchInput').value=''"><span class="si">${CAT_ICON[p.cat]}</span><div><div class="sn">${p.name}</div><div class="sa">${p.addr}</div></div></div>`).join('')
-    : '<div class="no-result">검색 결과가 없어요</div>';
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const dd=document.getElementById('searchDropdown');
+  if(!q){dd.classList.remove('open');return;}
+  const res=places.filter(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q)||p.tags.some(t=>t.toLowerCase().includes(q)));
+  dd.innerHTML=res.length
+    ?res.map(p=>`<div class="s-item" onclick="selectPlace(${p.id});closeSearchDrop();document.getElementById('searchInput').value=''"><span class="si">${CAT_ICON[p.cat]}</span><div><div class="sn">${p.name}</div><div class="sa">${p.addr}</div></div></div>`).join('')
+    :'<div class="no-result">검색 결과가 없어요</div>';
   dd.classList.add('open');
 }
-function doSearch() {
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const r = places.find(p => p.name.toLowerCase().includes(q) || p.addr.toLowerCase().includes(q));
-  if (r) { selectPlace(r.id); closeSearchDrop(); }
-}
-function closeSearchDrop() { document.getElementById('searchDropdown').classList.remove('open'); }
+function doSearch(){const q=document.getElementById('searchInput').value.trim().toLowerCase();const r=places.find(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q));if(r){selectPlace(r.id);closeSearchDrop();}}
+function closeSearchDrop(){document.getElementById('searchDropdown').classList.remove('open');}
 
-// ── 커뮤니티 ──────────────────────────────────────────────
-let currentTab = '후기', currentWriteType = '후기';
-
-function openComm() { document.getElementById('commOverlay').classList.add('open'); loadTab('후기'); }
-function closeComm() { document.getElementById('commOverlay').classList.remove('open'); }
-function handleOverlay(e, id) { if (e.target === document.getElementById(id)) document.getElementById(id).classList.remove('open'); }
-
-function switchTab(tab, btn) {
-  currentTab = tab;
-  document.querySelectorAll('.comm-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  loadTab(tab);
-}
-
+// 커뮤니티
+let currentTab='후기',currentWriteType='후기';
+function openComm(){document.getElementById('commOverlay').classList.add('open');loadTab('후기');}
+function closeComm(){document.getElementById('commOverlay').classList.remove('open');}
+function handleOverlay(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+function switchTab(tab,btn){currentTab=tab;document.querySelectorAll('.comm-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');loadTab(tab);}
 async function loadTab(tab) {
-  const body = document.getElementById('commBody');
-  if (tab === '저장') { renderSavedList(); return; }
-  renderPostList([], tab); // 바로 글쓰기 버튼 표시
+  const body=document.getElementById('commBody');
+  if(tab==='저장'){renderSavedList();return;}
+  renderPostList([],tab);
   try {
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
-    const fetch = db.from('posts').select('*').eq('type', tab).order('created_at', { ascending: false });
-    const { data: posts, error } = await Promise.race([fetch, timeout]);
-    if (error) throw error;
-    renderPostList(posts || [], tab);
-  } catch(e) {
-    renderPostList([], tab);
-  }
+    const timeout=new Promise((_,reject)=>setTimeout(()=>reject(),3000));
+    const fetchP=db.from('posts').select('*').eq('type',tab).order('created_at',{ascending:false});
+    const {data:posts,error}=await Promise.race([fetchP,timeout]);
+    if(error) throw error;
+    renderPostList(posts||[],tab);
+  } catch(e){renderPostList([],tab);}
 }
-
-function renderPostList(posts, tab) {
-  const labels = { '후기': '✍️ 후기 쓰기', '추천': '⭐ 성지순례 추천 쓰기', 'QnA': '❓ 질문 올리기', '요청': '📮 요청사항 남기기' };
-  document.getElementById('commBody').innerHTML = `
+function renderPostList(posts,tab){
+  document.getElementById('commBody').innerHTML=`
     <button class="post-write-btn" onclick="openWrite('${tab}')">✏️ 글쓰기</button>
-    <div class="post-list">
-      ${posts.length
-        ? posts.map(p => postCardHTML(p)).join('')
-        : '<div class="empty-state"><div class="ei">📝</div><p>아직 글이 없어요.<br/>첫 번째 글을 남겨보세요!</p></div>'}
-    </div>`;
+    <div class="post-list">${posts.length?posts.map(p=>postCardHTML(p)).join(''):'<div class="empty-state"><div class="ei">📝</div><p>아직 글이 없어요.<br/>첫 번째 글을 남겨보세요!</p></div>'}</div>`;
+}
+function postCardHTML(p){
+  const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div><div class="post-foot"><button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes||0}</button></div></div>`;
+}
+async function likePost(postId,el){const {data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;const n=(data.likes||0)+1;await db.from('posts').update({likes:n}).eq('id',postId);el.textContent='❤️ '+n;el.classList.add('liked');}
+function renderSavedList(){
+  const saved=places.filter(p=>isSaved(p.id));
+  document.getElementById('commBody').innerHTML=saved.length
+    ?`<div class="saved-list">${saved.map(p=>`<div class="saved-item" onclick="closeComm();selectPlace(${p.id})"><span class="saved-icon">${CAT_ICON[p.cat]}</span><div class="saved-info"><div class="saved-name">${p.name}</div><div class="saved-addr">${p.addr}</div></div><button class="unsave-btn" onclick="event.stopPropagation();toggleSave(${p.id});renderSavedList();renderAll()">🗑️</button></div>`).join('')}</div>`
+    :`<div class="empty-state"><div class="ei">🔖</div><p>저장한 성지가 없어요.<br/>카드의 🏷️ 버튼으로 저장해보세요!</p></div>`;
 }
 
-function postCardHTML(p) {
-  const date = new Date(p.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-  return `
-    <div class="post-card">
-      <div class="post-top">
-        <span class="post-type pt-${p.type}">${p.type}</span>
-        <span class="post-nick">${p.nick}</span>
-        <span class="post-date">${date}</span>
-      </div>
-      <div class="post-title">${p.title}</div>
-      <div class="post-preview">${p.content}</div>
-      <div class="post-foot">
-        <button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes || 0}</button>
-      </div>
-    </div>`;
+// 글쓰기
+function openWrite(type){currentWriteType=type||'후기';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===currentWriteType));document.getElementById('writeOverlay').classList.add('open');}
+function closeWrite(){document.getElementById('writeOverlay').classList.remove('open');}
+function selectType(btn){currentWriteType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+async function submitPost(){
+  const nick=document.getElementById('w-nick').value.trim()||'익명';
+  const title=document.getElementById('w-title').value.trim();
+  const content=document.getElementById('w-content').value.trim();
+  if(!title){alert('제목을 입력해주세요');return;}
+  if(!content){alert('내용을 입력해주세요');return;}
+  const {error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0});
+  if(error){alert('등록 실패: '+error.message);return;}
+  ['w-nick','w-title','w-content'].forEach(id=>document.getElementById(id).value='');
+  closeWrite();loadTab(currentWriteType);
 }
 
-async function likePost(postId, el) {
-  const { data } = await db.from('posts').select('likes').eq('id', postId).single();
-  if (!data) return;
-  const n = (data.likes || 0) + 1;
-  await db.from('posts').update({ likes: n }).eq('id', postId);
-  el.textContent = '❤️ ' + n;
-  el.classList.add('liked');
+// 장소 추가
+let pickMode=false,pickedLat=null,pickedLng=null,modalTags=[],selectedCat=null;
+function openAddModal(){document.getElementById('addOverlay').classList.add('open');resetForm();}
+function closeAddModal(){document.getElementById('addOverlay').classList.remove('open');if(pickMode)cancelPickMode();}
+function resetForm(){
+  ['f-name','f-addr','f-desc','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  modalTags=[];selectedCat=null;pickedLat=null;pickedLng=null;
+  document.getElementById('tagsPreview').innerHTML='';
+  document.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));
+  const pb=document.getElementById('mapPickBox');
+  pb.textContent='📍 지도에서 위치 직접 선택하기';pb.classList.remove('picked');
 }
-
-function renderSavedList() {
-  const saved = places.filter(p => isSaved(p.id));
-  document.getElementById('commBody').innerHTML = saved.length
-    ? `<div class="saved-list">${saved.map(p => `
-        <div class="saved-item" onclick="closeComm();selectPlace(${p.id})">
-          <span class="saved-icon">${CAT_ICON[p.cat]}</span>
-          <div class="saved-info"><div class="saved-name">${p.name}</div><div class="saved-addr">${p.addr}</div></div>
-          <button class="unsave-btn" onclick="event.stopPropagation();toggleSave(${p.id});renderSavedList();renderAll()">🗑️</button>
-        </div>`).join('')}</div>`
-    : `<div class="empty-state"><div class="ei">🔖</div><p>저장한 성지가 없어요.<br/>카드의 🏷️ 버튼으로 저장해보세요!</p></div>`;
+function selectCat(btn){document.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCat=btn.dataset.c;}
+function addTag(){const inp=document.getElementById('f-tag');const val=inp.value.trim();if(!val||modalTags.includes(val)){inp.value='';return;}modalTags.push(val);inp.value='';renderModalTags();}
+function removeTag(t){modalTags=modalTags.filter(x=>x!==t);renderModalTags();}
+function renderModalTags(){document.getElementById('tagsPreview').innerHTML=modalTags.map(t=>`<span class="tag-del" onclick="removeTag('${t}')">🏷 ${t} ✕</span>`).join('');}
+function startPickMode(){closeAddModal();pickMode=true;document.getElementById('pickModeBar').classList.add('on');map.setCursor('crosshair');kakao.maps.event.addListener(map,'click',onMapPick);}
+function onMapPick(e){
+  if(!pickMode)return;
+  pickedLat=e.latLng.getLat();pickedLng=e.latLng.getLng();
+  cancelPickMode();openAddModal();
+  const pb=document.getElementById('mapPickBox');
+  pb.textContent=`✅ 위치 선택됨 (${pickedLat.toFixed(4)}, ${pickedLng.toFixed(4)})`;pb.classList.add('picked');
+  try{new kakao.maps.services.Geocoder().coord2Address(pickedLng,pickedLat,(result,status)=>{if(status===kakao.maps.services.Status.OK&&result[0])document.getElementById('f-addr').value=result[0].address.address_name;});}catch(e){}
 }
-
-// ── 글쓰기 ────────────────────────────────────────────────
-function openWrite(type) {
-  currentWriteType = type || '후기';
-  document.querySelectorAll('.type-btn').forEach(b => b.classList.toggle('active', b.dataset.t === currentWriteType));
-  document.getElementById('writeOverlay').classList.add('open');
-}
-function closeWrite() { document.getElementById('writeOverlay').classList.remove('open'); }
-function selectType(btn) { currentWriteType = btn.dataset.t; document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
-
-async function submitPost() {
-  const nick = document.getElementById('w-nick').value.trim() || '익명';
-  const title = document.getElementById('w-title').value.trim();
-  const content = document.getElementById('w-content').value.trim();
-  if (!title) { alert('제목을 입력해주세요'); return; }
-  if (!content) { alert('내용을 입력해주세요'); return; }
-  const { error } = await db.from('posts').insert({ type: currentWriteType, nick, title, content, likes: 0 });
-  if (error) { alert('등록 실패: ' + error.message); return; }
-  ['w-nick', 'w-title', 'w-content'].forEach(id => document.getElementById(id).value = '');
-  closeWrite();
-  loadTab(currentWriteType);
-}
-
-// ── 장소 추가 ─────────────────────────────────────────────
-let pickMode = false, pickedLat = null, pickedLng = null, modalTags = [], selectedCat = null;
-
-function openAddModal() { document.getElementById('addOverlay').classList.add('open'); resetForm(); }
-function closeAddModal() { document.getElementById('addOverlay').classList.remove('open'); if (pickMode) cancelPickMode(); }
-function resetForm() {
-  ['f-name', 'f-addr', 'f-desc', 'f-tag'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  modalTags = []; selectedCat = null; pickedLat = null; pickedLng = null;
-  document.getElementById('tagsPreview').innerHTML = '';
-  document.querySelectorAll('.cat-sel-btn').forEach(b => b.classList.remove('active'));
-  const pb = document.getElementById('mapPickBox');
-  pb.textContent = '📍 지도에서 위치 직접 선택하기';
-  pb.classList.remove('picked');
-}
-function selectCat(btn) { document.querySelectorAll('.cat-sel-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedCat = btn.dataset.c; }
-function addTag() { const inp = document.getElementById('f-tag'); const val = inp.value.trim(); if (!val || modalTags.includes(val)) { inp.value = ''; return; } modalTags.push(val); inp.value = ''; renderModalTags(); }
-function removeTag(t) { modalTags = modalTags.filter(x => x !== t); renderModalTags(); }
-function renderModalTags() { document.getElementById('tagsPreview').innerHTML = modalTags.map(t => `<span class="tag-del" onclick="removeTag('${t}')">🏷 ${t} ✕</span>`).join(''); }
-
-function startPickMode() { closeAddModal(); pickMode = true; document.getElementById('pickModeBar').classList.add('on'); map.setCursor('crosshair'); kakao.maps.event.addListener(map, 'click', onMapPick); }
-function onMapPick(e) {
-  if (!pickMode) return;
-  pickedLat = e.latLng.getLat(); pickedLng = e.latLng.getLng();
-  cancelPickMode(); openAddModal();
-  const pb = document.getElementById('mapPickBox');
-  pb.textContent = `✅ 위치 선택됨 (${pickedLat.toFixed(4)}, ${pickedLng.toFixed(4)})`;
-  pb.classList.add('picked');
-  try {
-    new kakao.maps.services.Geocoder().coord2Address(pickedLng, pickedLat, (result, status) => {
-      if (status === kakao.maps.services.Status.OK && result[0]) document.getElementById('f-addr').value = result[0].address.address_name;
-    });
-  } catch(e) {}
-}
-function cancelPickMode() { pickMode = false; document.getElementById('pickModeBar').classList.remove('on'); map.setCursor(''); kakao.maps.event.removeListener(map, 'click', onMapPick); }
-
-function submitPlace() {
-  const name = document.getElementById('f-name').value.trim();
-  const addr = document.getElementById('f-addr').value.trim();
-  const desc = document.getElementById('f-desc').value.trim();
-  if (!name) { alert('샵 이름을 입력해주세요'); return; }
-  if (!selectedCat) { alert('카테고리를 선택해주세요'); return; }
-  if (!addr) { alert('주소를 입력해주세요'); return; }
-
-  const finalize = (lat, lng) => {
-    const np = { id: Date.now(), name, cat: selectedCat, addr, lat, lng, desc, tags: [...modalTags] };
-    places.push(np); savePlaces(); closeAddModal();
-    currentCat = '전체';
-    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+function cancelPickMode(){pickMode=false;document.getElementById('pickModeBar').classList.remove('on');map.setCursor('');kakao.maps.event.removeListener(map,'click',onMapPick);}
+function submitPlace(){
+  const name=document.getElementById('f-name').value.trim();
+  const addr=document.getElementById('f-addr').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  if(!name){alert('샵 이름을 입력해주세요');return;}
+  if(!selectedCat){alert('카테고리를 선택해주세요');return;}
+  if(!addr){alert('주소를 입력해주세요');return;}
+  const finalize=(lat,lng)=>{
+    const np={id:Date.now(),name,cat:selectedCat,addr,lat,lng,desc,tags:[...modalTags]};
+    places.push(np);savePlaces();closeAddModal();
+    currentCat='전체';
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
     renderAll();
-    setTimeout(() => selectPlace(np.id), 300);
+    setTimeout(()=>selectPlace(np.id),300);
   };
-
-  if (pickedLat && pickedLng) { finalize(pickedLat, pickedLng); return; }
-  try {
-    new kakao.maps.services.Geocoder().addressSearch(addr, (result, status) => {
-      if (status === kakao.maps.services.Status.OK) finalize(parseFloat(result[0].y), parseFloat(result[0].x));
-      else finalize(37.5519 + (Math.random() - .5) * .05, 127.0005 + (Math.random() - .5) * .05);
+  if(pickedLat&&pickedLng){finalize(pickedLat,pickedLng);return;}
+  try{
+    new kakao.maps.services.Geocoder().addressSearch(addr,(result,status)=>{
+      if(status===kakao.maps.services.Status.OK)finalize(parseFloat(result[0].y),parseFloat(result[0].x));
+      else finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);
     });
-  } catch(e) {
-    finalize(37.5519 + (Math.random() - .5) * .05, 127.0005 + (Math.random() - .5) * .05);
-  }
+  }catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
 }
 </script>
-  <!-- 모바일 목록 버튼 -->
-  <button class="mobile-list-btn" onclick="toggleMobilePanel()">🏪 샵 목록 보기</button>
-
-  <!-- 모바일 전체 목록 패널 -->
-  <div class="mobile-panel" id="mobilePanel">
-    <div class="mobile-panel-head">
-      <h3>🏪 샵 목록</h3>
-      <button class="mobile-panel-close" onclick="toggleMobilePanel()">✕</button>
-    </div>
-    <div class="mobile-place-list" id="mobilePlaceList"></div>
-  </div>
-
 </body>
 </html>
