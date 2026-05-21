@@ -252,6 +252,37 @@
     .comm-tabs { display: flex; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
     .comm-tabs::-webkit-scrollbar { display: none; }
     .comm-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
+    /* 로그인/회원가입 */
+    .btn-login { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
+    .btn-login:hover { border-color: var(--accent); color: var(--accent); }
+    .user-btn { background: var(--accent-l); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px; transition: all .2s; }
+    .user-btn:hover { background: var(--accent); color: #fff; }
+
+    .auth-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; }
+    .auth-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
+    .overlay.open .auth-panel { transform: translateY(0); }
+    .auth-panel h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+    .auth-panel p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .auth-tabs { display: flex; gap: 0; margin-bottom: 20px; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .auth-tab { flex: 1; padding: 9px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); transition: all .18s; }
+    .auth-tab.active { background: var(--accent); color: #fff; }
+    .auth-divider { text-align: center; font-size: 12px; color: var(--muted); margin: 14px 0; position: relative; }
+    .auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); }
+    .auth-divider span { background: var(--surface); padding: 0 10px; position: relative; }
+    .btn-google { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: var(--surface2); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; color: var(--text); margin-bottom: 4px; }
+    .btn-google:hover { border-color: var(--accent); }
+
+    /* 프로필 패널 */
+    .profile-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; max-height: 90dvh; overflow-y: auto; }
+    .profile-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
+    .overlay.open .profile-panel { transform: translateY(0); }
+    .profile-panel h2 { font-size: 20px; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--accent-l); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 3px solid var(--accent); overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .btn-logout { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: none; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--red); transition: all .2s; margin-top: 8px; }
+    .btn-logout:hover { background: var(--red-l); border-color: var(--red); }
+
     .comm-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .comm-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
     .comm-body::-webkit-scrollbar { width: 4px; }
@@ -342,6 +373,7 @@
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <div class="header-right">
+    <button class="btn-login" id="loginBtn" onclick="openAuth()">👤 로그인</button>
     <button class="btn-comm" onclick="openComm()">💬 <span>커뮤니티</span></button>
     <button class="btn-add" onclick="openAddModal()">＋ <span>샵 추가</span></button>
   </div>
@@ -736,6 +768,87 @@ function handleSearchInput() {
 function doSearch(){const q=document.getElementById('searchInput').value.trim().toLowerCase();const r=places.find(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q));if(r){selectPlace(r.id);closeSearchDrop();}}
 function closeSearchDrop(){document.getElementById('searchDropdown').classList.remove('open');}
 
+// ── 인증 ──────────────────────────────────────────────────
+let currentUser = null;
+let authMode = 'login';
+
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) setUser(session.user);
+});
+db.auth.onAuthStateChange((event, session) => {
+  if (session) setUser(session.user);
+  else clearUser();
+});
+
+async function setUser(user) {
+  currentUser = user;
+  const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
+  const nickname = profile?.nickname || user.email.split('@')[0];
+  const btn = document.getElementById('loginBtn');
+  if (btn) { btn.className = 'user-btn'; btn.innerHTML = '👤 ' + nickname; btn.onclick = openProfile; }
+}
+
+function clearUser() {
+  currentUser = null;
+  const btn = document.getElementById('loginBtn');
+  if (btn) { btn.className = 'btn-login'; btn.innerHTML = '👤 로그인'; btn.onclick = openAuth; }
+}
+
+function openAuth() { document.getElementById('authOverlay').classList.add('open'); }
+function closeAuth() { document.getElementById('authOverlay').classList.remove('open'); document.getElementById('authError').textContent = ''; }
+
+function switchAuth(mode) {
+  authMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+  document.getElementById('auth-nickname-wrap').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').textContent = mode === 'login' ? '로그인' : '회원가입';
+  document.getElementById('authError').textContent = '';
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pw = document.getElementById('auth-pw').value;
+  const nickname = document.getElementById('auth-nickname').value.trim();
+  const errEl = document.getElementById('authError');
+  if (!email || !pw) { errEl.textContent = '이메일과 비밀번호를 입력해주세요'; return; }
+  if (authMode === 'login') {
+    const { error } = await db.auth.signInWithPassword({ email, password: pw });
+    if (error) { errEl.textContent = '이메일 또는 비밀번호가 틀렸어요'; return; }
+  } else {
+    if (!nickname) { errEl.textContent = '닉네임을 입력해주세요'; return; }
+    if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; return; }
+    const { data, error } = await db.auth.signUp({ email, password: pw });
+    if (error) { errEl.textContent = error.message; return; }
+    if (data.user) await db.from('profiles').upsert({ id: data.user.id, nickname });
+  }
+  closeAuth();
+}
+
+async function logout() { await db.auth.signOut(); closeProfile(); }
+
+async function openProfile() {
+  if (!currentUser) return;
+  const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
+  document.getElementById('profileNickname').textContent = profile?.nickname || currentUser.email.split('@')[0];
+  document.getElementById('profileEmail').textContent = currentUser.email;
+  document.getElementById('edit-nickname').value = profile?.nickname || '';
+  document.getElementById('edit-bio').value = profile?.bio || '';
+  document.getElementById('profileOverlay').classList.add('open');
+}
+function closeProfile() { document.getElementById('profileOverlay').classList.remove('open'); }
+
+async function saveProfile() {
+  if (!currentUser) return;
+  const nickname = document.getElementById('edit-nickname').value.trim();
+  const bio = document.getElementById('edit-bio').value.trim();
+  if (!nickname) { alert('닉네임을 입력해주세요'); return; }
+  await db.from('profiles').upsert({ id: currentUser.id, nickname, bio });
+  await setUser(currentUser);
+  closeProfile();
+  alert('프로필이 저장됐어요!');
+}
+
 // 커뮤니티
 let currentTab='후기',currentWriteType='후기';
 function openComm(){document.getElementById('commOverlay').classList.add('open');loadTab('후기');}
@@ -838,5 +951,38 @@ function submitPlace(){
   }catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
 }
 </script>
+<!-- 로그인/회원가입 -->
+<div class="overlay" id="authOverlay" onclick="handleOverlay(event,'authOverlay')">
+  <div class="auth-panel">
+    <h2>환영해요! <button class="icon-close" onclick="closeAuth()">✕</button></h2>
+    <p>타쿠로드에 로그인하고 리뷰와 커뮤니티를 이용해보세요 😊</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">로그인</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">회원가입</button>
+    </div>
+    <div class="form-group"><label>이메일</label><input type="email" id="auth-email" placeholder="이메일 입력" /></div>
+    <div class="form-group"><label>비밀번호</label><input type="password" id="auth-pw" placeholder="비밀번호 입력" /></div>
+    <div class="form-group" id="auth-nickname-wrap" style="display:none"><label>닉네임</label><input type="text" id="auth-nickname" placeholder="닉네임 입력" /></div>
+    <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">로그인</button>
+    <div id="authError" style="color:var(--red);font-size:12px;margin-top:8px;text-align:center;"></div>
+  </div>
+</div>
+
+<!-- 프로필 -->
+<div class="overlay" id="profileOverlay" onclick="handleOverlay(event,'profileOverlay')">
+  <div class="profile-panel">
+    <h2>내 프로필 <button class="icon-close" onclick="closeProfile()">✕</button></h2>
+    <div class="avatar-wrap">
+      <div class="avatar" id="profileAvatar">👤</div>
+      <div style="font-size:16px;font-weight:900" id="profileNickname">닉네임</div>
+      <div style="font-size:12px;color:var(--muted)" id="profileEmail"></div>
+    </div>
+    <div class="form-group"><label>닉네임 변경</label><input type="text" id="edit-nickname" placeholder="새 닉네임" /></div>
+    <div class="form-group"><label>자기소개</label><textarea id="edit-bio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
+    <button class="btn-submit" onclick="saveProfile()">저장하기</button>
+    <button class="btn-logout" onclick="logout()">🚪 로그아웃</button>
+  </div>
+</div>
+
 </body>
 </html>
