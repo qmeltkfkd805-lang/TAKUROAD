@@ -373,7 +373,7 @@
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <div class="header-right">
-    <button class="btn-login" id="loginBtn" onclick="openAuth()">👤 로그인</button>
+    <button class="btn-login" id="loginBtn" onclick="openAuth()">로그인</button>
     <button class="btn-comm" onclick="openComm()">💬 <span>커뮤니티</span></button>
     <button class="btn-add" onclick="openAddModal()">＋ <span>샵 추가</span></button>
   </div>
@@ -785,13 +785,13 @@ async function setUser(user) {
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   const nickname = profile?.nickname || user.email.split('@')[0];
   const btn = document.getElementById('loginBtn');
-  if (btn) { btn.className = 'user-btn'; btn.innerHTML = '👤 ' + nickname; btn.onclick = openProfile; }
+  if (btn) { btn.className = 'user-btn'; btn.innerHTML = nickname; btn.onclick = openProfile; }
 }
 
 function clearUser() {
   currentUser = null;
   const btn = document.getElementById('loginBtn');
-  if (btn) { btn.className = 'btn-login'; btn.innerHTML = '👤 로그인'; btn.onclick = openAuth; }
+  if (btn) { btn.className = 'btn-login'; btn.innerHTML = '로그인'; btn.onclick = openAuth; }
 }
 
 function openAuth() { document.getElementById('authOverlay').classList.add('open'); }
@@ -980,7 +980,7 @@ function submitPlace(){
     <div class="form-group"><label>닉네임 변경</label><input type="text" id="edit-nickname" placeholder="새 닉네임" /></div>
     <div class="form-group"><label>자기소개</label><textarea id="edit-bio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
     <button class="btn-submit" onclick="saveProfile()">저장하기</button>
-    <button class="btn-logout" onclick="logout()">🚪 로그아웃</button>
+    <button class="btn-logout" onclick="logout()">로그아웃</button>
   </div>
 </div>
 
