@@ -154,6 +154,7 @@
       flex-direction: column;
       gap: 10px;
       height: 0;
+      align-items: stretch;
     }
     .list-panel-body::-webkit-scrollbar { width: 4px; }
     .list-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -172,6 +173,8 @@
       position: relative;
       overflow: hidden;
       width: 100%;
+      min-height: 90px;
+      flex-shrink: 0;
     }
     .shop-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--card-color, var(--accent)); border-radius: var(--r) 0 0 var(--r); }
     .shop-card:hover { border-color: var(--card-color, var(--accent)); box-shadow: var(--sh-md); transform: translateY(-1px); }
