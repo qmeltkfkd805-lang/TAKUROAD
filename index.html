@@ -382,14 +382,6 @@
 <div class="overlay" id="boardWriteOverlay" onclick="handleOverlay(event,'boardWriteOverlay')" style="align-items:center;">
   <div class="write-panel" style="border-radius:var(--r);max-width:520px;">
     <h2>글 쓰기 <button class="icon-close" onclick="closeBoardWrite()">✕</button></h2>
-    <div class="form-group"><label>유형</label>
-      <div class="type-row">
-        <button class="type-btn active" data-t="후기" onclick="selectBoardType(this)">✍️ 후기</button>
-        <button class="type-btn" data-t="추천" onclick="selectBoardType(this)">⭐ 추천</button>
-        <button class="type-btn" data-t="QnA" onclick="selectBoardType(this)">❓ Q&A</button>
-        <button class="type-btn" data-t="요청" onclick="selectBoardType(this)">📮 요청</button>
-      </div>
-    </div>
     <div class="form-group"><label>제목 *</label><input type="text" id="bw-title" placeholder="제목을 입력하세요"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="bw-content" rows="5" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
     <div class="form-group">
@@ -1179,7 +1171,7 @@ async function submitBoardPost(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('posts').insert({type:currentBoardWriteType,nick,title,content:postContent,likes:0,user_id:currentUser.id,board_id:currentBoard.id,images:imageUrls.length?imageUrls:null});
+  const{error}=await db.from('posts').insert({type:'일반',nick,title,content:postContent,likes:0,user_id:currentUser.id,board_id:currentBoard.id,images:imageUrls.length?imageUrls:null});
   if(error){alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
