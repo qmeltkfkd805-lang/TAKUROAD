@@ -1001,8 +1001,10 @@ async function loadBoards(){
     list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;text-align:center">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';
     return;
   }
+  window._boardCache=window._boardCache||{};
+  boards.forEach(b=>{window._boardCache[b.id]=b;});
   list.innerHTML=boards.map(b=>`
-    <div class="board-item${currentBoard&&currentBoard.id===b.id?' active':''}" onclick="selectBoard(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+    <div class="board-item${currentBoard&&currentBoard.id===b.id?' active':''}" onclick="selectBoardById('${b.id}')">
       <span>${b.name}</span>
       <span class="board-cnt">${b.post_count||0}</span>
     </div>`).join('');
@@ -1010,6 +1012,10 @@ async function loadBoards(){
 
 let currentSubBoard=null;
 
+function selectBoardById(id){
+  const b=window._boardCache&&window._boardCache[id];
+  if(b)selectBoard(b);
+}
 async function selectBoard(board){
   currentBoard=board;
   currentSubBoard=null;
@@ -1059,18 +1065,19 @@ async function selectBoard(board){
 }
 
 function renderBoardDesc(board, isMgr){
+function renderBoardDesc(board, isMgr){
   const area=document.getElementById('boardDescArea');
   if(!area)return;
   if(board.description_post){
-    area.innerHTML=`<div class="board-desc-box">${board.description_post.replace(/
-/g,'<br>')}${isMgr?`<button class="board-desc-edit-btn" onclick="showDescForm()">✏️ 수정</button>`:''}</div>`;
+    const descHtml=board.description_post.split('\n').join('<br>');
+    const editBtn=isMgr?'<button class="board-desc-edit-btn" onclick="showDescForm()">수정</button>':'';
+    area.innerHTML='<div class="board-desc-box">'+descHtml+editBtn+'</div>';
   } else if(isMgr){
-    area.innerHTML=`<div style="padding:10px 14px"><button onclick="showDescForm()" style="background:none;border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;width:100%">📝 게시판 소개글 작성하기</button></div>`;
+    area.innerHTML='<div style="padding:10px 14px"><button onclick="showDescForm()" style="background:none;border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;width:100%">게시판 소개글 작성하기</button></div>';
   } else {
     area.innerHTML='';
   }
 }
-
 function showDescForm(){
   const area=document.getElementById('boardDescArea');
   if(!area)return;
@@ -1119,7 +1126,8 @@ async function loadBoardPosts(){
     const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
     const imgs=p.images&&p.images.length?` 🖼️${p.images.length}`:'';
     const isMine=currentUser&&p.user_id===currentUser.id;
-    return`<div class="post-row" onclick="openBoardPost(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+    window._postCache=window._postCache||{};window._postCache[p.id]=p;
+    return`<div class="post-row" onclick="openBoardPostById('"+p.id+"')">
       <span class="post-row-type" style="${typeColor[p.type]||''}">${p.type}</span>
       <div class="post-row-title">
         <div class="post-row-name">${p.title}${imgs?`<span style="font-size:11px;color:var(--muted);margin-left:4px">${imgs}</span>`:''}</div>
@@ -1130,6 +1138,10 @@ async function loadBoardPosts(){
   }).join('');
 }
 
+function openBoardPostById(id){
+  const p=window._postCache&&window._postCache[id];
+  if(p)openBoardPost(p);
+}
 function openBoardPost(p){
   const table=document.getElementById('postTable');
   if(!table)return;
