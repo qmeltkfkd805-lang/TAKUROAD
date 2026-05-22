@@ -252,6 +252,50 @@
     .empty-state .ei{font-size:40px;margin-bottom:12px;}
     .empty-state p{font-size:14px;line-height:1.6;}
     @media(max-width:600px){.logo{font-size:24px;}.btn-add span:last-child,.btn-comm span:last-child{display:none;}.search-wrap{max-width:none;}}
+    .main-tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;}
+    .main-tab{flex:1;padding:11px;font-size:14px;font-weight:700;font-family:inherit;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .18s;}
+    .main-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .comm-full{flex:1 1 0;display:flex;overflow:hidden;height:0;}
+    .comm-sidebar{width:200px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--bg2);}
+    .comm-sidebar-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .comm-sidebar-head h3{font-size:14px;font-weight:900;}
+    .btn-new-board{background:var(--accent);color:#fff;border:none;border-radius:14px;padding:4px 10px;font-size:11px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;}
+    .btn-new-board:hover{background:var(--accent-d);}
+    .board-list{flex:1;overflow-y:auto;padding:8px;}
+    .board-list::-webkit-scrollbar{width:3px;}
+    .board-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+    .board-item{padding:8px 10px;border-radius:var(--r-sm);font-size:13px;cursor:pointer;color:var(--text);display:flex;justify-content:space-between;align-items:center;transition:all .15s;font-weight:500;}
+    .board-item:hover{background:var(--surface2);}
+    .board-item.active{background:var(--accent-l);color:var(--accent);font-weight:700;}
+    .board-cnt{font-size:11px;color:var(--muted);font-weight:400;}
+    .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
+    .comm-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .comm-board-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2);}
+    .comm-board-head-left{display:flex;flex-direction:column;gap:2px;}
+    .comm-board-name{font-size:16px;font-weight:900;color:var(--text);}
+    .comm-board-meta{font-size:11px;color:var(--muted);}
+    .comm-board-meta span{color:var(--accent);font-weight:700;}
+    .btn-write-post{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;}
+    .btn-write-post:hover{background:var(--accent-d);}
+    .post-table{flex:1;overflow-y:auto;}
+    .post-table::-webkit-scrollbar{width:4px;}
+    .post-table::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+    .post-row{padding:11px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .12s;}
+    .post-row:hover{background:var(--surface2);}
+    .post-row-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+    .post-row-title{flex:1;min-width:0;}
+    .post-row-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .post-row-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+    .post-row-likes{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:3px;flex-shrink:0;}
+    .post-detail-view{flex:1;overflow-y:auto;padding:20px;}
+    .post-detail-view::-webkit-scrollbar{width:4px;}
+    .post-detail-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+    .post-detail-back{background:none;border:1px solid var(--border);border-radius:14px;padding:5px 12px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:5px;}
+    .post-detail-back:hover{border-color:var(--accent);color:var(--accent);}
+    .board-modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:380px;padding:24px;position:relative;transform:translateY(20px);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+    .board-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:var(--r) var(--r) 0 0;}
+    .board-modal h2{font-size:17px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
+    @media(max-width:600px){.comm-sidebar{width:140px;}.comm-board-name{font-size:14px;}}
   </style>
 </head>
 <body>
@@ -263,11 +307,14 @@
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <div class="header-right">
-    <button class="btn-comm" onclick="openComm()">💬 <span>커뮤니티</span></button>
     <button class="btn-add" onclick="openAddModal()">＋ <span>샵 추가</span></button>
     <button class="btn-login" id="loginBtn" onclick="openAuth()">로그인</button>
   </div>
 </header>
+<div class="main-tabs" id="mainTabs">
+  <button class="main-tab active" id="tabMap" onclick="switchMainTab('map')">🗺️ 지도</button>
+  <button class="main-tab" id="tabComm" onclick="switchMainTab('comm')">💬 커뮤니티</button>
+</div>
 <div class="cat-bar">
   <button class="cat-btn active" data-cat="전체" onclick="filterCat('전체',this)">✨ 전체</button>
   <button class="cat-btn" data-cat="애니/만화" onclick="filterCat('애니/만화',this)">🌸 애니/만화</button>
@@ -279,7 +326,7 @@
   <button class="cat-btn" data-cat="동인샵" onclick="filterCat('동인샵',this)">🖨️ 동인샵</button>
   <button class="cat-btn" data-cat="게임샵" onclick="filterCat('게임샵',this)">🎮 게임샵</button>
 </div>
-<div class="main">
+<div class="main" id="mapView">
   <div id="map"></div>
   <div class="pick-mode-bar" id="pickModeBar">📍 지도를 클릭해 위치를 선택하세요 <button onclick="cancelPickMode()">취소</button></div>
   <div class="detail-panel" id="detailPanel">
@@ -287,6 +334,56 @@
     <div id="detailContent"></div>
   </div>
 </div>
+
+<!-- 커뮤니티 풀스크린 -->
+<div class="comm-full" id="commView" style="display:none;">
+  <div class="comm-sidebar">
+    <div class="comm-sidebar-head">
+      <h3>게시판</h3>
+      <button class="btn-new-board" onclick="openBoardModal()">+ 개설</button>
+    </div>
+    <div class="board-list" id="boardList"></div>
+  </div>
+  <div class="comm-main" id="commMain">
+    <div id="commMainContent" style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;">게시판을 선택해주세요</div>
+  </div>
+</div>
+
+<!-- 게시판 개설 모달 -->
+<div class="overlay" id="boardModalOverlay" onclick="handleOverlay(event,'boardModalOverlay')" style="align-items:center;">
+  <div class="board-modal">
+    <h2>게시판 개설 <button class="icon-close" onclick="closeBoardModal()">✕</button></h2>
+    <div class="form-group"><label>게시판 이름 *</label><input type="text" id="board-name" placeholder="예) 원피스, 주술회전, 건담…"/></div>
+    <div class="form-group"><label>소개</label><textarea id="board-desc" rows="2" placeholder="어떤 게시판인지 간단히 소개해주세요"></textarea></div>
+    <button class="btn-submit" onclick="submitBoard()">개설하기</button>
+    <div id="boardError" style="font-size:12px;margin-top:8px;text-align:center;color:var(--red);"></div>
+  </div>
+</div>
+
+<!-- 글쓰기 (게시판용) -->
+<div class="overlay" id="boardWriteOverlay" onclick="handleOverlay(event,'boardWriteOverlay')" style="align-items:center;">
+  <div class="write-panel" style="border-radius:var(--r);max-width:520px;">
+    <h2>글 쓰기 <button class="icon-close" onclick="closeBoardWrite()">✕</button></h2>
+    <div class="form-group"><label>유형</label>
+      <div class="type-row">
+        <button class="type-btn active" data-t="후기" onclick="selectBoardType(this)">✍️ 후기</button>
+        <button class="type-btn" data-t="추천" onclick="selectBoardType(this)">⭐ 추천</button>
+        <button class="type-btn" data-t="QnA" onclick="selectBoardType(this)">❓ Q&A</button>
+        <button class="type-btn" data-t="요청" onclick="selectBoardType(this)">📮 요청</button>
+      </div>
+    </div>
+    <div class="form-group"><label>제목 *</label><input type="text" id="bw-title" placeholder="제목을 입력하세요"/></div>
+    <div class="form-group"><label>내용 *</label><textarea id="bw-content" rows="5" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
+    <div class="form-group">
+      <label>이미지 첨부</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="bwImgPreviewArea"></div>
+      <button type="button" class="img-attach-btn" style="margin-top:8px" onclick="document.getElementById('bwImgInput').click()">📷 이미지 추가 (최대 5장)</button>
+      <input type="file" id="bwImgInput" accept="image/*" multiple style="display:none" onchange="handleBwImgSelect(event)"/>
+    </div>
+    <button class="btn-submit" onclick="submitBoardPost()">게시하기</button>
+  </div>
+</div>
+
 <button class="list-fab" onclick="toggleListPanel()">🏪 샵 목록 보기</button>
 <div class="list-panel" id="listPanel">
   <div class="list-panel-head">
@@ -839,6 +936,215 @@ function submitPlace(){
   if(pickedLat&&pickedLng){finalize(pickedLat,pickedLng);return;}
   try{new kakao.maps.services.Geocoder().addressSearch(addr,(result,status)=>{if(status===kakao.maps.services.Status.OK)finalize(parseFloat(result[0].y),parseFloat(result[0].x));else finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);});}
   catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
+}
+
+// ── 메인 탭 전환 ──
+function switchMainTab(tab){
+  const mapView=document.getElementById('mapView');
+  const commView=document.getElementById('commView');
+  const catBar=document.querySelector('.cat-bar');
+  const listFab=document.querySelector('.list-fab');
+  document.getElementById('tabMap').classList.toggle('active',tab==='map');
+  document.getElementById('tabComm').classList.toggle('active',tab==='comm');
+  if(tab==='map'){
+    mapView.style.display='';commView.style.display='none';
+    catBar.style.display='';listFab.style.display='';
+  }else{
+    mapView.style.display='none';commView.style.display='';
+    catBar.style.display='none';listFab.style.display='none';
+    loadBoards();
+  }
+}
+
+// ── 게시판 ──
+let currentBoard=null, currentBoardWriteType='후기';
+let _bwImgFiles=[];
+
+async function loadBoards(){
+  const{data:boards}=await db.from('boards').select('*').order('post_count',{ascending:false});
+  const list=document.getElementById('boardList');
+  if(!boards||!boards.length){
+    list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;text-align:center">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';
+    return;
+  }
+  list.innerHTML=boards.map(b=>`
+    <div class="board-item${currentBoard&&currentBoard.id===b.id?' active':''}" onclick="selectBoard(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+      <span>${b.name}</span>
+      <span class="board-cnt">${b.post_count||0}</span>
+    </div>`).join('');
+}
+
+async function selectBoard(board){
+  currentBoard=board;
+  await loadBoards();
+  const main=document.getElementById('commMainContent');
+  const isMgr=currentUser&&currentUser.id===board.manager_id;
+  main.style='flex:1;display:flex;flex-direction:column;overflow:hidden;';
+  main.innerHTML=`
+    <div class="comm-board-head">
+      <div class="comm-board-head-left">
+        <div class="comm-board-name">${board.name}</div>
+        <div class="comm-board-meta">매니저: <span>${board.manager_nickname||'알수없음'}</span> · 게시글 ${board.post_count||0}개${isMgr?' · <span style="color:var(--purple)">내 게시판</span>':''}</div>
+      </div>
+      <button class="btn-write-post" onclick="openBoardWrite()">✏️ 글쓰기</button>
+    </div>
+    <div class="post-table" id="postTable"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div></div>`;
+  loadBoardPosts();
+}
+
+async function loadBoardPosts(){
+  if(!currentBoard)return;
+  const{data:posts}=await db.from('posts').select('*').eq('board_id',currentBoard.id).order('created_at',{ascending:false});
+  const table=document.getElementById('postTable');
+  if(!table)return;
+  if(!currentUser){window._likedPosts=new Set();}
+  else{
+    const{data:likes}=await db.from('post_likes').select('post_id').eq('user_id',currentUser.id);
+    window._likedPosts=new Set((likes||[]).map(l=>l.post_id));
+  }
+  const ps=posts||[];
+  if(!ps.length){table.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">📝 아직 글이 없어요.<br/>첫 번째 글을 남겨보세요!</div>';return;}
+  const typeColor={'후기':'background:var(--accent-l);color:var(--accent)','추천':'background:var(--yellow-l);color:var(--yellow)','QnA':'background:var(--cyan-l);color:var(--cyan)','요청':'background:var(--purple-l);color:var(--purple)'};
+  table.innerHTML=ps.map(p=>{
+    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    const imgs=p.images&&p.images.length?` 🖼️${p.images.length}`:'';
+    const isMine=currentUser&&p.user_id===currentUser.id;
+    return`<div class="post-row" onclick="openBoardPost(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <span class="post-row-type" style="${typeColor[p.type]||''}">${p.type}</span>
+      <div class="post-row-title">
+        <div class="post-row-name">${p.title}${imgs?`<span style="font-size:11px;color:var(--muted);margin-left:4px">${imgs}</span>`:''}</div>
+        <div class="post-row-sub">${p.nick} · ${date}</div>
+      </div>
+      <div class="post-row-likes">❤️ ${p.likes||0}</div>
+    </div>`;
+  }).join('');
+}
+
+function openBoardPost(p){
+  const table=document.getElementById('postTable');
+  if(!table)return;
+  const liked=window._likedPosts&&window._likedPosts.has(p.id);
+  const isMine=currentUser&&p.user_id===currentUser.id;
+  const imgs=p.images&&p.images.length?`<div class="post-images">${p.images.map(src=>`<img class="post-img" src="${src}" onclick="openImgFull('${src}')" />`).join('')}</div>`:'';
+  const typeColor={'후기':'background:var(--accent-l);color:var(--accent)','추천':'background:var(--yellow-l);color:var(--yellow)','QnA':'background:var(--cyan-l);color:var(--cyan)','요청':'background:var(--purple-l);color:var(--purple)'};
+  const date=new Date(p.created_at).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  table.innerHTML=`
+    <div class="post-detail-view">
+      <button class="post-detail-back" onclick="loadBoardPosts()">← 목록으로</button>
+      <div style="margin-bottom:14px">
+        <span class="post-row-type" style="${typeColor[p.type]||''};margin-right:8px">${p.type}</span>
+        <span style="font-size:18px;font-weight:900">${p.title}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;display:flex;gap:12px;align-items:center">
+        <span style="color:var(--cyan);font-weight:700">${p.nick}</span>
+        <span>${date}</span>
+        ${isMine?`<button onclick="deleteBoardPost('${p.id}')" style="background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;margin-left:auto" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">삭제</button>`:''}
+      </div>
+      <div style="font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px">${p.content}</div>
+      ${imgs}
+      <div style="margin-top:16px">
+        <button onclick="likeBoardPost('${p.id}',this)" ${liked?'disabled':''} style="display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid ${liked?'var(--accent)':'var(--border)'};background:${liked?'var(--accent-l)':'none'};color:${liked?'var(--accent)':'var(--muted)'};font-family:inherit;font-size:14px;font-weight:700;cursor:${liked?'default':'pointer'}">
+          ❤️ ${p.likes||0}
+        </button>
+      </div>
+    </div>`;
+}
+
+async function likeBoardPost(postId, el){
+  if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
+  if(window._likedPosts&&window._likedPosts.has(postId))return;
+  const{error}=await db.from('post_likes').insert({post_id:postId,user_id:currentUser.id});
+  if(error)return;
+  const{data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;
+  const n=(data.likes||0)+1;
+  await db.from('posts').update({likes:n}).eq('id',postId);
+  if(!window._likedPosts)window._likedPosts=new Set();
+  window._likedPosts.add(postId);
+  el.innerHTML=`❤️ ${n}`;el.disabled=true;
+  el.style.borderColor='var(--accent)';el.style.color='var(--accent)';el.style.background='var(--accent-l)';
+}
+
+async function deleteBoardPost(postId){
+  if(!currentUser)return;
+  if(!confirm('정말 삭제할까요?'))return;
+  await db.from('posts').delete().eq('id',postId).eq('user_id',currentUser.id);
+  if(currentBoard){
+    await db.from('boards').update({post_count:Math.max(0,(currentBoard.post_count||1)-1)}).eq('id',currentBoard.id);
+    currentBoard.post_count=Math.max(0,(currentBoard.post_count||1)-1);
+  }
+  loadBoardPosts();
+}
+
+// 게시판 개설
+function openBoardModal(){
+  if(!currentUser){alert('로그인 후 게시판을 개설할 수 있어요!');return;}
+  document.getElementById('boardModalOverlay').classList.add('open');
+}
+function closeBoardModal(){document.getElementById('boardModalOverlay').classList.remove('open');}
+
+async function submitBoard(){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const name=document.getElementById('board-name').value.trim();
+  const desc=document.getElementById('board-desc').value.trim();
+  const errEl=document.getElementById('boardError');
+  if(!name){errEl.textContent='게시판 이름을 입력해주세요';return;}
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{data:existing}=await db.from('boards').select('id').eq('name',name).maybeSingle();
+  if(existing){errEl.textContent='이미 같은 이름의 게시판이 있어요';return;}
+  const{error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0});
+  if(error){errEl.textContent='개설 실패: '+error.message;return;}
+  document.getElementById('board-name').value='';document.getElementById('board-desc').value='';
+  closeBoardModal();loadBoards();
+}
+
+// 게시판 글쓰기
+function openBoardWrite(){
+  if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  _bwImgFiles=[];
+  document.getElementById('bwImgPreviewArea').innerHTML='';
+  document.getElementById('boardWriteOverlay').classList.add('open');
+}
+function closeBoardWrite(){document.getElementById('boardWriteOverlay').classList.remove('open');_bwImgFiles=[];}
+function selectBoardType(btn){currentBoardWriteType=btn.dataset.t;document.querySelectorAll('#boardWriteOverlay .type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+function handleBwImgSelect(event){
+  const files=Array.from(event.target.files);
+  const combined=[..._bwImgFiles,...files].slice(0,5);
+  _bwImgFiles=combined;
+  const area=document.getElementById('bwImgPreviewArea');
+  area.innerHTML='';
+  combined.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{_bwImgFiles.splice(i,1);handleBwImgSelect({target:{files:[]}});};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+  event.target.value='';
+}
+
+async function submitBoardPost(){
+  if(!currentUser||!currentBoard){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  const title=document.getElementById('bw-title').value.trim();
+  const postContent=document.getElementById('bw-content').value.trim();
+  if(!title){alert('제목을 입력해주세요');return;}
+  if(!postContent){alert('내용을 입력해주세요');return;}
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const imageUrls=[];
+  for(const file of _bwImgFiles){
+    const ext=file.name.split('.').pop();
+    const path=`${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  const{error}=await db.from('posts').insert({type:currentBoardWriteType,nick,title,content:postContent,likes:0,user_id:currentUser.id,board_id:currentBoard.id,images:imageUrls.length?imageUrls:null});
+  if(error){alert('등록 실패: '+error.message);return;}
+  await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
+  currentBoard.post_count=(currentBoard.post_count||0)+1;
+  document.getElementById('bw-title').value='';document.getElementById('bw-content').value='';
+  closeBoardWrite();loadBoardPosts();
 }
 </script>
 </body>
