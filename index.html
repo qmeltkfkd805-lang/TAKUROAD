@@ -485,11 +485,14 @@ function handleSaveBtn(id,btn){toggleSave(id);btn.textContent=isSaved(id)?'🔖'
 function toggleListPanel(){document.getElementById('listPanel').classList.toggle('open');}
 function addMarker(p,offset={lat:0,lng:0}){
   const color=CAT_COLOR[p.cat]||'#e8006f';
-  const content=`<div class="taku-marker"><div class="marker-bubble" style="background:${color}">${CAT_ICON[p.cat]} ${p.name}</div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid ${color};margin:auto"></div></div>`;
-  const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(p.lat+offset.lat,p.lng+offset.lng),content,yAnchor:1});
+  const el=document.createElement('div');
+  el.className='taku-marker';
+  el.innerHTML=`<div class="marker-bubble" style="background:${color};cursor:pointer">${CAT_ICON[p.cat]} ${p.name}</div><div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid ${color};margin:auto"></div>`;
+  el.style.cursor='pointer';
+  el.addEventListener('click',()=>selectPlace(p.id));
+  const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(p.lat+offset.lat,p.lng+offset.lng),content:el,yAnchor:1});
   overlay.setMap(map);
   markers.push({overlay,id:p.id});
-  setTimeout(()=>{const el=overlay.getContent();if(typeof el==='string')return;el.addEventListener('click',()=>selectPlace(p.id));},100);
 }
 function clearMarkers(){markers.forEach(m=>m.overlay.setMap(null));markers=[];}
 async function selectPlace(id){
