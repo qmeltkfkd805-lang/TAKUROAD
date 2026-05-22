@@ -11,37 +11,20 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #fdf6ff;
-      --bg2: #ffffff;
-      --surface: #ffffff;
-      --surface2: #f5eeff;
-      --border: #e8d5f5;
-      --text: #1a0a2e;
-      --muted: #9b7bb8;
-      --accent: #e8006f;
-      --accent-l: rgba(232,0,111,.1);
-      --accent-d: #c4005e;
-      --cyan: #0099cc;
-      --cyan-l: rgba(0,153,204,.1);
-      --yellow: #cc8800;
-      --yellow-l: rgba(204,136,0,.1);
-      --purple: #7c3aed;
-      --purple-l: rgba(124,58,237,.1);
-      --green: #059669;
-      --green-l: rgba(5,150,105,.1);
-      --orange: #ea580c;
-      --orange-l: rgba(234,88,12,.1);
-      --pink: #db2777;
-      --pink-l: rgba(219,39,119,.1);
-      --red: #dc2626;
-      --red-l: rgba(220,38,38,.1);
+      --bg: #fdf6ff; --bg2: #ffffff; --surface: #ffffff; --surface2: #f5eeff;
+      --border: #e8d5f5; --text: #1a0a2e; --muted: #9b7bb8;
+      --accent: #e8006f; --accent-l: rgba(232,0,111,.1); --accent-d: #c4005e;
+      --cyan: #0099cc; --cyan-l: rgba(0,153,204,.1);
+      --yellow: #cc8800; --yellow-l: rgba(204,136,0,.1);
+      --purple: #7c3aed; --purple-l: rgba(124,58,237,.1);
+      --green: #059669; --green-l: rgba(5,150,105,.1);
+      --orange: #ea580c; --orange-l: rgba(234,88,12,.1);
+      --pink: #db2777; --pink-l: rgba(219,39,119,.1);
+      --red: #dc2626; --red-l: rgba(220,38,38,.1);
       --c-anime: #e8006f; --c-figure: #7c3aed; --c-card: #b45309;
-      --c-used: #059669; --c-popup: #0099cc; --c-doujin: #db2777;
-      --c-game: #ea580c;
-      --sh-sm: 0 2px 8px rgba(124,58,237,.08);
-      --sh-md: 0 4px 24px rgba(124,58,237,.12);
-      --sh-lg: 0 12px 48px rgba(124,58,237,.15);
-      --sh-glow: 0 0 20px rgba(232,0,111,.2);
+      --c-used: #059669; --c-popup: #0099cc; --c-doujin: #db2777; --c-game: #ea580c;
+      --sh-sm: 0 2px 8px rgba(124,58,237,.08); --sh-md: 0 4px 24px rgba(124,58,237,.12);
+      --sh-lg: 0 12px 48px rgba(124,58,237,.15); --sh-glow: 0 0 20px rgba(232,0,111,.2);
       --r: 12px; --r-sm: 7px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -179,15 +162,16 @@
     .comm-tabs { display: flex; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
     .comm-tabs::-webkit-scrollbar { display: none; }
     .comm-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
+    .comm-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
     .btn-login { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
     .btn-login:hover { border-color: var(--accent); color: var(--accent); }
-   .user-btn { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 5px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 7px; transition: all .2s; }
-.user-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .user-btn .user-avatar-mini { width: 26px; height: 26px; min-width: 26px; min-height: 26px; border-radius: 50%; overflow: hidden; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.user-btn .user-avatar-mini img { width: 26px; height: 26px; object-fit: cover; border-radius: 50%; display: block; }
+    .user-btn { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 5px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 7px; transition: all .2s; }
+    .user-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .user-btn .user-avatar-mini { width: 26px; height: 26px; min-width: 26px; min-height: 26px; border-radius: 50%; overflow: hidden; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .user-btn .user-avatar-mini img { width: 26px; height: 26px; object-fit: cover; border-radius: 50%; display: block; }
 
-    /* ── 프로필 패널 (아바타 업로드 포함) ── */
-    .auth-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; }
+    .auth-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; max-height: 90dvh; overflow-y: auto; }
     .auth-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
     .overlay.open .auth-panel { transform: translateY(0); }
     .auth-panel h2 { font-size: 20px; font-weight: 900; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
@@ -201,12 +185,16 @@
     .btn-google { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: var(--surface2); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; color: var(--text); margin-bottom: 4px; }
     .btn-google:hover { border-color: var(--accent); }
 
+    /* 비밀번호 확인 일치 표시 */
+    .pw-match { font-size: 11px; margin-top: 4px; }
+    .pw-match.ok { color: var(--green); }
+    .pw-match.no { color: var(--red); }
+
     .profile-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; max-height: 90dvh; overflow-y: auto; }
     .profile-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
     .overlay.open .profile-panel { transform: translateY(0); }
     .profile-panel h2 { font-size: 20px; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
 
-    /* 아바타 업로드 영역 */
     .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
     .avatar-upload-ring { position: relative; width: 88px; height: 88px; cursor: pointer; }
     .avatar-upload-ring:hover .avatar-overlay { opacity: 1; }
@@ -223,7 +211,6 @@
     .btn-logout { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: none; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--red); transition: all .2s; margin-top: 8px; }
     .btn-logout:hover { background: var(--red-l); border-color: var(--red); }
 
-    .comm-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .comm-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
     .comm-body::-webkit-scrollbar { width: 4px; }
     .comm-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -309,8 +296,8 @@
   </div>
   <div class="header-right">
     <button class="btn-comm" onclick="openComm()">💬 <span>커뮤니티</span></button>
-<button class="btn-add" onclick="openAddModal()">＋ <span>샵 추가</span></button>
-<button class="btn-login" id="loginBtn" onclick="openAuth()">로그인</button>
+    <button class="btn-add" onclick="openAddModal()">＋ <span>샵 추가</span></button>
+    <button class="btn-login" id="loginBtn" onclick="openAuth()">로그인</button>
   </div>
 </header>
 
@@ -425,10 +412,18 @@
       <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">회원가입</button>
     </div>
     <div class="form-group"><label>이메일</label><input type="email" id="auth-email" placeholder="이메일 입력" /></div>
-    <div class="form-group"><label>비밀번호</label><input type="password" id="auth-pw" placeholder="비밀번호 입력" /></div>
-    <div class="form-group" id="auth-nickname-wrap" style="display:none"><label>닉네임</label><input type="text" id="auth-nickname" placeholder="닉네임 입력" /></div>
+    <div class="form-group"><label>비밀번호</label><input type="password" id="auth-pw" placeholder="비밀번호 입력 (6자 이상)" /></div>
+    <!-- 회원가입 전용 필드 -->
+    <div id="signup-only" style="display:none">
+      <div class="form-group">
+        <label>비밀번호 확인</label>
+        <input type="password" id="auth-pw2" placeholder="비밀번호 재입력" oninput="checkPwMatch()" />
+        <div class="pw-match" id="pwMatchMsg"></div>
+      </div>
+      <div class="form-group"><label>닉네임</label><input type="text" id="auth-nickname" placeholder="닉네임 입력 (중복 불가)" /></div>
+    </div>
     <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">로그인</button>
-    <div id="authError" style="color:var(--red);font-size:12px;margin-top:8px;text-align:center;"></div>
+    <div id="authError" style="font-size:12px;margin-top:8px;text-align:center;"></div>
     <div class="auth-divider"><span>또는</span></div>
     <button class="btn-google" onclick="loginWithGoogle()">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.4 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/><path fill="#FBBC05" d="M10.6 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.3 0-11.6-4-13.5-9.4l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>
@@ -442,15 +437,9 @@
   <div class="profile-panel">
     <h2>내 프로필 <button class="icon-close" onclick="closeProfile()">✕</button></h2>
     <div class="avatar-wrap">
-      <!-- 아바타 업로드 링 -->
       <div class="avatar-upload-ring" id="avatarUploadRing" onclick="document.getElementById('avatarFileInput').click()">
-        <div class="avatar" id="profileAvatar">
-          <span id="avatarEmoji">👤</span>
-        </div>
-        <div class="avatar-overlay">
-          <span>📷</span>
-          <span>변경</span>
-        </div>
+        <div class="avatar" id="profileAvatar"><span id="avatarEmoji">👤</span></div>
+        <div class="avatar-overlay"><span>📷</span><span>변경</span></div>
         <div class="avatar-uploading" id="avatarUploading">업로드 중…</div>
       </div>
       <input type="file" id="avatarFileInput" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event)" />
@@ -533,8 +522,7 @@ async function geocodeDummy() {
     await new Promise(resolve => {
       geocoder.addressSearch(p.addr, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
-          p.lat = parseFloat(result[0].y);
-          p.lng = parseFloat(result[0].x);
+          p.lat = parseFloat(result[0].y); p.lng = parseFloat(result[0].x);
         }
         resolve();
       });
@@ -559,8 +547,7 @@ function renderAll() {
     let offset = { lat: 0, lng: 0 };
     if (group.length > 1) {
       const angle = (2 * Math.PI / group.length) * idx;
-      const radius = 0.0004;
-      offset = { lat: Math.sin(angle) * radius, lng: Math.cos(angle) * radius };
+      offset = { lat: Math.sin(angle) * 0.0004, lng: Math.cos(angle) * 0.0004 };
     }
     addMarker(p, offset);
   });
@@ -608,7 +595,7 @@ function makeShopCard(p) {
 function handleSaveBtn(id, btn) { toggleSave(id); btn.textContent = isSaved(id) ? '🔖' : '🏷️'; }
 function toggleListPanel() { document.getElementById('listPanel').classList.toggle('open'); }
 
-function addMarker(p, offset = {lat: 0, lng: 0}) {
+function addMarker(p, offset = {lat:0,lng:0}) {
   const color = CAT_COLOR[p.cat] || '#e8006f';
   const content = `<div class="taku-marker"><div class="marker-bubble" style="background:${color}">${CAT_ICON[p.cat]} ${p.name}</div><div class="marker-tail" style="border-top:6px solid ${color};border-left:5px solid transparent;border-right:5px solid transparent"></div></div>`;
   const overlay = new kakao.maps.CustomOverlay({ position: new kakao.maps.LatLng(p.lat + offset.lat, p.lng + offset.lng), content, yAnchor: 1 });
@@ -735,13 +722,8 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 let currentUser = null;
 let authMode = 'login';
 
-db.auth.getSession().then(({ data: { session } }) => {
-  if (session) setUser(session.user);
-});
-db.auth.onAuthStateChange((event, session) => {
-  if (session) setUser(session.user);
-  else clearUser();
-});
+db.auth.getSession().then(({ data: { session } }) => { if (session) setUser(session.user); });
+db.auth.onAuthStateChange((event, session) => { if (session) setUser(session.user); else clearUser(); });
 
 async function setUser(user) {
   currentUser = user;
@@ -751,11 +733,9 @@ async function setUser(user) {
   const btn = document.getElementById('loginBtn');
   if (btn) {
     btn.className = 'user-btn';
-    if (avatarUrl) {
-      btn.innerHTML = `<div class="user-avatar-mini"><img src="${avatarUrl}" /></div>${nickname}`;
-    } else {
-      btn.innerHTML = `<div class="user-avatar-mini">👤</div>${nickname}`;
-    }
+    btn.innerHTML = avatarUrl
+      ? `<div class="user-avatar-mini"><img src="${avatarUrl}" /></div>${nickname}`
+      : `<div class="user-avatar-mini">👤</div>${nickname}`;
     btn.onclick = openProfile;
   }
 }
@@ -775,217 +755,99 @@ async function loginWithGoogle() {
 }
 
 function openAuth() { document.getElementById('authOverlay').classList.add('open'); }
-function closeAuth() { document.getElementById('authOverlay').classList.remove('open'); document.getElementById('authError').textContent = ''; }
+function closeAuth() {
+  document.getElementById('authOverlay').classList.remove('open');
+  setAuthMsg('', '');
+}
 
 function switchAuth(mode) {
   authMode = mode;
   document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
   document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
-  document.getElementById('auth-nickname-wrap').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('signup-only').style.display = mode === 'signup' ? 'block' : 'none';
   document.getElementById('authSubmitBtn').textContent = mode === 'login' ? '로그인' : '회원가입';
-  document.getElementById('authError').textContent = '';
+  setAuthMsg('', '');
+  document.getElementById('pwMatchMsg').textContent = '';
+}
+
+function setAuthMsg(msg, color) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.color = color || 'var(--red)';
+}
+
+// 비밀번호 확인 일치 여부 실시간 표시
+function checkPwMatch() {
+  const pw = document.getElementById('auth-pw').value;
+  const pw2 = document.getElementById('auth-pw2').value;
+  const msg = document.getElementById('pwMatchMsg');
+  if (!pw2) { msg.textContent = ''; return; }
+  if (pw === pw2) {
+    msg.textContent = '✅ 비밀번호가 일치해요';
+    msg.className = 'pw-match ok';
+  } else {
+    msg.textContent = '❌ 비밀번호가 일치하지 않아요';
+    msg.className = 'pw-match no';
+  }
 }
 
 async function submitAuth() {
   const email = document.getElementById('auth-email').value.trim();
   const pw = document.getElementById('auth-pw').value;
-  const nickname = document.getElementById('auth-nickname').value.trim();
   const errEl = document.getElementById('authError');
-  if (!email || !pw) { errEl.textContent = '이메일과 비밀번호를 입력해주세요'; return; }
+
+  if (!email || !pw) { setAuthMsg('이메일과 비밀번호를 입력해주세요'); return; }
+
   if (authMode === 'login') {
     const { error } = await db.auth.signInWithPassword({ email, password: pw });
-    if (error) { errEl.textContent = '이메일 또는 비밀번호가 틀렸어요'; return; }
+    if (error) { setAuthMsg('이메일 또는 비밀번호가 틀렸어요'); return; }
+    closeAuth();
   } else {
-    if (!nickname) { errEl.textContent = '닉네임을 입력해주세요'; return; }
-    if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; return; }
+    // 회원가입
+    const pw2 = document.getElementById('auth-pw2').value;
+    const nickname = document.getElementById('auth-nickname').value.trim();
+
+    if (!nickname) { setAuthMsg('닉네임을 입력해주세요'); return; }
+    if (pw.length < 6) { setAuthMsg('비밀번호는 6자 이상이어야 해요'); return; }
+    if (pw !== pw2) { setAuthMsg('비밀번호가 일치하지 않아요'); return; }
+
+    // 닉네임 중복 체크
+    const { data: existing } = await db.from('profiles').select('id').eq('nickname', nickname).maybeSingle();
+    if (existing) { setAuthMsg('이미 사용 중인 닉네임이에요 😅'); return; }
+
     const { data, error } = await db.auth.signUp({ email, password: pw });
-    if (error) { errEl.textContent = error.message; return; }
-  if (data.user) await db.from('profiles').upsert({ id: data.user.id, nickname });
+    if (error) { setAuthMsg(error.message); return; }
+    if (data.user) {
+      await db.from('profiles').upsert({ id: data.user.id, nickname });
+    }
+    setAuthMsg('📧 가입 완료! 이메일 받은편지함에서 인증 링크를 클릭해주세요 😊', 'var(--green)');
+  }
 }
-closeAuth();
 
-async function logout() { await db.auth.signOut(); closeProfile(); }
-
-// ── 프로필 (아바타 업로드 포함) ──────────────────────────
+// ── 프로필 ──────────────────────────────────────────────
 async function openProfile() {
   if (!currentUser) return;
   const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
   const nickname = profile?.nickname || currentUser.email.split('@')[0];
   const avatarUrl = profile?.avatar_url || null;
-
   document.getElementById('profileNickname').textContent = nickname;
   document.getElementById('profileEmail').textContent = currentUser.email;
   document.getElementById('edit-nickname').value = profile?.nickname || '';
   document.getElementById('edit-bio').value = profile?.bio || '';
-
-  // 아바타 렌더링
   const avatarEl = document.getElementById('profileAvatar');
-  if (avatarUrl) {
-    avatarEl.innerHTML = `<img src="${avatarUrl}" />`;
-  } else {
-    avatarEl.innerHTML = `<span id="avatarEmoji">👤</span>`;
-  }
-
+  avatarEl.innerHTML = avatarUrl ? `<img src="${avatarUrl}" />` : `<span id="avatarEmoji">👤</span>`;
   document.getElementById('profileOverlay').classList.add('open');
 }
-
 function closeProfile() { document.getElementById('profileOverlay').classList.remove('open'); }
 
 async function handleAvatarUpload(event) {
   if (!currentUser) { alert('로그인이 필요해요'); return; }
   const file = event.target.files[0];
   if (!file) return;
-
-  // 파일 크기 체크 (5MB)
   if (file.size > 5 * 1024 * 1024) { alert('5MB 이하의 이미지만 업로드할 수 있어요'); return; }
-
   const ring = document.getElementById('avatarUploadRing');
   ring.classList.add('uploading');
-
   try {
-    // 파일명: userId/timestamp.ext
     const ext = file.name.split('.').pop();
     const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
-
-    // Supabase Storage 업로드
-    const { error: uploadError } = await db.storage
-      .from('avatars')
-      .upload(filePath, file, { upsert: true });
-
-    if (uploadError) throw uploadError;
-
-    // Public URL 가져오기
-    const { data: urlData } = db.storage.from('avatars').getPublicUrl(filePath);
-    const publicUrl = urlData.publicUrl;
-
-    // profiles 테이블에 저장
-    await db.from('profiles').upsert({ id: currentUser.id, avatar_url: publicUrl });
-
-    // UI 업데이트
-    const avatarEl = document.getElementById('profileAvatar');
-    avatarEl.innerHTML = `<img src="${publicUrl}" />`;
-
-    // 헤더 버튼도 업데이트
-    await setUser(currentUser);
-
-  } catch (err) {
-    alert('업로드 실패: ' + (err.message || '다시 시도해주세요'));
-  } finally {
-    ring.classList.remove('uploading');
-    event.target.value = ''; // 같은 파일 재업로드 가능하게
-  }
-}
-
-async function saveProfile() {
-  if (!currentUser) return;
-  const nickname = document.getElementById('edit-nickname').value.trim();
-  const bio = document.getElementById('edit-bio').value.trim();
-  if (!nickname) { alert('닉네임을 입력해주세요'); return; }
-  await db.from('profiles').upsert({ id: currentUser.id, nickname, bio });
-  await setUser(currentUser);
-  closeProfile();
-  alert('프로필이 저장됐어요!');
-}
-
-// 커뮤니티
-let currentTab='후기',currentWriteType='후기';
-function openComm(){document.getElementById('commOverlay').classList.add('open');loadTab('후기');}
-function closeComm(){document.getElementById('commOverlay').classList.remove('open');}
-function handleOverlay(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
-function switchTab(tab,btn){currentTab=tab;document.querySelectorAll('.comm-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');loadTab(tab);}
-async function loadTab(tab) {
-  const body=document.getElementById('commBody');
-  if(tab==='저장'){renderSavedList();return;}
-  renderPostList([],tab);
-  try {
-    const timeout=new Promise((_,reject)=>setTimeout(()=>reject(),3000));
-    const fetchP=db.from('posts').select('*').eq('type',tab).order('created_at',{ascending:false});
-    const {data:posts,error}=await Promise.race([fetchP,timeout]);
-    if(error) throw error;
-    renderPostList(posts||[],tab);
-  } catch(e){renderPostList([],tab);}
-}
-function renderPostList(posts,tab){
-  document.getElementById('commBody').innerHTML=`
-    <button class="post-write-btn" onclick="openWrite('${tab}')">✏️ 글쓰기</button>
-    <div class="post-list">${posts.length?posts.map(p=>postCardHTML(p)).join(''):'<div class="empty-state"><div class="ei">📝</div><p>아직 글이 없어요.<br/>첫 번째 글을 남겨보세요!</p></div>'}</div>`;
-}
-function postCardHTML(p){
-  const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div><div class="post-foot"><button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes||0}</button></div></div>`;
-}
-async function likePost(postId,el){const {data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;const n=(data.likes||0)+1;await db.from('posts').update({likes:n}).eq('id',postId);el.textContent='❤️ '+n;el.classList.add('liked');}
-function renderSavedList(){
-  const saved=places.filter(p=>isSaved(p.id));
-  document.getElementById('commBody').innerHTML=saved.length
-    ?`<div class="saved-list">${saved.map(p=>`<div class="saved-item" onclick="closeComm();selectPlace(${p.id})"><span class="saved-icon">${CAT_ICON[p.cat]}</span><div class="saved-info"><div class="saved-name">${p.name}</div><div class="saved-addr">${p.addr}</div></div><button class="unsave-btn" onclick="event.stopPropagation();toggleSave(${p.id});renderSavedList();renderAll()">🗑️</button></div>`).join('')}</div>`
-    :`<div class="empty-state"><div class="ei">🔖</div><p>저장한 성지가 없어요.<br/>카드의 🏷️ 버튼으로 저장해보세요!</p></div>`;
-}
-
-function openWrite(type){currentWriteType=type||'후기';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===currentWriteType));document.getElementById('writeOverlay').classList.add('open');}
-function closeWrite(){document.getElementById('writeOverlay').classList.remove('open');}
-function selectType(btn){currentWriteType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-async function submitPost(){
-  const nick=document.getElementById('w-nick').value.trim()||'익명';
-  const title=document.getElementById('w-title').value.trim();
-  const content=document.getElementById('w-content').value.trim();
-  if(!title){alert('제목을 입력해주세요');return;}
-  if(!content){alert('내용을 입력해주세요');return;}
-  const {error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0});
-  if(error){alert('등록 실패: '+error.message);return;}
-  ['w-nick','w-title','w-content'].forEach(id=>document.getElementById(id).value='');
-  closeWrite();loadTab(currentWriteType);
-}
-
-let pickMode=false,pickedLat=null,pickedLng=null,modalTags=[],selectedCat=null;
-function openAddModal(){document.getElementById('addOverlay').classList.add('open');resetForm();}
-function closeAddModal(){document.getElementById('addOverlay').classList.remove('open');if(pickMode)cancelPickMode();}
-function resetForm(){
-  ['f-name','f-addr','f-desc','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  modalTags=[];selectedCat=null;pickedLat=null;pickedLng=null;
-  document.getElementById('tagsPreview').innerHTML='';
-  document.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));
-  const pb=document.getElementById('mapPickBox');
-  pb.textContent='📍 지도에서 위치 직접 선택하기';pb.classList.remove('picked');
-}
-function selectCat(btn){document.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');selectedCat=btn.dataset.c;}
-function addTag(){const inp=document.getElementById('f-tag');const val=inp.value.trim();if(!val||modalTags.includes(val)){inp.value='';return;}modalTags.push(val);inp.value='';renderModalTags();}
-function removeTag(t){modalTags=modalTags.filter(x=>x!==t);renderModalTags();}
-function renderModalTags(){document.getElementById('tagsPreview').innerHTML=modalTags.map(t=>`<span class="tag-del" onclick="removeTag('${t}')">🏷 ${t} ✕</span>`).join('');}
-function startPickMode(){closeAddModal();pickMode=true;document.getElementById('pickModeBar').classList.add('on');map.setCursor('crosshair');kakao.maps.event.addListener(map,'click',onMapPick);}
-function onMapPick(e){
-  if(!pickMode)return;
-  pickedLat=e.latLng.getLat();pickedLng=e.latLng.getLng();
-  cancelPickMode();openAddModal();
-  const pb=document.getElementById('mapPickBox');
-  pb.textContent=`✅ 위치 선택됨 (${pickedLat.toFixed(4)}, ${pickedLng.toFixed(4)})`;pb.classList.add('picked');
-  try{new kakao.maps.services.Geocoder().coord2Address(pickedLng,pickedLat,(result,status)=>{if(status===kakao.maps.services.Status.OK&&result[0])document.getElementById('f-addr').value=result[0].address.address_name;});}catch(e){}
-}
-function cancelPickMode(){pickMode=false;document.getElementById('pickModeBar').classList.remove('on');map.setCursor('');kakao.maps.event.removeListener(map,'click',onMapPick);}
-function submitPlace(){
-  const name=document.getElementById('f-name').value.trim();
-  const addr=document.getElementById('f-addr').value.trim();
-  const desc=document.getElementById('f-desc').value.trim();
-  if(!name){alert('샵 이름을 입력해주세요');return;}
-  if(!selectedCat){alert('카테고리를 선택해주세요');return;}
-  if(!addr){alert('주소를 입력해주세요');return;}
-  const finalize=(lat,lng)=>{
-    const np={id:Date.now(),name,cat:selectedCat,addr,lat,lng,desc,tags:[...modalTags]};
-    places.push(np);savePlaces();closeAddModal();
-    currentCat='전체';
-    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
-    renderAll();
-    setTimeout(()=>selectPlace(np.id),300);
-  };
-  if(pickedLat&&pickedLng){finalize(pickedLat,pickedLng);return;}
-  try{
-    new kakao.maps.services.Geocoder().addressSearch(addr,(result,status)=>{
-      if(status===kakao.maps.services.Status.OK)finalize(parseFloat(result[0].y),parseFloat(result[0].x));
-      else finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);
-    });
-  }catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
-}
-</script>
-</body>
-</html>
+    const { error: uploadError } = aw
