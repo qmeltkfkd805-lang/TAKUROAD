@@ -800,10 +800,12 @@ async function submitAuth() {
     if (pw.length < 6) { errEl.textContent = '비밀번호는 6자 이상이어야 해요'; return; }
     const { data, error } = await db.auth.signUp({ email, password: pw });
     if (error) { errEl.textContent = error.message; return; }
-    if (data.user) await db.from('profiles').upsert({ id: data.user.id, nickname });
+   if (data.user) await db.from('profiles').upsert({ id: data.user.id, nickname });
+    document.getElementById('authError').style.color = 'var(--green)';
+    document.getElementById('authError').textContent = '📧 가입 완료! 이메일 받은편지함에서 인증 링크를 클릭해주세요 😊';
+    return;
   }
-  closeAuth();
-}
+closeAuth();
 
 async function logout() { await db.auth.signOut(); closeProfile(); }
 
