@@ -633,10 +633,13 @@ async function submitAuth(){
     if(pw!==pw2){setAuthMsg('비밀번호가 일치하지 않아요');return;}
     const{data:existing}=await db.from('profiles').select('id').eq('nickname',nickname).maybeSingle();
     if(existing){setAuthMsg('이미 사용 중인 닉네임이에요 😅');return;}
-    const{data,error}=await db.auth.signUp({email,password:pw});
-    if(error){setAuthMsg(error.message);return;}
-    if(data.user)await db.from('profiles').upsert({id:data.user.id,nickname});
-    setAuthMsg('📧 가입 완료! 이메일 받은편지함에서 인증 링크를 클릭해주세요 😊','var(--green)');
+   const{data,error}=await db.auth.signUp({email,password:pw});
+if(error){setAuthMsg(error.message);return;}
+if(data.user)await db.from('profiles').upsert({id:data.user.id,nickname});
+// 바로 로그인
+const{error:loginErr}=await db.auth.signInWithPassword({email,password:pw});
+if(loginErr){setAuthMsg('가입됐어요! 로그인해주세요 😊','var(--green)');return;}
+closeAuth();
   }
 }
 async function openProfile(){
