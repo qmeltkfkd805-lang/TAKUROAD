@@ -240,6 +240,15 @@
     .btn-logout{width:100%;padding:11px;border:1.5px solid var(--border);border-radius:var(--r-sm);background:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--red);transition:all .2s;margin-top:8px;}
     .btn-logout:hover{background:var(--red-l);border-color:var(--red);}
     .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+    .post-images{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .post-img{width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);}
+    .img-preview-wrap{position:relative;display:inline-block;}
+    .img-preview-wrap img{width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+    .img-preview-del{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+    .img-attach-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px dashed var(--border);border-radius:var(--r-sm);background:none;font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s;}
+    .img-attach-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .post-img-full{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:900;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+    .post-img-full img{max-width:90vw;max-height:90vh;border-radius:8px;}
     .empty-state .ei{font-size:40px;margin-bottom:12px;}
     .empty-state p{font-size:14px;line-height:1.6;}
     @media(max-width:600px){.logo{font-size:24px;}.btn-add span:last-child,.btn-comm span:last-child{display:none;}.search-wrap{max-width:none;}}
@@ -318,6 +327,12 @@
     </div>
     <div class="form-group"><label>제목 *</label><input type="text" id="w-title" placeholder="제목을 입력하세요"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="w-content" rows="6" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
+    <div class="form-group">
+      <label>이미지 첨부</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="imgPreviewArea"></div>
+      <button type="button" class="img-attach-btn" style="margin-top:8px" onclick="document.getElementById('postImgInput').click()">📷 이미지 추가 (최대 5장)</button>
+      <input type="file" id="postImgInput" accept="image/*" multiple style="display:none" onchange="handlePostImgSelect(event)"/>
+    </div>
     <button class="btn-submit" onclick="submitPost()">게시하기</button>
   </div>
 </div>
@@ -690,6 +705,11 @@ async function loadTab(tab){
     const fetchP=db.from('posts').select('*').eq('type',tab).order('created_at',{ascending:false});
     const{data:posts,error}=await Promise.race([fetchP,timeout]);
     if(error)throw error;
+    // 좋아요한 글 로드
+    if(currentUser){
+      const{data:likes}=await db.from('post_likes').select('post_id').eq('user_id',currentUser.id);
+      window._likedPosts=new Set((likes||[]).map(l=>l.post_id));
+    }
     renderPostList(posts||[],tab);
   }catch(e){renderPostList([],tab);}
 }
@@ -699,8 +719,33 @@ function renderPostList(posts,tab){
 function postCardHTML(p){
   const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
   const isMine=currentUser&&p.user_id===currentUser.id;
-  const delBtn=isMine?`<button onclick="deletePost('${p.id}')" style="margin-left:auto;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑️ 삭제</button>`:'';
-  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div><div class="post-foot"><button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes||0}</button>${delBtn}</div></div>`;
+  const delBtn=isMine?`<button onclick="deletePost('${p.id}')" style="margin-left:auto;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">삭제</button>`:'';
+  const liked=window._likedPosts&&window._likedPosts.has(p.id);
+  const imgs=p.images&&p.images.length?`<div class="post-images">${p.images.map(src=>`<img class="post-img" src="${src}" onclick="openImgFull('${src}')" />`).join('')}</div>`:'';
+  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div>${imgs}<div class="post-foot"><button class="like-btn${liked?' liked':''}" onclick="likePost('${p.id}',this)" ${liked?'disabled':''}>❤️ ${p.likes||0}</button>${delBtn}</div></div>`;
+}
+window._postImgFiles=[];
+function handlePostImgSelect(event){
+  const files=Array.from(event.target.files);
+  const current=window._postImgFiles||[];
+  const combined=[...current,...files].slice(0,5);
+  window._postImgFiles=combined;
+  const area=document.getElementById('imgPreviewArea');
+  area.innerHTML='';
+  combined.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._postImgFiles.splice(i,1);handlePostImgSelect({target:{files:[]}});};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+  event.target.value='';
+}
+function openImgFull(src){
+  const d=document.createElement('div');d.className='post-img-full';
+  d.innerHTML=`<img src="${src}"/>`;
+  d.onclick=()=>d.remove();
+  document.body.appendChild(d);
 }
 async function deletePost(postId){
   if(!currentUser){alert('로그인이 필요해요');return;}
@@ -709,23 +754,47 @@ async function deletePost(postId){
   if(error){alert('삭제 실패: '+error.message);return;}
   loadTab(currentTab);
 }
-async function likePost(postId,el){const{data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;const n=(data.likes||0)+1;await db.from('posts').update({likes:n}).eq('id',postId);el.textContent='❤️ '+n;el.classList.add('liked');}
+async function likePost(postId,el){
+  if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
+  if(window._likedPosts&&window._likedPosts.has(postId))return;
+  const{error:likeErr}=await db.from('post_likes').insert({post_id:postId,user_id:currentUser.id});
+  if(likeErr)return;
+  const{data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;
+  const n=(data.likes||0)+1;
+  await db.from('posts').update({likes:n}).eq('id',postId);
+  if(!window._likedPosts)window._likedPosts=new Set();
+  window._likedPosts.add(postId);
+  el.textContent='❤️ '+n;el.classList.add('liked');el.disabled=true;
+}
 function renderSavedList(){
   const saved=places.filter(p=>isSaved(p.id));
   document.getElementById('commBody').innerHTML=saved.length?`<div class="saved-list">${saved.map(p=>`<div class="saved-item" onclick="closeComm();selectPlace(${p.id})"><span style="font-size:20px">${CAT_ICON[p.cat]}</span><div class="saved-info"><div class="saved-name">${p.name}</div><div class="saved-addr">${p.addr}</div></div><button class="unsave-btn" onclick="event.stopPropagation();toggleSave(${p.id});renderSavedList();renderAll()">🗑️</button></div>`).join('')}</div>`:'<div class="empty-state"><div class="ei">🔖</div><p>저장한 성지가 없어요.</p></div>';
 }
 function openWrite(type){currentWriteType=type||'후기';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===currentWriteType));document.getElementById('writeOverlay').classList.add('open');}
-function closeWrite(){document.getElementById('writeOverlay').classList.remove('open');}
+function closeWrite(){
+  document.getElementById('writeOverlay').classList.remove('open');
+  document.getElementById('imgPreviewArea').innerHTML='';
+  window._postImgFiles=[];
+}
 function selectType(btn){currentWriteType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 async function submitPost(){
   if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
   const title=document.getElementById('w-title').value.trim();
-  const content=document.getElementById('w-content').value.trim();
+  const postContent=document.getElementById('w-content').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
-  if(!content){alert('내용을 입력해주세요');return;}
+  if(!postContent){alert('내용을 입력해주세요');return;}
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile?.nickname||currentUser.email.split('@')[0];
-  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0,user_id:currentUser.id});
+  // 이미지 업로드
+  const imageUrls=[];
+  const files=window._postImgFiles||[];
+  for(const file of files){
+    const ext=file.name.split('.').pop();
+    const path=`${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content:postContent,likes:0,user_id:currentUser.id,images:imageUrls.length?imageUrls:null});
   if(error){alert('등록 실패: '+error.message);return;}
   ['w-title','w-content'].forEach(id=>document.getElementById(id).value='');
   closeWrite();loadTab(currentWriteType);
