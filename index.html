@@ -47,7 +47,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans KR', 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* 헤더 */
     header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 16px; height: 56px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; z-index: 100; position: relative; }
     header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), var(--purple), transparent); }
     .logo { font-family: 'Cute Font', cursive; font-size: 34px; color: var(--accent); white-space: nowrap; letter-spacing: 2px; flex-shrink: 0; -webkit-text-stroke: 0.5px var(--accent-d); }
@@ -68,7 +67,6 @@
     .btn-add { background: var(--accent); color: #fff; border: none; border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
     .btn-add:hover { background: var(--accent-d); }
 
-    /* 카테고리 바 */
     .cat-bar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; gap: 7px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
     .cat-bar::-webkit-scrollbar { display: none; }
     .cat-btn { display: flex; align-items: center; gap: 5px; padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; transition: all .18s; color: var(--muted); font-weight: 700; }
@@ -84,102 +82,35 @@
     .cat-btn[data-cat="게임샵"].active { background: var(--c-game); }
     .cat-btn[data-cat="쿠지샵"].active { background: #e03535; }
 
-    /* 본문 */
     .main { flex: 1 1 0; display: flex; overflow: hidden; position: relative; height: 0; }
     #map { flex: 1; height: 100%; }
 
-    /* 픽모드 */
     .pick-mode-bar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; padding: 8px 18px; border-radius: 24px; z-index: 300; box-shadow: var(--sh-glow); display: none; align-items: center; gap: 8px; white-space: nowrap; }
     .pick-mode-bar.on { display: flex; }
     .pick-mode-bar button { background: rgba(255,255,255,.2); border: none; border-radius: 12px; color: #fff; padding: 3px 9px; font-size: 12px; cursor: pointer; font-family: inherit; }
 
-    /* 마커 */
     .taku-marker { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .marker-bubble { color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 10px; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,.3); font-family: 'Noto Sans KR', sans-serif; }
     .marker-tail { width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; margin-top: -1px; }
 
-    /* 샵 목록 버튼 (FAB) */
-    .list-fab {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 28px;
-      padding: 13px 26px;
-      font-size: 15px;
-      font-family: inherit;
-      font-weight: 900;
-      cursor: pointer;
-      z-index: 300;
-      box-shadow: 0 4px 20px rgba(232,0,111,.4);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      white-space: nowrap;
-      transition: all .2s;
-      letter-spacing: 0.5px;
-    }
+    .list-fab { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #fff; border: none; border-radius: 28px; padding: 13px 26px; font-size: 15px; font-family: inherit; font-weight: 900; cursor: pointer; z-index: 300; box-shadow: 0 4px 20px rgba(232,0,111,.4); display: flex; align-items: center; gap: 8px; white-space: nowrap; transition: all .2s; letter-spacing: 0.5px; }
     .list-fab:hover { background: var(--accent-d); transform: translateX(-50%) translateY(-2px); }
 
-    /* 샵 목록 패널 */
-    .list-panel {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      background: var(--surface);
-      border-radius: 20px 20px 0 0;
-      box-shadow: var(--sh-lg);
-      z-index: 500;
-      height: 85dvh;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(100%);
-      transition: transform .35s cubic-bezier(.32,.72,0,1);
-    }
+    .list-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; box-shadow: var(--sh-lg); z-index: 500; height: 85dvh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform .35s cubic-bezier(.32,.72,0,1); }
     .list-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: 20px 20px 0 0; }
     .list-panel.open { transform: translateY(0); }
-
     .list-panel-head { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .list-panel-head h2 { font-size: 16px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
     .list-panel-close { background: var(--surface2); border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .15s; }
     .list-panel-close:hover { border-color: var(--accent); color: var(--accent); }
-
-    .list-panel-body {
-      flex: 1 1 0;
-      overflow-y: auto;
-      padding: 12px 16px 80px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 0;
-      align-items: stretch;
-    }
+    .list-panel-body { flex: 1 1 0; overflow-y: auto; padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 10px; height: 0; align-items: stretch; }
     .list-panel-body::-webkit-scrollbar { width: 4px; }
     .list-panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* 샵 카드 - 새로 디자인 */
-    .shop-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r);
-      padding: 14px 16px 14px 20px;
-      cursor: pointer;
-      transition: all .18s;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      min-height: 90px;
-      flex-shrink: 0;
-    }
+    .shop-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r); padding: 14px 16px 14px 20px; cursor: pointer; transition: all .18s; display: flex; align-items: flex-start; gap: 14px; position: relative; overflow: hidden; width: 100%; min-height: 90px; flex-shrink: 0; }
     .shop-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--card-color, var(--accent)); border-radius: var(--r) 0 0 var(--r); }
     .shop-card:hover { border-color: var(--card-color, var(--accent)); box-shadow: var(--sh-md); transform: translateY(-1px); }
     .shop-card.active { border-color: var(--card-color, var(--accent)); box-shadow: 0 0 0 3px var(--accent-l); }
-
     .shop-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
     .shop-body { flex: 1; min-width: 0; }
     .shop-top { display: flex; align-items: flex-start; gap: 8px; }
@@ -193,7 +124,6 @@
     .shop-tag-cat { border: 1px solid transparent; }
     .shop-tag-info { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
-    /* 상세패널 */
     .detail-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); border-radius: var(--r) var(--r) 0 0; box-shadow: var(--sh-lg); padding: 20px; transform: translateY(100%); transition: transform .3s cubic-bezier(.32,.72,0,1); z-index: 600; max-height: 75dvh; overflow-y: auto; }
     .detail-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
     .detail-panel.open { transform: translateY(0); }
@@ -216,7 +146,6 @@
     .tag-cat { background: var(--accent-l); color: var(--accent); }
     .tag-info { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 
-    /* 리뷰 */
     .review-section h3 { font-size: 14px; font-weight: 900; margin-bottom: 10px; }
     .review-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
     .review-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; }
@@ -236,11 +165,9 @@
     .btn-review { background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 10px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; }
     .btn-review:hover { background: var(--accent-d); }
 
-    /* 오버레이 */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 700; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s; backdrop-filter: blur(4px); }
     .overlay.open { opacity: 1; pointer-events: all; }
 
-    /* 커뮤니티 */
     .comm-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 680px; height: 88dvh; display: flex; flex-direction: column; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; }
     .comm-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
     .overlay.open .comm-panel, .overlay.open .write-panel, .overlay.open .add-modal { transform: translateY(0); }
@@ -252,12 +179,14 @@
     .comm-tabs { display: flex; overflow-x: auto; scrollbar-width: none; margin-bottom: -1px; }
     .comm-tabs::-webkit-scrollbar { display: none; }
     .comm-tab { padding: 9px 16px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
-    /* 로그인/회원가입 */
     .btn-login { background: var(--surface2); color: var(--text); border: 1.5px solid var(--border); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all .2s; display: flex; align-items: center; gap: 5px; }
     .btn-login:hover { border-color: var(--accent); color: var(--accent); }
-    .user-btn { background: var(--accent-l); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 20px; padding: 7px 14px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px; transition: all .2s; }
+    .user-btn { background: var(--accent-l); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 20px; padding: 5px 12px 5px 5px; font-size: 13px; font-family: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 7px; transition: all .2s; }
     .user-btn:hover { background: var(--accent); color: #fff; }
+    .user-btn .user-avatar-mini { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: var(--accent-l); display: flex; align-items: center; justify-content: center; font-size: 13px; overflow: hidden; flex-shrink: 0; }
+    .user-btn .user-avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
 
+    /* ── 프로필 패널 (아바타 업로드 포함) ── */
     .auth-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; }
     .auth-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
     .overlay.open .auth-panel { transform: translateY(0); }
@@ -272,14 +201,25 @@
     .btn-google { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: var(--surface2); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; color: var(--text); margin-bottom: 4px; }
     .btn-google:hover { border-color: var(--accent); }
 
-    /* 프로필 패널 */
     .profile-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 420px; padding: 28px 24px 36px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); position: relative; max-height: 90dvh; overflow-y: auto; }
     .profile-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
     .overlay.open .profile-panel { transform: translateY(0); }
     .profile-panel h2 { font-size: 20px; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+
+    /* 아바타 업로드 영역 */
     .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; }
-    .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--accent-l); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 3px solid var(--accent); overflow: hidden; }
+    .avatar-upload-ring { position: relative; width: 88px; height: 88px; cursor: pointer; }
+    .avatar-upload-ring:hover .avatar-overlay { opacity: 1; }
+    .avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--accent-l); display: flex; align-items: center; justify-content: center; font-size: 36px; border: 3px solid var(--accent); overflow: hidden; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-overlay { position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,.45); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+    .avatar-overlay span:first-child { font-size: 20px; }
+    .avatar-overlay span:last-child { font-size: 10px; color: #fff; font-weight: 700; letter-spacing: 0.5px; }
+    .avatar-upload-input { display: none; }
+    .avatar-uploading { position: absolute; inset: 0; border-radius: 50%; background: rgba(255,255,255,.75); display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); }
+    .avatar-upload-ring.uploading .avatar-uploading { display: flex; }
+    .avatar-hint { font-size: 11px; color: var(--muted); }
+
     .btn-logout { width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: none; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--red); transition: all .2s; margin-top: 8px; }
     .btn-logout:hover { background: var(--red-l); border-color: var(--red); }
 
@@ -306,7 +246,6 @@
     .like-btn { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); cursor: pointer; background: none; border: none; font-family: inherit; padding: 0; }
     .like-btn:hover, .like-btn.liked { color: var(--accent); }
 
-    /* 글쓰기 */
     .write-panel { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 680px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
     .write-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,var(--accent),var(--cyan)); border-radius: var(--r) var(--r) 0 0; }
     .write-panel h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
@@ -322,7 +261,6 @@
     .btn-submit { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: var(--r-sm); padding: 13px; font-size: 15px; font-family: inherit; font-weight: 900; cursor: pointer; margin-top: 4px; }
     .btn-submit:hover { background: var(--accent-d); }
 
-    /* 장소추가 */
     .add-modal { background: var(--surface); border-radius: var(--r) var(--r) 0 0; width: 100%; max-width: 520px; padding: 24px 20px 32px; transform: translateY(40px); transition: transform .3s cubic-bezier(.32,.72,0,1); max-height: 90dvh; overflow-y: auto; position: relative; }
     .add-modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple)); border-radius: var(--r) var(--r) 0 0; }
     .add-modal h2 { font-size: 18px; font-weight: 900; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
@@ -339,7 +277,6 @@
     .map-pick-box:hover { border-color: var(--cyan); color: var(--cyan); }
     .map-pick-box.picked { border-style: solid; border-color: var(--cyan); color: var(--cyan); background: var(--cyan-l); }
 
-    /* 저장목록 */
     .saved-list { display: flex; flex-direction: column; gap: 8px; }
     .saved-item { background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--r); padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
     .saved-item:hover { border-color: var(--accent); }
@@ -350,12 +287,10 @@
     .unsave-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 4px; opacity: .5; }
     .unsave-btn:hover { opacity: 1; }
 
-    /* 공통 */
     .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
     .empty-state .ei { font-size: 40px; margin-bottom: 12px; }
     .empty-state p { font-size: 14px; line-height: 1.6; }
 
-    /* 반응형 */
     @media(max-width: 600px) {
       .logo { font-size: 24px; }
       .btn-add span:last-child, .btn-comm span:last-child { display: none; }
@@ -400,10 +335,8 @@
   </div>
 </div>
 
-<!-- 샵 목록 FAB 버튼 -->
 <button class="list-fab" id="listFab" onclick="toggleListPanel()">🏪 샵 목록 보기</button>
 
-<!-- 샵 목록 패널 -->
 <div class="list-panel" id="listPanel">
   <div class="list-panel-head">
     <h2>🏪 샵 목록 <span id="listCount" style="font-size:13px;color:var(--muted);font-weight:500;margin-left:4px;"></span></h2>
@@ -482,6 +415,56 @@
   </div>
 </div>
 
+<!-- 로그인/회원가입 -->
+<div class="overlay" id="authOverlay" onclick="handleOverlay(event,'authOverlay')">
+  <div class="auth-panel">
+    <h2>환영해요! <button class="icon-close" onclick="closeAuth()">✕</button></h2>
+    <p>타쿠로드에 로그인하고 리뷰와 커뮤니티를 이용해보세요 😊</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">로그인</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">회원가입</button>
+    </div>
+    <div class="form-group"><label>이메일</label><input type="email" id="auth-email" placeholder="이메일 입력" /></div>
+    <div class="form-group"><label>비밀번호</label><input type="password" id="auth-pw" placeholder="비밀번호 입력" /></div>
+    <div class="form-group" id="auth-nickname-wrap" style="display:none"><label>닉네임</label><input type="text" id="auth-nickname" placeholder="닉네임 입력" /></div>
+    <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">로그인</button>
+    <div id="authError" style="color:var(--red);font-size:12px;margin-top:8px;text-align:center;"></div>
+    <div class="auth-divider"><span>또는</span></div>
+    <button class="btn-google" onclick="loginWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.4 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/><path fill="#FBBC05" d="M10.6 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.3 0-11.6-4-13.5-9.4l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>
+      구글로 계속하기
+    </button>
+  </div>
+</div>
+
+<!-- 프로필 -->
+<div class="overlay" id="profileOverlay" onclick="handleOverlay(event,'profileOverlay')">
+  <div class="profile-panel">
+    <h2>내 프로필 <button class="icon-close" onclick="closeProfile()">✕</button></h2>
+    <div class="avatar-wrap">
+      <!-- 아바타 업로드 링 -->
+      <div class="avatar-upload-ring" id="avatarUploadRing" onclick="document.getElementById('avatarFileInput').click()">
+        <div class="avatar" id="profileAvatar">
+          <span id="avatarEmoji">👤</span>
+        </div>
+        <div class="avatar-overlay">
+          <span>📷</span>
+          <span>변경</span>
+        </div>
+        <div class="avatar-uploading" id="avatarUploading">업로드 중…</div>
+      </div>
+      <input type="file" id="avatarFileInput" class="avatar-upload-input" accept="image/*" onchange="handleAvatarUpload(event)" />
+      <div class="avatar-hint">눌러서 프로필 사진 변경</div>
+      <div style="font-size:16px;font-weight:900" id="profileNickname">닉네임</div>
+      <div style="font-size:12px;color:var(--muted)" id="profileEmail"></div>
+    </div>
+    <div class="form-group"><label>닉네임 변경</label><input type="text" id="edit-nickname" placeholder="새 닉네임" /></div>
+    <div class="form-group"><label>자기소개</label><textarea id="edit-bio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
+    <button class="btn-submit" onclick="saveProfile()">저장하기</button>
+    <button class="btn-logout" onclick="logout()">로그아웃</button>
+  </div>
+</div>
+
 <script>
 const SUPA_URL = 'https://ouhlwmtwgxewrktgrzkd.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91aGx3bXR3Z3hld3JrdGdyemtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDM4NjUsImV4cCI6MjA5NDkxOTg2NX0.Y1BGbubuWUM-8E9ydN0sJk3R3j8wiYwhj0Qkk7F2O_M';
@@ -526,7 +509,6 @@ function toggleSave(id) {
   localStorage.setItem('takuroad_saves', JSON.stringify(savedIds));
 }
 
-// 지도
 let map, markers = [], currentCat = '전체', activePlaceId = null;
 
 window.onload = function () {
@@ -534,7 +516,6 @@ window.onload = function () {
     map = new kakao.maps.Map(document.getElementById('map'), {
       center: new kakao.maps.LatLng(37.5519, 127.0005), level: 8
     });
-    // 저장된 데이터 없으면 더미 데이터 좌표 자동 보정
     if (!localStorage.getItem('takuroad_places')) {
       geocodeDummy().then(() => renderAll());
     } else {
@@ -565,15 +546,12 @@ async function geocodeDummy() {
 function renderAll() {
   clearMarkers();
   const filtered = currentCat === '전체' ? places : places.filter(p => p.cat === currentCat);
-
-  // 같은 좌표 그룹화해서 겹치면 원형으로 분산
   const posMap = {};
   filtered.forEach(p => {
     const key = p.lat.toFixed(4) + ',' + p.lng.toFixed(4);
     if (!posMap[key]) posMap[key] = [];
     posMap[key].push(p);
   });
-
   filtered.forEach(p => {
     const key = p.lat.toFixed(4) + ',' + p.lng.toFixed(4);
     const group = posMap[key];
@@ -586,11 +564,9 @@ function renderAll() {
     }
     addMarker(p, offset);
   });
-
   renderListPanel(filtered);
 }
 
-// 샵 목록 패널 렌더링
 function renderListPanel(filtered) {
   const body = document.getElementById('listPanelBody');
   const count = document.getElementById('listCount');
@@ -603,7 +579,6 @@ function renderListPanel(filtered) {
   filtered.forEach(p => body.appendChild(makeShopCard(p)));
 }
 
-// 새로 만든 샵 카드 함수
 function makeShopCard(p) {
   const color = CAT_COLOR[p.cat] || '#e8006f';
   const bg = CAT_BG[p.cat] || 'rgba(232,0,111,.12)';
@@ -631,12 +606,7 @@ function makeShopCard(p) {
 }
 
 function handleSaveBtn(id, btn) { toggleSave(id); btn.textContent = isSaved(id) ? '🔖' : '🏷️'; }
-
-// 샵 목록 패널 토글
-function toggleListPanel() {
-  const panel = document.getElementById('listPanel');
-  panel.classList.toggle('open');
-}
+function toggleListPanel() { document.getElementById('listPanel').classList.toggle('open'); }
 
 function addMarker(p, offset = {lat: 0, lng: 0}) {
   const color = CAT_COLOR[p.cat] || '#e8006f';
@@ -661,15 +631,12 @@ async function selectPlace(id) {
   if (card) { card.classList.add('active'); card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
   map.setCenter(new kakao.maps.LatLng(p.lat, p.lng));
   map.setLevel(4);
-  // 샵 목록 패널 닫기
   document.getElementById('listPanel').classList.remove('open');
   await showDetail(p);
 }
 
 async function showDetail(p) {
   const color = CAT_COLOR[p.cat] || '#e8006f';
-
-  // 기본 정보 즉시 표시
   document.getElementById('detailContent').innerHTML = `
     <div class="detail-cat" style="color:${color}">${CAT_ICON[p.cat]} <strong>${p.cat}</strong></div>
     <div class="detail-name">${p.name}</div>
@@ -695,8 +662,6 @@ async function showDetail(p) {
     </div>`;
   document.getElementById('detailPanel').classList.add('open');
   window._pickedStar = 0;
-
-  // 리뷰 비동기 로딩
   try {
     const { data: reviews } = await db.from('reviews').select('*').eq('place_id', p.id).order('created_at', { ascending: false });
     const rv = reviews || [];
@@ -745,7 +710,6 @@ async function likeReview(reviewId, el) {
 function starStr(n){n=Math.max(0,Math.min(5,n));return'★'.repeat(n)+'☆'.repeat(5-n);}
 function closeDetail(){document.getElementById('detailPanel').classList.remove('open');activePlaceId=null;document.querySelectorAll('.shop-card').forEach(c=>c.classList.remove('active'));}
 
-// 카테고리
 function filterCat(cat, btn) {
   currentCat=cat;
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
@@ -754,7 +718,6 @@ function filterCat(cat, btn) {
   renderAll();
 }
 
-// 검색
 function handleSearchInput() {
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
@@ -784,8 +747,17 @@ async function setUser(user) {
   currentUser = user;
   const { data: profile } = await db.from('profiles').select('*').eq('id', user.id).single();
   const nickname = profile?.nickname || user.email.split('@')[0];
+  const avatarUrl = profile?.avatar_url || null;
   const btn = document.getElementById('loginBtn');
-  if (btn) { btn.className = 'user-btn'; btn.innerHTML = nickname; btn.onclick = openProfile; }
+  if (btn) {
+    btn.className = 'user-btn';
+    if (avatarUrl) {
+      btn.innerHTML = `<div class="user-avatar-mini"><img src="${avatarUrl}" /></div>${nickname}`;
+    } else {
+      btn.innerHTML = `<div class="user-avatar-mini">👤</div>${nickname}`;
+    }
+    btn.onclick = openProfile;
+  }
 }
 
 function clearUser() {
@@ -835,16 +807,75 @@ async function submitAuth() {
 
 async function logout() { await db.auth.signOut(); closeProfile(); }
 
+// ── 프로필 (아바타 업로드 포함) ──────────────────────────
 async function openProfile() {
   if (!currentUser) return;
   const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
-  document.getElementById('profileNickname').textContent = profile?.nickname || currentUser.email.split('@')[0];
+  const nickname = profile?.nickname || currentUser.email.split('@')[0];
+  const avatarUrl = profile?.avatar_url || null;
+
+  document.getElementById('profileNickname').textContent = nickname;
   document.getElementById('profileEmail').textContent = currentUser.email;
   document.getElementById('edit-nickname').value = profile?.nickname || '';
   document.getElementById('edit-bio').value = profile?.bio || '';
+
+  // 아바타 렌더링
+  const avatarEl = document.getElementById('profileAvatar');
+  if (avatarUrl) {
+    avatarEl.innerHTML = `<img src="${avatarUrl}" />`;
+  } else {
+    avatarEl.innerHTML = `<span id="avatarEmoji">👤</span>`;
+  }
+
   document.getElementById('profileOverlay').classList.add('open');
 }
+
 function closeProfile() { document.getElementById('profileOverlay').classList.remove('open'); }
+
+async function handleAvatarUpload(event) {
+  if (!currentUser) { alert('로그인이 필요해요'); return; }
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // 파일 크기 체크 (5MB)
+  if (file.size > 5 * 1024 * 1024) { alert('5MB 이하의 이미지만 업로드할 수 있어요'); return; }
+
+  const ring = document.getElementById('avatarUploadRing');
+  ring.classList.add('uploading');
+
+  try {
+    // 파일명: userId/timestamp.ext
+    const ext = file.name.split('.').pop();
+    const filePath = `${currentUser.id}/${Date.now()}.${ext}`;
+
+    // Supabase Storage 업로드
+    const { error: uploadError } = await db.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    // Public URL 가져오기
+    const { data: urlData } = db.storage.from('avatars').getPublicUrl(filePath);
+    const publicUrl = urlData.publicUrl;
+
+    // profiles 테이블에 저장
+    await db.from('profiles').upsert({ id: currentUser.id, avatar_url: publicUrl });
+
+    // UI 업데이트
+    const avatarEl = document.getElementById('profileAvatar');
+    avatarEl.innerHTML = `<img src="${publicUrl}" />`;
+
+    // 헤더 버튼도 업데이트
+    await setUser(currentUser);
+
+  } catch (err) {
+    alert('업로드 실패: ' + (err.message || '다시 시도해주세요'));
+  } finally {
+    ring.classList.remove('uploading');
+    event.target.value = ''; // 같은 파일 재업로드 가능하게
+  }
+}
 
 async function saveProfile() {
   if (!currentUser) return;
@@ -892,7 +923,6 @@ function renderSavedList(){
     :`<div class="empty-state"><div class="ei">🔖</div><p>저장한 성지가 없어요.<br/>카드의 🏷️ 버튼으로 저장해보세요!</p></div>`;
 }
 
-// 글쓰기
 function openWrite(type){currentWriteType=type||'후기';document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===currentWriteType));document.getElementById('writeOverlay').classList.add('open');}
 function closeWrite(){document.getElementById('writeOverlay').classList.remove('open');}
 function selectType(btn){currentWriteType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
@@ -908,7 +938,6 @@ async function submitPost(){
   closeWrite();loadTab(currentWriteType);
 }
 
-// 장소 추가
 let pickMode=false,pickedLat=null,pickedLng=null,modalTags=[],selectedCat=null;
 function openAddModal(){document.getElementById('addOverlay').classList.add('open');resetForm();}
 function closeAddModal(){document.getElementById('addOverlay').classList.remove('open');if(pickMode)cancelPickMode();}
@@ -959,43 +988,5 @@ function submitPlace(){
   }catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
 }
 </script>
-<!-- 로그인/회원가입 -->
-<div class="overlay" id="authOverlay" onclick="handleOverlay(event,'authOverlay')">
-  <div class="auth-panel">
-    <h2>환영해요! <button class="icon-close" onclick="closeAuth()">✕</button></h2>
-    <p>타쿠로드에 로그인하고 리뷰와 커뮤니티를 이용해보세요 😊</p>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin" onclick="switchAuth('login')">로그인</button>
-      <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">회원가입</button>
-    </div>
-    <div class="form-group"><label>이메일</label><input type="email" id="auth-email" placeholder="이메일 입력" /></div>
-    <div class="form-group"><label>비밀번호</label><input type="password" id="auth-pw" placeholder="비밀번호 입력" /></div>
-    <div class="form-group" id="auth-nickname-wrap" style="display:none"><label>닉네임</label><input type="text" id="auth-nickname" placeholder="닉네임 입력" /></div>
-    <button class="btn-submit" id="authSubmitBtn" onclick="submitAuth()">로그인</button>
-    <div id="authError" style="color:var(--red);font-size:12px;margin-top:8px;text-align:center;"></div>
-    <div class="auth-divider"><span>또는</span></div>
-    <button class="btn-google" onclick="loginWithGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.8 2.5 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.4 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17z"/><path fill="#FBBC05" d="M10.6 28.6A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6l-7.9-6.1A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.5-5.8c-2 1.4-4.6 2.2-7.7 2.2-6.3 0-11.6-4-13.5-9.4l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>
-      구글로 계속하기
-    </button>
-  </div>
-</div>
-
-<!-- 프로필 -->
-<div class="overlay" id="profileOverlay" onclick="handleOverlay(event,'profileOverlay')">
-  <div class="profile-panel">
-    <h2>내 프로필 <button class="icon-close" onclick="closeProfile()">✕</button></h2>
-    <div class="avatar-wrap">
-      <div class="avatar" id="profileAvatar">👤</div>
-      <div style="font-size:16px;font-weight:900" id="profileNickname">닉네임</div>
-      <div style="font-size:12px;color:var(--muted)" id="profileEmail"></div>
-    </div>
-    <div class="form-group"><label>닉네임 변경</label><input type="text" id="edit-nickname" placeholder="새 닉네임" /></div>
-    <div class="form-group"><label>자기소개</label><textarea id="edit-bio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
-    <button class="btn-submit" onclick="saveProfile()">저장하기</button>
-    <button class="btn-logout" onclick="logout()">로그아웃</button>
-  </div>
-</div>
-
 </body>
 </html>
