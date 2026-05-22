@@ -296,6 +296,24 @@
     .board-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:var(--r) var(--r) 0 0;}
     .board-modal h2{font-size:17px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
     @media(max-width:600px){.comm-sidebar{width:140px;}.comm-board-name{font-size:14px;}}
+    .comment-section{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
+    .comment-section h4{font-size:13px;font-weight:900;margin-bottom:12px;color:var(--text);}
+    .comment-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;}
+    .comment-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+    .comment-nick{font-size:12px;font-weight:700;color:var(--cyan);}
+    .comment-date{font-size:11px;color:var(--muted);}
+    .comment-del{margin-left:auto;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;}
+    .comment-del:hover{color:var(--red);}
+    .comment-text{font-size:13px;line-height:1.6;color:var(--text);}
+    .comment-form{display:flex;gap:8px;margin-top:12px;}
+    .comment-form textarea{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;resize:none;transition:border-color .2s;}
+    .comment-form textarea:focus{border-color:var(--accent);}
+    .comment-submit{background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:0 16px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;}
+    .comment-submit:hover{background:var(--accent-d);}
+    .transfer-modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:360px;padding:24px;position:relative;transform:translateY(20px);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+    .transfer-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:var(--r) var(--r) 0 0;}
+    .transfer-modal h2{font-size:17px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+    .transfer-modal p{font-size:12px;color:var(--muted);margin-bottom:16px;}
   </style>
 </head>
 <body>
@@ -381,6 +399,17 @@
       <input type="file" id="bwImgInput" accept="image/*" multiple style="display:none" onchange="handleBwImgSelect(event)"/>
     </div>
     <button class="btn-submit" onclick="submitBoardPost()">게시하기</button>
+  </div>
+</div>
+
+<!-- 매니저 양도 모달 -->
+<div class="overlay" id="transferOverlay" onclick="handleOverlay(event,'transferOverlay')" style="align-items:center;">
+  <div class="transfer-modal">
+    <h2>매니저 양도 <button class="icon-close" onclick="closeTransfer()">✕</button></h2>
+    <p>양도할 사용자의 닉네임을 입력해주세요. 양도 후에는 되돌릴 수 없어요.</p>
+    <div class="form-group"><label>닉네임</label><input type="text" id="transfer-nick" placeholder="상대방 닉네임 입력"/></div>
+    <button class="btn-submit" onclick="submitTransfer()">양도하기</button>
+    <div id="transferError" style="font-size:12px;margin-top:8px;text-align:center;color:var(--red);"></div>
   </div>
 </div>
 
@@ -1023,14 +1052,19 @@ async function loadBoardPosts(){
 function openBoardPost(p){
   const table=document.getElementById('postTable');
   if(!table)return;
+  window._currentPostId=p.id;
   const liked=window._likedPosts&&window._likedPosts.has(p.id);
   const isMine=currentUser&&p.user_id===currentUser.id;
-  const imgs=p.images&&p.images.length?`<div class="post-images">${p.images.map(src=>`<img class="post-img" src="${src}" onclick="openImgFull('${src}')" />`).join('')}</div>`:'';
+  const isMgr=currentUser&&currentBoard&&currentUser.id===currentBoard.manager_id;
+  const imgs=p.images&&p.images.length?`<div class="post-images" style="margin-bottom:14px">${p.images.map(src=>`<img class="post-img" src="${src}" onclick="openImgFull('${src}')" />`).join('')}</div>`:'';
   const typeColor={'후기':'background:var(--accent-l);color:var(--accent)','추천':'background:var(--yellow-l);color:var(--yellow)','QnA':'background:var(--cyan-l);color:var(--cyan)','요청':'background:var(--purple-l);color:var(--purple)'};
   const date=new Date(p.created_at).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   table.innerHTML=`
     <div class="post-detail-view">
-      <button class="post-detail-back" onclick="loadBoardPosts()">← 목록으로</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <button class="post-detail-back" style="margin-bottom:0" onclick="loadBoardPosts()">← 목록으로</button>
+        ${isMgr?`<button onclick="openTransfer()" style="background:var(--purple-l);color:var(--purple);border:1px solid var(--purple);border-radius:14px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;">👑 매니저 양도</button>`:''}
+      </div>
       <div style="margin-bottom:14px">
         <span class="post-row-type" style="${typeColor[p.type]||''};margin-right:8px">${p.type}</span>
         <span style="font-size:18px;font-weight:900">${p.title}</span>
@@ -1042,12 +1076,18 @@ function openBoardPost(p){
       </div>
       <div style="font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px">${p.content}</div>
       ${imgs}
-      <div style="margin-top:16px">
+      <div style="margin-top:16px;margin-bottom:4px">
         <button onclick="likeBoardPost('${p.id}',this)" ${liked?'disabled':''} style="display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid ${liked?'var(--accent)':'var(--border)'};background:${liked?'var(--accent-l)':'none'};color:${liked?'var(--accent)':'var(--muted)'};font-family:inherit;font-size:14px;font-weight:700;cursor:${liked?'default':'pointer'}">
           ❤️ ${p.likes||0}
         </button>
       </div>
+      <div class="comment-section">
+        <h4>💬 댓글</h4>
+        <div id="commentList"><p style="font-size:12px;color:var(--muted)">불러오는 중…</p></div>
+        ${currentUser?`<div class="comment-form"><textarea id="commentInput" rows="2" placeholder="댓글을 입력하세요"></textarea><button class="comment-submit" onclick="submitComment('${p.id}')">등록</button></div>`:`<p style="font-size:12px;color:var(--muted);margin-top:8px">로그인 후 댓글을 달 수 있어요</p>`}
+      </div>
     </div>`;
+  loadComments(p.id);
 }
 
 async function likeBoardPost(postId, el){
@@ -1145,6 +1185,72 @@ async function submitBoardPost(){
   currentBoard.post_count=(currentBoard.post_count||0)+1;
   document.getElementById('bw-title').value='';document.getElementById('bw-content').value='';
   closeBoardWrite();loadBoardPosts();
+}
+
+// ── 댓글 ──
+async function loadComments(postId){
+  const{data:comments}=await db.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true});
+  const list=document.getElementById('commentList');
+  if(!list)return;
+  const cs=comments||[];
+  if(!cs.length){list.innerHTML='<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 댓글을 남겨보세요!</p>';return;}
+  list.innerHTML=cs.map(c=>{
+    const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    const isMine=currentUser&&c.user_id===currentUser.id;
+    return`<div class="comment-item">
+      <div class="comment-top">
+        <span class="comment-nick">${c.nick}</span>
+        <span class="comment-date">${date}</span>
+        ${isMine?`<button class="comment-del" onclick="deleteComment('${c.id}','${postId}')">삭제</button>`:''}
+      </div>
+      <div class="comment-text">${c.content}</div>
+    </div>`;
+  }).join('');
+}
+
+async function submitComment(postId){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const input=document.getElementById('commentInput');
+  const content=input.value.trim();
+  if(!content)return;
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{error}=await db.from('comments').insert({post_id:postId,user_id:currentUser.id,nick,content});
+  if(error){alert('등록 실패: '+error.message);return;}
+  input.value='';
+  loadComments(postId);
+}
+
+async function deleteComment(commentId,postId){
+  if(!currentUser)return;
+  if(!confirm('댓글을 삭제할까요?'))return;
+  await db.from('comments').delete().eq('id',commentId).eq('user_id',currentUser.id);
+  loadComments(postId);
+}
+
+// ── 매니저 양도 ──
+function openTransfer(){
+  document.getElementById('transferOverlay').classList.add('open');
+  document.getElementById('transferError').textContent='';
+  document.getElementById('transfer-nick').value='';
+}
+function closeTransfer(){document.getElementById('transferOverlay').classList.remove('open');}
+
+async function submitTransfer(){
+  if(!currentUser||!currentBoard)return;
+  const nick=document.getElementById('transfer-nick').value.trim();
+  const errEl=document.getElementById('transferError');
+  if(!nick){errEl.textContent='닉네임을 입력해주세요';return;}
+  const{data:profile}=await db.from('profiles').select('id,nickname').eq('nickname',nick).maybeSingle();
+  if(!profile){errEl.textContent='해당 닉네임의 유저가 없어요';return;}
+  if(profile.id===currentUser.id){errEl.textContent='본인에게는 양도할 수 없어요';return;}
+  const{error}=await db.from('boards').update({manager_id:profile.id,manager_nickname:profile.nickname}).eq('id',currentBoard.id);
+  if(error){errEl.textContent='양도 실패: '+error.message;return;}
+  currentBoard.manager_id=profile.id;
+  currentBoard.manager_nickname=profile.nickname;
+  closeTransfer();
+  alert(`${profile.nickname}님께 매니저를 양도했어요!`);
+  selectBoard(currentBoard);
 }
 </script>
 </body>
