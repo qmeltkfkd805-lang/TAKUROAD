@@ -554,7 +554,7 @@ async function likeReview(reviewId,el){
 }
 function starStr(n){n=Math.max(0,Math.min(5,n));return'★'.repeat(n)+'☆'.repeat(5-n);}
 function closeDetail(){document.getElementById('detailPanel').classList.remove('open');activePlaceId=null;document.querySelectorAll('.shop-card').forEach(c=>c.classList.remove('active'));}
-function filterCat(cat,btn){currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');closeDetail();renderAll();}
+function filterCat(cat,btn){currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');closeDetail();renderAll();document.getElementById('listPanel').classList.add('open');}
 function handleSearchInput(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
