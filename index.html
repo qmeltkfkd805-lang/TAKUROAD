@@ -296,6 +296,19 @@
     .board-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple));border-radius:var(--r) var(--r) 0 0;}
     .board-modal h2{font-size:17px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;}
     @media(max-width:600px){.comm-sidebar{width:140px;}.comm-board-name{font-size:14px;}}
+    .sub-board-list{display:flex;flex-direction:column;gap:2px;padding:4px 0 8px 0;}
+    .sub-board-item{padding:6px 10px;border-radius:var(--r-sm);font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s;font-weight:500;}
+    .sub-board-item:hover{background:var(--surface2);color:var(--text);}
+    .sub-board-item.active{background:var(--accent-l);color:var(--accent);font-weight:700;}
+    .board-desc-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;color:var(--text);position:relative;}
+    .board-desc-edit-btn{position:absolute;top:8px;right:8px;background:none;border:1px solid var(--border);border-radius:10px;padding:3px 8px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;}
+    .board-desc-edit-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .board-desc-form{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;}
+    .board-desc-form textarea{width:100%;padding:8px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;resize:none;}
+    .board-desc-form textarea:focus{border-color:var(--accent);}
+    .board-desc-btns{display:flex;gap:8px;margin-top:8px;justify-content:flex-end;}
+    .board-desc-save{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:5px 14px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;}
+    .board-desc-cancel{background:none;border:1px solid var(--border);border-radius:10px;padding:5px 14px;font-size:12px;font-family:inherit;color:var(--muted);cursor:pointer;}
     .comment-section{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
     .comment-section h4{font-size:13px;font-weight:900;margin-bottom:12px;color:var(--text);}
     .comment-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;}
@@ -982,7 +995,7 @@ let currentBoard=null, currentBoardWriteType='후기';
 let _bwImgFiles=[];
 
 async function loadBoards(){
-  const{data:boards}=await db.from('boards').select('*').order('post_count',{ascending:false});
+  const{data:boards}=await db.from('boards').select('*').order('created_at',{ascending:true});
   const list=document.getElementById('boardList');
   if(!boards||!boards.length){
     list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;text-align:center">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';
@@ -995,12 +1008,19 @@ async function loadBoards(){
     </div>`).join('');
 }
 
+let currentSubBoard=null;
+
 async function selectBoard(board){
   currentBoard=board;
+  currentSubBoard=null;
   await loadBoards();
   const main=document.getElementById('commMainContent');
   const isMgr=currentUser&&currentUser.id===board.manager_id;
   main.style='flex:1;display:flex;flex-direction:column;overflow:hidden;';
+
+  const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',board.id).order('order_num',{ascending:true});
+  const subList=subs||[];
+
   main.innerHTML=`
     <div class="comm-board-head">
       <div class="comm-board-head-left">
@@ -1009,13 +1029,71 @@ async function selectBoard(board){
       </div>
       <button class="btn-write-post" onclick="openBoardWrite()">✏️ 글쓰기</button>
     </div>
-    <div class="post-table" id="postTable"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div></div>`;
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <div style="width:130px;border-right:1px solid var(--border);padding:8px;flex-shrink:0;overflow-y:auto;background:var(--bg2);">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);padding:4px 10px 6px;letter-spacing:0.5px;">세부게시판</div>
+        <div class="sub-board-list" id="subBoardList">
+          ${subList.map(s=>`<div class="sub-board-item" id="sub-${s.id}" onclick="selectSubBoard(${JSON.stringify(s).replace(/"/g,'&quot;')})">${s.name}</div>`).join('')}
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+        <div id="boardDescArea"></div>
+        <div class="post-table" id="postTable">
+          <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div>
+        </div>
+      </div>
+    </div>`;
+
+  renderBoardDesc(board, isMgr);
+}
+
+function renderBoardDesc(board, isMgr){
+  const area=document.getElementById('boardDescArea');
+  if(!area)return;
+  if(board.description_post){
+    area.innerHTML=`<div class="board-desc-box">${board.description_post.replace(/
+/g,'<br>')}${isMgr?`<button class="board-desc-edit-btn" onclick="showDescForm()">✏️ 수정</button>`:''}</div>`;
+  } else if(isMgr){
+    area.innerHTML=`<div style="padding:10px 14px"><button onclick="showDescForm()" style="background:none;border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:8px 14px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;width:100%">📝 게시판 소개글 작성하기</button></div>`;
+  } else {
+    area.innerHTML='';
+  }
+}
+
+function showDescForm(){
+  const area=document.getElementById('boardDescArea');
+  if(!area)return;
+  area.innerHTML=`<div class="board-desc-form">
+    <textarea id="descTextarea" rows="4" placeholder="게시판 소개글을 입력하세요">${currentBoard.description_post||''}</textarea>
+    <div class="board-desc-btns">
+      <button class="board-desc-cancel" onclick="renderBoardDesc(currentBoard, true)">취소</button>
+      <button class="board-desc-save" onclick="saveDesc()">저장</button>
+    </div>
+  </div>`;
+}
+
+async function saveDesc(){
+  if(!currentUser||!currentBoard)return;
+  const text=document.getElementById('descTextarea').value.trim();
+  const{error}=await db.from('boards').update({description_post:text}).eq('id',currentBoard.id);
+  if(error){alert('저장 실패: '+error.message);return;}
+  currentBoard.description_post=text;
+  renderBoardDesc(currentBoard, true);
+}
+
+function selectSubBoard(sub){
+  currentSubBoard=sub;
+  document.querySelectorAll('.sub-board-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('sub-'+sub.id);
+  if(el)el.classList.add('active');
   loadBoardPosts();
 }
 
 async function loadBoardPosts(){
   if(!currentBoard)return;
-  const{data:posts}=await db.from('posts').select('*').eq('board_id',currentBoard.id).order('created_at',{ascending:false});
+  let query=db.from('posts').select('*').eq('board_id',currentBoard.id);
+  if(currentSubBoard)query=query.eq('sub_board_id',currentSubBoard.id);
+  const{data:posts}=await query.order('created_at',{ascending:false});
   const table=document.getElementById('postTable');
   if(!table)return;
   if(!currentUser){window._likedPosts=new Set();}
@@ -1124,8 +1202,12 @@ async function submitBoard(){
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   const{data:existing}=await db.from('boards').select('id').eq('name',name).maybeSingle();
   if(existing){errEl.textContent='이미 같은 이름의 게시판이 있어요';return;}
-  const{error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0});
+  const{data:newBoard,error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0}).select().single();
   if(error){errEl.textContent='개설 실패: '+error.message;return;}
+  const subNames=['자유게시판','이벤트 공지','동행구해요','공동구매','교환해요','중고판매'];
+  for(let i=0;i<subNames.length;i++){
+    await db.from('sub_boards').insert({board_id:newBoard.id,name:subNames[i],order_num:i+1});
+  }
   document.getElementById('board-name').value='';document.getElementById('board-desc').value='';
   closeBoardModal();loadBoards();
 }
@@ -1171,7 +1253,8 @@ async function submitBoardPost(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('posts').insert({type:'일반',nick,title,content:postContent,likes:0,user_id:currentUser.id,board_id:currentBoard.id,images:imageUrls.length?imageUrls:null});
+  if(!currentSubBoard){alert('세부게시판을 먼저 선택해주세요!');return;}
+  const{error}=await db.from('posts').insert({type:'일반',nick,title,content:postContent,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:currentSubBoard.id,images:imageUrls.length?imageUrls:null});
   if(error){alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
