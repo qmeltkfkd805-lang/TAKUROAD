@@ -699,7 +699,16 @@ function renderPostList(posts,tab){
 }
 function postCardHTML(p){
   const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div><div class="post-foot"><button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes||0}</button></div></div>`;
+  const isMine=currentUser&&p.user_id===currentUser.id;
+  const delBtn=isMine?`<button onclick="deletePost('${p.id}')" style="margin-left:auto;background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:0;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑️ 삭제</button>`:'';
+  return`<div class="post-card"><div class="post-top"><span class="post-type pt-${p.type}">${p.type}</span><span class="post-nick">${p.nick}</span><span class="post-date">${date}</span></div><div class="post-title">${p.title}</div><div class="post-preview">${p.content}</div><div class="post-foot"><button class="like-btn" onclick="likePost('${p.id}',this)">❤️ ${p.likes||0}</button>${delBtn}</div></div>`;
+}
+async function deletePost(postId){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  if(!confirm('정말 삭제할까요?'))return;
+  const{error}=await db.from('posts').delete().eq('id',postId).eq('user_id',currentUser.id);
+  if(error){alert('삭제 실패: '+error.message);return;}
+  loadTab(currentTab);
 }
 async function likePost(postId,el){const{data}=await db.from('posts').select('likes').eq('id',postId).single();if(!data)return;const n=(data.likes||0)+1;await db.from('posts').update({likes:n}).eq('id',postId);el.textContent='❤️ '+n;el.classList.add('liked');}
 function renderSavedList(){
@@ -715,7 +724,8 @@ async function submitPost(){
   const content=document.getElementById('w-content').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
   if(!content){alert('내용을 입력해주세요');return;}
-  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0});
+  const user_id=currentUser?currentUser.id:null;
+  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0,user_id});
   if(error){alert('등록 실패: '+error.message);return;}
   ['w-nick','w-title','w-content'].forEach(id=>document.getElementById(id).value='');
   closeWrite();loadTab(currentWriteType);
