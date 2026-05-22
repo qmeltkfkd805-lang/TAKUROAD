@@ -1017,34 +1017,45 @@ async function selectBoard(board){
   const main=document.getElementById('commMainContent');
   const isMgr=currentUser&&currentUser.id===board.manager_id;
   main.style='flex:1;display:flex;flex-direction:column;overflow:hidden;';
-
   const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',board.id).order('order_num',{ascending:true});
   const subList=subs||[];
+  main.innerHTML='';
 
-  main.innerHTML=`
-    <div class="comm-board-head">
-      <div class="comm-board-head-left">
-        <div class="comm-board-name">${board.name}</div>
-        <div class="comm-board-meta">매니저: <span>${board.manager_nickname||'알수없음'}</span> · 게시글 ${board.post_count||0}개${isMgr?' · <span style="color:var(--purple)">내 게시판</span>':''}</div>
-      </div>
-      <button class="btn-write-post" onclick="openBoardWrite()">✏️ 글쓰기</button>
-    </div>
-    <div style="display:flex;flex:1;overflow:hidden;">
-      <div style="width:130px;border-right:1px solid var(--border);padding:8px;flex-shrink:0;overflow-y:auto;background:var(--bg2);">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);padding:4px 10px 6px;letter-spacing:0.5px;">세부게시판</div>
-        <div class="sub-board-list" id="subBoardList">
-          ${subList.map(s=>`<div class="sub-board-item" id="sub-${s.id}" onclick="selectSubBoard(${JSON.stringify(s).replace(/"/g,'&quot;')})">${s.name}</div>`).join('')}
-        </div>
-      </div>
-      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-        <div id="boardDescArea"></div>
-        <div class="post-table" id="postTable">
-          <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div>
-        </div>
-      </div>
-    </div>`;
+  // 헤더
+  const head=document.createElement('div');
+  head.className='comm-board-head';
+  head.innerHTML=`<div class="comm-board-head-left"><div class="comm-board-name">${board.name}</div><div class="comm-board-meta">매니저: <span>${board.manager_nickname||'알수없음'}</span> · 게시글 ${board.post_count||0}개${isMgr?' · <span style="color:var(--purple)">내 게시판</span>':''}</div></div><button class="btn-write-post" onclick="openBoardWrite()">✏️ 글쓰기</button>`;
+  main.appendChild(head);
 
-  renderBoardDesc(board, isMgr);
+  // 바디 (세부게시판 + 콘텐츠)
+  const body=document.createElement('div');
+  body.style='display:flex;flex:1;overflow:hidden;';
+
+  // 세부게시판 사이드바
+  const subSide=document.createElement('div');
+  subSide.style='width:130px;border-right:1px solid var(--border);padding:8px;flex-shrink:0;overflow-y:auto;background:var(--bg2);';
+  subSide.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--muted);padding:4px 10px 6px;letter-spacing:0.5px;">세부게시판</div><div class="sub-board-list" id="subBoardList"></div>';
+  body.appendChild(subSide);
+
+  // 메인 콘텐츠
+  const mainCol=document.createElement('div');
+  mainCol.style='flex:1;display:flex;flex-direction:column;overflow:hidden;';
+  mainCol.innerHTML='<div id="boardDescArea"></div><div class="post-table" id="postTable"><div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div></div>';
+  body.appendChild(mainCol);
+  main.appendChild(body);
+
+  // 세부게시판 버튼 렌더
+  const subListEl=document.getElementById('subBoardList');
+  subList.forEach(s=>{
+    const el=document.createElement('div');
+    el.className='sub-board-item';
+    el.id='sub-'+s.id;
+    el.textContent=s.name;
+    el.onclick=()=>selectSubBoard(s);
+    subListEl.appendChild(el);
+  });
+
+  renderBoardDesc(board,isMgr);
 }
 
 function renderBoardDesc(board, isMgr){
