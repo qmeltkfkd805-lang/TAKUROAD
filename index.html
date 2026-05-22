@@ -869,11 +869,21 @@ function openDesc(board){
 async function saveDesc(){
   if(!currentUser||!currentBoard)return;
   const text=document.getElementById('descText').value.trim();
-  await db.from('boards').update({description_post:text}).eq('id',currentBoard.id);
-  currentBoard.description_post=text;
-  const isMgr=currentUser.id===currentBoard.manager_id;
-  const descBox=document.getElementById('descBox');
-  if(descBox)renderDesc(currentBoard,isMgr,descBox);
+  if(window._editingSubDesc){
+    // 세부게시판 소개글 저장
+    const sub=window._editingSubDesc;
+    await db.from('sub_boards').update({description:text}).eq('id',sub.id);
+    sub.description=text;
+    renderSubDesc(sub);
+    window._editingSubDesc=null;
+  } else {
+    // 게시판 소개글 저장
+    await db.from('boards').update({description_post:text}).eq('id',currentBoard.id);
+    currentBoard.description_post=text;
+    const isMgr=currentUser.id===currentBoard.manager_id;
+    const descBox=document.getElementById('descBox');
+    if(descBox)renderDesc(currentBoard,isMgr,descBox);
+  }
   closeOverlay('descOverlay');
 }
 
@@ -881,7 +891,43 @@ function selectSub(sub){
   currentSub=sub;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-'+sub.id);if(el)el.classList.add('active');
+  renderSubDesc(sub);
   loadBoardPosts();
+}
+
+function renderSubDesc(sub){
+  const postArea=document.querySelector('.post-area');
+  if(!postArea)return;
+  const isMgr=currentUser&&currentBoard&&currentUser.id===currentBoard.manager_id;
+  let descEl=document.getElementById('subDescBox');
+  if(!descEl){
+    descEl=document.createElement('div');descEl.id='subDescBox';
+    postArea.insertBefore(descEl,postArea.firstChild);
+  }
+  descEl.innerHTML='';
+  if(sub.description){
+    const box=document.createElement('div');box.className='board-desc-box';
+    const txt=document.createElement('span');txt.style.flex='1';
+    txt.innerHTML=sub.description.split('
+').join('<br>');
+    box.appendChild(txt);
+    if(isMgr){
+      const eb=document.createElement('button');eb.className='board-desc-edit';eb.textContent='수정';
+      eb.onclick=()=>openSubDesc(sub);box.appendChild(eb);
+    }
+    descEl.appendChild(box);
+  } else if(isMgr){
+    const box=document.createElement('div');box.className='board-desc-box';
+    const btn=document.createElement('button');btn.className='board-desc-edit';
+    btn.textContent='📝 세부게시판 소개글 작성';btn.onclick=()=>openSubDesc(sub);
+    box.appendChild(btn);descEl.appendChild(box);
+  }
+}
+
+function openSubDesc(sub){
+  document.getElementById('descText').value=sub.description||'';
+  document.getElementById('descOverlay').classList.add('open');
+  window._editingSubDesc=sub;
 }
 
 async function loadBoardPosts(){
