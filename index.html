@@ -1120,22 +1120,26 @@ async function loadBoardPosts(){
     window._likedPosts=new Set((likes||[]).map(l=>l.post_id));
   }
   const ps=posts||[];
-  if(!ps.length){table.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">📝 아직 글이 없어요.<br/>첫 번째 글을 남겨보세요!</div>';return;}
+  if(!ps.length){table.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">아직 글이 없어요. 첫 번째 글을 남겨보세요!</div>';return;}
   const typeColor={'후기':'background:var(--accent-l);color:var(--accent)','추천':'background:var(--yellow-l);color:var(--yellow)','QnA':'background:var(--cyan-l);color:var(--cyan)','요청':'background:var(--purple-l);color:var(--purple)'};
-  table.innerHTML=ps.map(p=>{
+  window._postCache=window._postCache||{};
+  table.innerHTML='';
+  ps.forEach(p=>{
+    window._postCache[p.id]=p;
+    const row=document.createElement('div');
+    row.className='post-row';
+    row.onclick=()=>openBoardPost(p);
+    const imgTxt=p.images&&p.images.length?' 🖼️'+p.images.length:'';
     const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-    const imgs=p.images&&p.images.length?` 🖼️${p.images.length}`:'';
-    const isMine=currentUser&&p.user_id===currentUser.id;
-    window._postCache=window._postCache||{};window._postCache[p.id]=p;
-    return`<div class="post-row" onclick="openBoardPostById('"+p.id+"')">
-      <span class="post-row-type" style="${typeColor[p.type]||''}">${p.type}</span>
-      <div class="post-row-title">
-        <div class="post-row-name">${p.title}${imgs?`<span style="font-size:11px;color:var(--muted);margin-left:4px">${imgs}</span>`:''}</div>
-        <div class="post-row-sub">${p.nick} · ${date}</div>
-      </div>
-      <div class="post-row-likes">❤️ ${p.likes||0}</div>
-    </div>`;
-  }).join('');
+    const typeStyle=typeColor[p.type]||'';
+    row.innerHTML='<span class="post-row-type" style="'+typeStyle+'">'+p.type+'</span>'
+      +'<div class="post-row-title">'
+      +'<div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div>'
+      +'<div class="post-row-sub">'+p.nick+' · '+date+'</div>'
+      +'</div>'
+      +'<div class="post-row-likes">❤️ '+(p.likes||0)+'</div>';
+    table.appendChild(row);
+  });
 }
 
 function openBoardPostById(id){
