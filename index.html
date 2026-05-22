@@ -316,7 +316,6 @@
         <button class="type-btn" data-t="요청" onclick="selectType(this)">📮 요청사항</button>
       </div>
     </div>
-    <div class="form-group"><label>닉네임</label><input type="text" id="w-nick" placeholder="닉네임 (미입력시 익명)"/></div>
     <div class="form-group"><label>제목 *</label><input type="text" id="w-title" placeholder="제목을 입력하세요"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="w-content" rows="6" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
     <button class="btn-submit" onclick="submitPost()">게시하기</button>
@@ -719,15 +718,16 @@ function openWrite(type){currentWriteType=type||'후기';document.querySelectorA
 function closeWrite(){document.getElementById('writeOverlay').classList.remove('open');}
 function selectType(btn){currentWriteType=btn.dataset.t;document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 async function submitPost(){
-  const nick=document.getElementById('w-nick').value.trim()||'익명';
+  if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
   const title=document.getElementById('w-title').value.trim();
   const content=document.getElementById('w-content').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
   if(!content){alert('내용을 입력해주세요');return;}
-  const user_id=currentUser?currentUser.id:null;
-  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0,user_id});
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{error}=await db.from('posts').insert({type:currentWriteType,nick,title,content,likes:0,user_id:currentUser.id});
   if(error){alert('등록 실패: '+error.message);return;}
-  ['w-nick','w-title','w-content'].forEach(id=>document.getElementById(id).value='');
+  ['w-title','w-content'].forEach(id=>document.getElementById(id).value='');
   closeWrite();loadTab(currentWriteType);
 }
 let pickMode=false,pickedLat=null,pickedLng=null,modalTags=[],selectedCat=null;
