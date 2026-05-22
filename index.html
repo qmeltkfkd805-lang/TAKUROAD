@@ -642,10 +642,8 @@ async function submitAuth(){
     if(error){setAuthMsg(error.message);return;}
     if(data.user){
       await db.from('profiles').upsert({id:data.user.id,nickname,username});
-      // 바로 로그인
-      await db.auth.signInWithPassword({email,password:pw});
     }
-    closeAuth();
+    setAuthMsg('📧 가입 완료! 이메일 받은편지함에서 인증 링크를 클릭해주세요 😊','var(--green)');
   }
 }
 async function openProfile(){
