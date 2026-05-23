@@ -435,8 +435,21 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div class="panel-base panel-center" style="max-width:380px;">
     <h2>게시판 개설 <button class="icon-close" onclick="closeOverlay('boardModalOverlay')">✕</button></h2>
     <div class="form-group"><label>대분류 *</label>
-      <input type="text" id="boardCategory" placeholder="예) 애니메이션, 게임, 만화, 기타…" list="categoryList"/>
-      <datalist id="categoryList"></datalist>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="catBtnRow">
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'애니/만화')">애니/만화</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'웹툰')">웹툰</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'웹소설')">웹소설</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'게임')">게임</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'산리오')">산리오</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'치이카와')">치이카와</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'지브리')">지브리</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'디즈니/픽사')">디즈니/픽사</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'건담')">건담</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'버추얼')">버추얼</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'보컬로이드/우타이테')">보컬로이드/우타이테</button>
+        <button type="button" class="cat-sel-btn" onclick="selBoardCat(this,'기타')">기타</button>
+      </div>
+      <input type="text" id="boardCategory" placeholder="직접 입력도 가능해요"/>
     </div>
     <div class="form-group"><label>게시판 이름 *</label><input type="text" id="boardName" placeholder="예) 원피스, 주술회전…"/></div>
     <div class="form-group"><label>소개</label><textarea id="boardDesc" rows="2" placeholder="어떤 게시판인지 간단히 소개해주세요"></textarea></div>
@@ -1204,11 +1217,18 @@ async function deleteComment(commentId,postId){
 }
 
 // 게시판 개설
+function selBoardCat(btn, cat){
+  document.querySelectorAll('#catBtnRow .cat-sel-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('boardCategory').value=cat;
+}
+
 function openBoardModal(){
   if(!currentUser){alert('로그인 후 게시판을 개설할 수 있어요!');return;}
   document.getElementById('boardName').value='';
   document.getElementById('boardDesc').value='';
   document.getElementById('boardCategory').value='';
+  document.querySelectorAll('#catBtnRow .cat-sel-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('boardError').textContent='';
   document.getElementById('boardModalOverlay').classList.add('open');
 }
