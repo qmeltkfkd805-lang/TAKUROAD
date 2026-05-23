@@ -214,6 +214,17 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
+    .board-grid-view{flex:1;overflow-y:auto;padding:20px;}
+    .board-grid-view::-webkit-scrollbar{width:4px;}
+    .board-grid-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+    .board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+    .board-grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .18s;position:relative;}
+    .board-grid-card:hover{border-color:var(--accent);box-shadow:var(--sh-md);transform:translateY(-2px);}
+    .board-grid-card.active{border-color:var(--accent);background:var(--accent-l);}
+    .board-grid-name{font-size:14px;font-weight:900;color:var(--text);margin-bottom:6px;}
+    .board-grid-meta{font-size:11px;color:var(--muted);}
+    .board-grid-mgr{font-size:11px;color:var(--accent);font-weight:700;margin-top:4px;}
+    .comm-board-view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .comm-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .comm-board-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2);}
 .comm-board-name{font-size:15px;font-weight:900;}
@@ -310,19 +321,32 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 </div>
 
 <!-- 커뮤니티 뷰 -->
-<div class="comm-view" id="commView" style="display:none;">
-  <div class="comm-sidebar">
-    <div class="comm-sidebar-head">
-      <h3>게시판</h3>
-      <button class="btn-new-board" onclick="openBoardModal()">+ 개설</button>
+<div class="comm-view" id="commView" style="display:none;flex-direction:column;">
+  <!-- 게시판 목록 화면 -->
+  <div id="boardListView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:14px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg2);flex-shrink:0;">
+      <h3 style="font-size:15px;font-weight:900;">게시판 목록</h3>
+      <input class="board-search" id="boardSearch" style="flex:1;max-width:240px;margin-bottom:0;" placeholder="🔍 게시판 검색…" oninput="filterBoards(this.value)"/>
+      <button class="btn-new-board" style="margin-left:auto;" onclick="openBoardModal()">+ 개설</button>
     </div>
-    <div style="padding:8px 8px 0;">
-      <input class="board-search" id="boardSearch" placeholder="🔍 게시판 검색…" oninput="filterBoards(this.value)"/>
+    <div class="board-grid-view">
+      <div class="board-grid" id="boardGrid"></div>
     </div>
-    <div class="board-list" id="boardList"></div>
   </div>
-  <div class="comm-main" id="commMain">
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;" id="commMainContent">게시판을 선택해주세요</div>
+  <!-- 게시판 상세 화면 -->
+  <div id="boardDetailView" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+    <div class="comm-board-head" id="boardDetailHead"></div>
+    <div style="display:flex;flex:1;overflow:hidden;">
+      <div class="sub-sidebar">
+        <div class="sub-sidebar-title">세부게시판</div>
+        <div id="subBoardList"></div>
+      </div>
+      <div class="post-area" id="postArea">
+        <div class="post-table" id="postTable">
+          <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -840,31 +864,53 @@ function filterBoards(q){
 
 async function loadBoards(){
   const{data:boards}=await db.from('boards').select('*').order('created_at',{ascending:true});
-  const list=document.getElementById('boardList');
-  list.innerHTML='';
-  if(!boards||!boards.length){list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;text-align:center">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';return;}
+  const grid=document.getElementById('boardGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  if(!boards||!boards.length){
+    grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);font-size:14px">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';
+    return;
+  }
+  window._allBoards=boards;
+  renderBoardGrid(boards);
+}
+
+function renderBoardGrid(boards){
+  const grid=document.getElementById('boardGrid');if(!grid)return;
+  grid.innerHTML='';
   boards.forEach(b=>{
-    const el=document.createElement('div');
-    el.className='board-item'+(currentBoard&&currentBoard.id===b.id?' active':'');
-    el.innerHTML='<span>'+b.name+'</span><span class="board-cnt">'+(b.post_count||0)+'</span>';
-    el.onclick=()=>selectBoard(b);
-    list.appendChild(el);
+    const card=document.createElement('div');
+    card.className='board-grid-card'+(currentBoard&&currentBoard.id===b.id?' active':'');
+    card.dataset.name=b.name.toLowerCase();
+    card.innerHTML='<div class="board-grid-name">'+b.name+'</div>'
+      +'<div class="board-grid-meta">글 '+(b.post_count||0)+'개</div>'
+      +'<div class="board-grid-mgr">👑 '+(b.manager_nickname||'알수없음')+'</div>';
+    card.onclick=()=>selectBoard(b);
+    grid.appendChild(card);
   });
+}
+
+function filterBoards(q){
+  if(!window._allBoards)return;
+  const filtered=window._allBoards.filter(b=>b.name.toLowerCase().includes(q.toLowerCase()));
+  renderBoardGrid(filtered);
 }
 
 async function selectBoard(board){
   currentBoard=board;currentSub=null;
-  await loadBoards();
-  const main=document.getElementById('commMain');
-  main.innerHTML='';
+
+  // 그리드 숨기고 상세 표시
+  document.getElementById('boardListView').style.display='none';
+  const detailView=document.getElementById('boardDetailView');
+  detailView.style.display='flex';
 
   const isMgr=currentUser&&currentUser.id===board.manager_id;
 
   // 헤더
-  const head=document.createElement('div');
-  head.className='comm-board-head';
+  const head=document.getElementById('boardDetailHead');
+  head.innerHTML='';
   const headLeft=document.createElement('div');
-  headLeft.innerHTML='<div class="comm-board-name">'+board.name+'</div><div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div>';
+  headLeft.innerHTML='<div style="display:flex;align-items:center;gap:8px;"><button onclick="backToBoards()" style="background:none;border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;">← 목록</button><div class="comm-board-name">'+board.name+'</div></div><div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div>';
   const headRight=document.createElement('div');
   headRight.style.cssText='display:flex;gap:8px;align-items:center;';
   if(isMgr){
@@ -872,30 +918,27 @@ async function selectBoard(board){
   }
   const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headRight.appendChild(wBtn);
   head.appendChild(headLeft);head.appendChild(headRight);
-  main.appendChild(head);
-
-  // 컨텐츠 영역
-  const content=document.createElement('div');
-  content.className='comm-content';
 
   // 세부게시판
-  const subSide=document.createElement('div');
-  subSide.className='sub-sidebar';
-  subSide.innerHTML='<div class="sub-sidebar-title">세부게시판</div>';
+  const subList=document.getElementById('subBoardList');
+  subList.innerHTML='';
   const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',board.id).order('order_num',{ascending:true});
   (subs||[]).forEach(s=>{
     const el=document.createElement('div');
     el.className='sub-item';el.id='sub-'+s.id;el.textContent=s.name;
-    el.onclick=()=>selectSub(s);subSide.appendChild(el);
+    el.onclick=()=>selectSub(s);subList.appendChild(el);
   });
 
-  // 포스트 영역
-  const postArea=document.createElement('div');
-  postArea.className='post-area';
+  // 포스트 영역 초기화
+  const postArea=document.getElementById('postArea');
   postArea.innerHTML='<div class="post-table" id="postTable"><div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div></div>';
+}
 
-  content.appendChild(subSide);content.appendChild(postArea);
-  main.appendChild(content);
+function backToBoards(){
+  currentBoard=null;currentSub=null;
+  document.getElementById('boardDetailView').style.display='none';
+  document.getElementById('boardListView').style.display='flex';
+  loadBoards();
 }
 
 function renderDesc(board,isMgr,container){
@@ -941,7 +984,7 @@ function selectSub(sub){
 }
 
 function renderSubDesc(sub){
-  const postArea=document.querySelector('.post-area');
+  const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMgr=currentUser&&currentBoard&&currentUser.id===currentBoard.manager_id;
   let descEl=document.getElementById('subDescBox');
@@ -1006,7 +1049,7 @@ async function loadBoardPosts(){
 }
 
 function openPostDetail(p){
-  const postArea=document.querySelector('.post-area');
+  const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMine=currentUser&&p.user_id===currentUser.id;
   const isMgr=currentUser&&currentBoard&&currentUser.id===currentBoard.manager_id;
