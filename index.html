@@ -544,7 +544,9 @@ function addMarker(p,offset){
   const bubble=document.createElement('div');
   bubble.className='marker-bubble';
   bubble.style.background=color;
-  bubble.textContent=CAT_ICON[p.cat]+' '+p.name;
+  // 지점명 제거 (홍대점, 잠실롯데점 등 '점'으로 끝나는 부분 앞까지)
+  const shortName=p.name.replace(/\s*(홍대점|잠실롯데점|부산점|수원점.*|코엑스|용산.*|센텀시티|서면|판교|대전|대구|고양|신촌점|을지로|성수|마포).*$/, '').trim()||p.name.split(' ')[0];
+  bubble.textContent=shortName;
   const tail=document.createElement('div');
   tail.style.cssText='width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid '+color+';margin:auto';
   el.appendChild(bubble);el.appendChild(tail);
