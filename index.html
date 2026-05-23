@@ -610,15 +610,48 @@ async function showDetail(p){
 
 function handleDetailSave(id){toggleSave(id);const btn=document.getElementById('dSaveBtn');if(btn){btn.className='da-btn '+(isSaved(id)?'saved':'');btn.textContent=isSaved(id)?'🔖 저장됨':'🏷️ 저장';}renderAll();}
 function setStar(n){window._pickedStar=n;document.querySelectorAll('#starPicker span').forEach((s,i)=>s.classList.toggle('on',i<n));}
+window._rvImgFiles=[];
+function handleRvImg(event){
+  const files=Array.from(event.target.files);
+  window._rvImgFiles=[...window._rvImgFiles,...files].slice(0,5);
+  renderRvPreview();event.target.value='';
+}
+function renderRvPreview(){
+  const area=document.getElementById('rvImgPreview');if(!area)return;
+  area.innerHTML='';
+  window._rvImgFiles.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._rvImgFiles.splice(i,1);renderRvPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+}
 async function submitReview(placeId,placeName){
-  const nick=document.getElementById('rv-nick').value.trim()||'익명';
+  if(!currentUser){alert('로그인 후 리뷰를 작성할 수 있어요!');return;}
   const content=document.getElementById('rv-text').value.trim();
   const stars=window._pickedStar||0;
   if(!content){alert('리뷰 내용을 입력해주세요');return;}
   if(!stars){alert('별점을 선택해주세요');return;}
-  const{error}=await db.from('reviews').insert({place_id:placeId,place_name:placeName,nick,stars,content,likes:0});
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile&&profile.nickname?profile.nickname:currentUser.email.split('@')[0];
+  const imageUrls=[];
+  for(const file of window._rvImgFiles){
+    const ext=file.name.split('.').pop();
+    const path=currentUser.id+'/rv_'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  const{error}=await db.from('reviews').insert({place_id:placeId,place_name:placeName,nick,stars,content,likes:0,user_id:currentUser.id,images:imageUrls.length?imageUrls:null});
   if(error){alert('등록 실패: '+error.message);return;}
+  window._rvImgFiles=[];
   const p=places.find(x=>x.id===placeId);if(p)await showDetail(p);
+}
+async function deleteReview(reviewId){
+  if(!currentUser)return;
+  if(!confirm('리뷰를 삭제할까요?'))return;
+  await db.from('reviews').delete().eq('id',reviewId).eq('user_id',currentUser.id);
+  if(activePlaceId){const p=places.find(x=>x.id===activePlaceId);if(p)await showDetail(p);}
 }
 async function likeReview(id,el){
   const{data}=await db.from('reviews').select('likes').eq('id',id).single();if(!data)return;
