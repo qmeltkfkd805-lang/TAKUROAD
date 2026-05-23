@@ -862,12 +862,6 @@ async function selectBoard(board){
   head.appendChild(headLeft);head.appendChild(headRight);
   main.appendChild(head);
 
-  // 소개글
-  const descBox=document.createElement('div');
-  descBox.id='descBox';
-  renderDesc(board,isMgr,descBox);
-  main.appendChild(descBox);
-
   // 컨텐츠 영역
   const content=document.createElement('div');
   content.className='comm-content';
@@ -917,19 +911,11 @@ async function saveDesc(){
   if(!currentUser||!currentBoard)return;
   const text=document.getElementById('descText').value.trim();
   if(window._editingSubDesc){
-    // 세부게시판 소개글 저장
     const sub=window._editingSubDesc;
     await db.from('sub_boards').update({description:text}).eq('id',sub.id);
     sub.description=text;
     renderSubDesc(sub);
     window._editingSubDesc=null;
-  } else {
-    // 게시판 소개글 저장
-    await db.from('boards').update({description_post:text}).eq('id',currentBoard.id);
-    currentBoard.description_post=text;
-    const isMgr=currentUser.id===currentBoard.manager_id;
-    const descBox=document.getElementById('descBox');
-    if(descBox)renderDesc(currentBoard,isMgr,descBox);
   }
   closeOverlay('descOverlay');
 }
