@@ -217,7 +217,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .board-grid-view{flex:1;overflow-y:auto;padding:20px;}
     .board-grid-view::-webkit-scrollbar{width:4px;}
     .board-grid-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-    .board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+    .board-grid{display:flex;flex-direction:column;gap:0;}
     .board-grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .18s;position:relative;}
     .board-grid-card:hover{border-color:var(--accent);box-shadow:var(--sh-md);transform:translateY(-2px);}
     .board-grid-card.active{border-color:var(--accent);background:var(--accent-l);}
@@ -225,6 +225,10 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .board-grid-meta{font-size:11px;color:var(--muted);}
     .board-grid-mgr{font-size:11px;color:var(--accent);font-weight:700;margin-top:4px;}
     .comm-board-view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .board-category-section{margin-bottom:20px;}
+    .board-category-title{font-size:13px;font-weight:900;color:var(--muted);padding:6px 4px;border-bottom:2px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .board-category-title span{color:var(--text);}
+    .board-grid-card .board-grid-cnt{font-size:11px;color:var(--muted);margin-top:2px;}
 .comm-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .comm-board-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2);}
 .comm-board-name{font-size:15px;font-weight:900;}
@@ -430,6 +434,10 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="overlay center" id="boardModalOverlay" onclick="handleOverlay(event,'boardModalOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
     <h2>게시판 개설 <button class="icon-close" onclick="closeOverlay('boardModalOverlay')">✕</button></h2>
+    <div class="form-group"><label>대분류 *</label>
+      <input type="text" id="boardCategory" placeholder="예) 애니메이션, 게임, 만화, 기타…" list="categoryList"/>
+      <datalist id="categoryList"></datalist>
+    </div>
     <div class="form-group"><label>게시판 이름 *</label><input type="text" id="boardName" placeholder="예) 원피스, 주술회전…"/></div>
     <div class="form-group"><label>소개</label><textarea id="boardDesc" rows="2" placeholder="어떤 게시판인지 간단히 소개해주세요"></textarea></div>
     <button class="btn-submit" onclick="submitBoard()">개설하기</button>
@@ -878,15 +886,43 @@ async function loadBoards(){
 function renderBoardGrid(boards){
   const grid=document.getElementById('boardGrid');if(!grid)return;
   grid.innerHTML='';
+  if(!boards.length){grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>';return;}
+
+  // 카테고리별 그룹핑
+  const groups={};
   boards.forEach(b=>{
-    const card=document.createElement('div');
-    card.className='board-grid-card'+(currentBoard&&currentBoard.id===b.id?' active':'');
-    card.dataset.name=b.name.toLowerCase();
-    card.innerHTML='<div class="board-grid-name">'+b.name+'</div>'
-      +'<div class="board-grid-meta">글 '+(b.post_count||0)+'개</div>'
-      +'<div class="board-grid-mgr">👑 '+(b.manager_nickname||'알수없음')+'</div>';
-    card.onclick=()=>selectBoard(b);
-    grid.appendChild(card);
+    const cat=b.category||'기타';
+    if(!groups[cat])groups[cat]=[];
+    groups[cat].push(b);
+  });
+
+  // datalist 업데이트
+  const dl=document.getElementById('categoryList');
+  if(dl){dl.innerHTML=Object.keys(groups).map(c=>'<option value="'+c+'">').join('');}
+
+  Object.keys(groups).forEach(cat=>{
+    const section=document.createElement('div');
+    section.className='board-category-section';
+    section.style.gridColumn='1/-1';
+
+    const title=document.createElement('div');
+    title.className='board-category-title';
+    title.innerHTML='<span>'+cat+'</span><span style="font-size:11px;font-weight:400">('+groups[cat].length+')</span>';
+    section.appendChild(title);
+
+    const row=document.createElement('div');
+    row.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;';
+    groups[cat].forEach(b=>{
+      const card=document.createElement('div');
+      card.className='board-grid-card'+(currentBoard&&currentBoard.id===b.id?' active':'');
+      card.dataset.name=b.name.toLowerCase();
+      card.innerHTML='<div class="board-grid-name">'+b.name+'</div>'
+        +'<div class="board-grid-cnt">글 '+(b.post_count||0)+'개</div>';
+      card.onclick=()=>selectBoard(b);
+      row.appendChild(card);
+    });
+    section.appendChild(row);
+    grid.appendChild(section);
   });
 }
 
@@ -1170,7 +1206,9 @@ async function deleteComment(commentId,postId){
 // 게시판 개설
 function openBoardModal(){
   if(!currentUser){alert('로그인 후 게시판을 개설할 수 있어요!');return;}
-  document.getElementById('boardName').value='';document.getElementById('boardDesc').value='';
+  document.getElementById('boardName').value='';
+  document.getElementById('boardDesc').value='';
+  document.getElementById('boardCategory').value='';
   document.getElementById('boardError').textContent='';
   document.getElementById('boardModalOverlay').classList.add('open');
 }
@@ -1185,7 +1223,8 @@ async function submitBoard(){
   const nick=profile&&profile.nickname?profile.nickname:currentUser.email.split('@')[0];
   const{data:existing}=await db.from('boards').select('id').eq('name',name).maybeSingle();
   if(existing){errEl.textContent='이미 같은 이름의 게시판이 있어요';return;}
-  const{data:newBoard,error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0}).select().single();
+  const category=document.getElementById('boardCategory').value.trim()||'기타';
+  const{data:newBoard,error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0,category}).select().single();
   if(error){errEl.textContent='개설 실패: '+error.message;return;}
   for(let i=0;i<SUB_BOARDS.length;i++){
     await db.from('sub_boards').insert({board_id:newBoard.id,name:SUB_BOARDS[i],order_num:i+1});
