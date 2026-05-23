@@ -469,6 +469,10 @@ const DUMMY=[
 ];
 
 let places=JSON.parse(localStorage.getItem('takuroad_places')||'null')||DUMMY;
+// 카테고리명 마이그레이션
+const CAT_MIGRATE={'애니/만화':'애니/웹툰','팝업스토어':'팝업/카페','동인샵':'동인지','게임샵':'게임','쿠지샵':'쿠지'};
+places=places.map(p=>({...p,cat:CAT_MIGRATE[p.cat]||p.cat}));
+savePlaces();
 function savePlaces(){localStorage.setItem('takuroad_places',JSON.stringify(places));}
 let savedIds=JSON.parse(localStorage.getItem('takuroad_saves')||'[]');
 const isSaved=id=>savedIds.includes(id);
