@@ -951,6 +951,11 @@ async function loadBoards(){
     grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);font-size:14px">아직 게시판이 없어요<br/>첫 번째로 개설해보세요!</div>';
     return;
   }
+  // 실제 글 수 가져오기
+  const{data:counts}=await db.from('posts').select('board_id');
+  const countMap={};
+  (counts||[]).forEach(p=>{countMap[p.board_id]=(countMap[p.board_id]||0)+1;});
+  boards.forEach(b=>{b._realCount=countMap[b.id]||0;});
   window._allBoards=boards;
   renderBoardGrid(boards);
 }
@@ -989,7 +994,7 @@ function renderBoardGrid(boards){
       card.className='board-grid-card'+(currentBoard&&currentBoard.id===b.id?' active':'');
       card.dataset.name=b.name.toLowerCase();
       card.innerHTML='<div class="board-grid-name">'+b.name+'</div>'
-        +'<div class="board-grid-cnt">글 '+(b.post_count||0)+'개</div>';
+        +'<div class="board-grid-cnt">글 '+(b._realCount||0)+'개</div>';
       card.onclick=()=>selectBoard(b);
       row.appendChild(card);
     });
