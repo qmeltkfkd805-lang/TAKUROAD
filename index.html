@@ -986,6 +986,12 @@ async function selectBoard(board){
   allEl.className='sub-item active';allEl.id='sub-all';allEl.textContent='전체게시판';
   allEl.onclick=()=>selectSubAll();subList.appendChild(allEl);
 
+  // 인기글 추가
+  const popEl=document.createElement('div');
+  popEl.className='sub-item';popEl.id='sub-popular';
+  popEl.innerHTML='🔥 인기글';
+  popEl.onclick=()=>selectSubPopular();subList.appendChild(popEl);
+
   (subs||[]).forEach(s=>{
     const el=document.createElement('div');
     el.className='sub-item';el.id='sub-'+s.id;el.textContent=s.name;
@@ -1049,10 +1055,33 @@ async function saveDesc(){
 }
 
 function selectSubAll(){
-  currentSub=null;
+  currentSub=null;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-all');if(el)el.classList.add('active');
   loadBoardPosts();
+}
+
+async function selectSubPopular(){
+  currentSub=null;window._popularMode=true;
+  document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('sub-popular');if(el)el.classList.add('active');
+  const table=document.getElementById('postTable');
+  if(!table)return;
+  table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div>';
+  const{data:posts}=await db.from('posts').select('*').eq('board_id',currentBoard.id).gte('likes',5).order('likes',{ascending:false});
+  const ps=posts||[];
+  table.innerHTML='';
+  if(!ps.length){table.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">❤️ 하트 5개 이상인 글이 없어요</div>';return;}
+  window._postCache=window._postCache||{};
+  ps.forEach(p=>{
+    window._postCache[p.id]=p;
+    const row=document.createElement('div');row.className='post-row';
+    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div>'
+      +'<div class="post-row-likes" style="color:var(--accent);font-weight:700;">❤️ '+p.likes+'</div>';
+    row.onclick=()=>openPostDetail(p);
+    table.appendChild(row);
+  });
 }
 
 function selectSub(sub){
@@ -1099,6 +1128,7 @@ function openSubDesc(sub){
 
 async function loadBoardPosts(){
   if(!currentBoard)return;
+  if(window._popularMode){selectSubPopular();return;}
   const table=document.getElementById('postTable');
   if(!table)return;
   table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div>';
