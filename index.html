@@ -1422,8 +1422,11 @@ async function deletePost(postId){
   }
   const pa=document.getElementById('postArea');
   if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
-  history.back();
-  loadBoardPosts();
+  if(currentSub){
+    selectSub(currentSub);
+  } else {
+    selectSubAll();
+  }
 }
 
 async function loadComments(postId){
