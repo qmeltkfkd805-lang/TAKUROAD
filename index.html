@@ -551,10 +551,33 @@ function toggleSave(id){savedIds=isSaved(id)?savedIds.filter(x=>x!==id):[...save
 let map,markers=[],currentCat='전체',activePlaceId=null;
 
 window.onload=function(){
-  // 탭 상태 복원
-  const savedTab=localStorage.getItem('takuroad_tab');
-  if(savedTab==='comm'){
-    setTimeout(()=>switchTab('comm'),100);
+  // 상태 복원
+  const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
+  if(st.tab==='comm'){
+    setTimeout(async()=>{
+      switchTab('comm');
+      if(st.boardId){
+        // 게시판 복원
+        const{data:board}=await db.from('boards').select('*').eq('id',st.boardId).single();
+        if(board){
+          await selectBoard(board);
+          if(st.subId){
+            // 세부게시판 복원
+            const{data:sub}=await db.from('sub_boards').select('*').eq('id',st.subId).single();
+            if(sub){
+              selectSub(sub);
+              if(st.postId){
+                // 글 복원
+                setTimeout(async()=>{
+                  const{data:post}=await db.from('posts').select('*').eq('id',st.postId).single();
+                  if(post)openPostDetail(post);
+                },300);
+              }
+            }
+          }
+        }
+      }
+    },100);
   }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
@@ -1000,6 +1023,7 @@ async function selectBoard(board){
   const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headBtns.appendChild(wBtn);
   head.appendChild(headInfo);head.appendChild(headBtns);
   // 브라우저 히스토리에 추가
+  localStorage.setItem('tr_state',JSON.stringify({tab:'comm',boardId:board.id,boardName:board.name}));
   history.pushState({view:'board',boardId:board.id},'',location.pathname+'?board='+encodeURIComponent(board.name));
   // 세부게시판
   const subList=document.getElementById('subBoardList');
@@ -1038,6 +1062,7 @@ window.addEventListener('popstate', function(e){
 
 function backToBoards(fromPopstate){
   currentBoard=null;currentSub=null;
+  localStorage.setItem('tr_state',JSON.stringify({tab:'comm'}));
   document.getElementById('boardDetailView').style.display='none';
   document.getElementById('boardListView').style.display='flex';
   if(!fromPopstate) history.back();
@@ -1115,6 +1140,9 @@ function selectSub(sub){
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-'+sub.id);if(el)el.classList.add('active');
   renderSubDesc(sub);
+  const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
+  st.subId=sub.id;st.subName=sub.name;st.postId=null;
+  localStorage.setItem('tr_state',JSON.stringify(st));
   loadBoardPosts();
 }
 
@@ -1185,6 +1213,9 @@ async function loadBoardPosts(){
 }
 
 function openPostDetail(p){
+  const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
+  st.postId=p.id;
+  localStorage.setItem('tr_state',JSON.stringify(st));
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMine=currentUser&&p.user_id===currentUser.id;
