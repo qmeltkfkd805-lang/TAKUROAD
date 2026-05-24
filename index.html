@@ -958,23 +958,18 @@ async function selectBoard(board){
   // 헤더
   const head=document.getElementById('boardDetailHead');
   head.innerHTML='';
-  head.style.cssText='border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;background:var(--bg2);';
-  const headLeft=document.createElement('div');
-  headLeft.style.cssText='width:100px;min-width:100px;max-width:100px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:4px;flex-shrink:0;overflow:hidden;';
-  headLeft.innerHTML='<button onclick="backToBoards()" style="background:var(--accent-l);border:1.5px solid var(--accent);border-radius:10px;padding:4px 2px;font-size:10px;color:var(--accent);cursor:pointer;font-family:inherit;font-weight:700;text-align:center;line-height:1.4;width:90%;">← 게시판<br>목록</button>';
-  const headRight=document.createElement('div');
-  headRight.style.cssText='flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px;';
+  head.style.cssText='border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;background:var(--bg2);';
   const headInfo=document.createElement('div');
   headInfo.innerHTML='<div class="comm-board-name">'+board.name+'</div><div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div>';
-  headRight.appendChild(headInfo);
   const headBtns=document.createElement('div');
-  headBtns.style.cssText='display:flex;gap:8px;align-items:center;flex-shrink:0;';
+  headBtns.style.cssText='display:flex;gap:8px;align-items:center;';
   if(isMgr){
     const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent='👑 매니저 양도';tBtn.onclick=openTransfer;headBtns.appendChild(tBtn);
   }
   const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headBtns.appendChild(wBtn);
-  headRight.appendChild(headBtns);
-  head.appendChild(headLeft);head.appendChild(headRight);
+  head.appendChild(headInfo);head.appendChild(headBtns);
+  // 브라우저 히스토리에 추가
+  history.pushState({view:'board',boardId:board.id},'',location.pathname+'?board='+encodeURIComponent(board.name));
   // 세부게시판
   const subList=document.getElementById('subBoardList');
   subList.innerHTML='';
@@ -990,10 +985,17 @@ async function selectBoard(board){
   postArea.innerHTML='<div class="post-table" id="postTable"><div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div></div>';
 }
 
-function backToBoards(){
+window.addEventListener('popstate', function(e){
+  if(!e.state||e.state.view==='list'){
+    backToBoards(true);
+  }
+});
+
+function backToBoards(fromPopstate){
   currentBoard=null;currentSub=null;
   document.getElementById('boardDetailView').style.display='none';
   document.getElementById('boardListView').style.display='flex';
+  if(!fromPopstate) history.back();
   loadBoards();
 }
 
