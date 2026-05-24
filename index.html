@@ -1915,7 +1915,6 @@ function makeSlider(images, containerId){
   const container=document.getElementById(containerId);
   if(!container||!images||!images.length)return;
   if(images.length===1){
-  if(images.length===1){
     const img=document.createElement('img');img.src=images[0];img.onclick=()=>openImgFull(images[0]);
     img.style.cssText='width:100%;max-width:400px;height:auto;border-radius:8px;border:1px solid var(--border);cursor:pointer;display:block;margin-bottom:16px;';
     container.appendChild(img);
