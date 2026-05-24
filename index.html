@@ -1230,9 +1230,6 @@ async function loadBoardPosts(){
 }
 
 function openPostDetail(p){
-  const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
-  st.postId=p.id;
-  localStorage.setItem('tr_state',JSON.stringify(st));
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMine=currentUser&&p.user_id===currentUser.id;
