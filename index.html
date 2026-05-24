@@ -841,7 +841,7 @@ async function showDetail(p){
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
-    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">"+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button></div>'
+    +'<div class="detail-actions" id="detailActions"></div>'
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
@@ -853,14 +853,26 @@ async function showDetail(p){
     +'<textarea id="rv-text" rows="2" placeholder="방문 후기를 남겨주세요"></textarea>'
     +'<button class="btn-review" onclick="submitReview('+p.id+',\''+p.name+'\')">리뷰 등록</button>'
     +'</div></div>';
-  // 네이버지도 버튼 추가
-  const actionsEl=document.querySelector('#detailContent .detail-actions');
+  // 액션 버튼들 DOM으로 추가
+  const actionsEl=document.getElementById('detailActions');
   if(actionsEl){
+  if(actionsEl){
+    // 저장 버튼
+    const saveBtn=document.createElement('button');
+    saveBtn.id='dSaveBtn';saveBtn.className='da-btn '+(isSaved(p.id)?'saved':'');
+    saveBtn.textContent=isSaved(p.id)?'🔖 저장됨':'🏷️ 저장';
+    saveBtn.onclick=()=>handleDetailSave(p.id);
+    actionsEl.appendChild(saveBtn);
+    // 수정 버튼
+    const editBtn=document.createElement('button');
+    editBtn.className='da-btn';editBtn.textContent='✏️ 수정';
+    editBtn.onclick=()=>openEditShop(p.id);
+    actionsEl.appendChild(editBtn);
+    // 네이버지도 버튼
     const naverBtn=document.createElement('a');
     naverBtn.className='da-btn';
     naverBtn.href='https://map.naver.com/v5/search/'+encodeURIComponent(p.name);
-    naverBtn.target='_blank';
-    naverBtn.style.textDecoration='none';
+    naverBtn.target='_blank';naverBtn.style.textDecoration='none';
     naverBtn.textContent='🗺️ 네이버지도';
     actionsEl.appendChild(naverBtn);
   }
