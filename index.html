@@ -1215,16 +1215,36 @@ async function loadBoardPosts(){
   if(!ps.length){table.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">아직 글이 없어요. 첫 번째 글을 남겨보세요!</div>';return;}
 
   window._postCache=window._postCache||{};
-  ps.forEach(p=>{
-    window._postCache[p.id]=p;
-    const row=document.createElement('div');row.className='post-row';
-    const imgTxt=p.images&&p.images.length?' 🖼️'+p.images.length:'';
-    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-    row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div>';
-    row.onclick=()=>openPostDetail(p);
-    table.appendChild(row);
-  });
-}
+  const gridSubs=['이벤트 공지','중고거래','공동구매','교환해요'];
+  const isGrid=currentSub&&gridSubs.includes(currentSub.name);
+  if(isGrid){
+    const grid=document.createElement('div');grid.className='grid-view';
+    ps.forEach(p=>{
+      window._postCache[p.id]=p;
+      const card=document.createElement('div');card.className='grid-card';
+      const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+      const imgHtml=p.images&&p.images.length?'<img src="'+p.images[0]+'"  />':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px">📷</div>';
+      card.innerHTML='<div class="grid-card-img">'+imgHtml+'</div>'
+        +'<div class="grid-card-body">'
+        +(p.price?'<div class="grid-card-price">'+p.price.toLocaleString()+'원</div>':'')
+        +'<div class="grid-card-title">'+p.title+'</div>'
+        +'<div class="grid-card-meta">'+p.nick+' · '+date+'</div>'
+        +'</div>';
+      card.onclick=()=>openPostDetail(p);
+      grid.appendChild(card);
+    });
+    table.appendChild(grid);
+  } else {
+    ps.forEach(p=>{
+      window._postCache[p.id]=p;
+      const row=document.createElement('div');row.className='post-row';
+      const imgTxt=p.images&&p.images.length?' 🖼️'+p.images.length:'';
+      const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+      row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div>';
+      row.onclick=()=>openPostDetail(p);
+      table.appendChild(row);
+    });
+  }
 
 function openPostDetail(p){
   const postArea=document.getElementById('postArea');
