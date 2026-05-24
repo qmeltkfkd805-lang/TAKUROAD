@@ -1053,12 +1053,12 @@ async function selectBoard(board){
     el.onclick=()=>selectSub(s);subList.appendChild(el);
   });
 
-  // 기본으로 전체게시판 보여주기
-  selectSubAll();
-
   // 포스트 영역 초기화
   const postArea=document.getElementById('postArea');
   postArea.innerHTML='<div class="post-table" id="postTable"></div>';
+
+  // 기본으로 전체게시판 보여주기
+  selectSubAll();
 }
 
 window.addEventListener('popstate', function(e){
