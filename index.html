@@ -902,7 +902,8 @@ function filterCat(cat,btn){
 function handleSearchInput(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
-  if(!q){dd.classList.remove('open');return;}
+  const isComm=document.getElementById('tabComm').classList.contains('active');
+  if(!q||isComm){dd.classList.remove('open');if(isComm)doCommSearch();return;}
   const res=places.filter(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q)||p.tags.some(t=>t.toLowerCase().includes(q)));
   dd.innerHTML='';
   if(!res.length){dd.innerHTML='<div class="no-result">검색 결과가 없어요</div>';}
