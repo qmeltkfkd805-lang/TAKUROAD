@@ -718,7 +718,7 @@ async function showDetail(p){
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
-    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">'+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button></div>'
+    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">'+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button></div>'
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
@@ -1047,8 +1047,18 @@ async function submitPlace(){
   if(!name){alert('샵 이름을 입력해주세요');return;}
   if(!selectedCat){alert('카테고리를 선택해주세요');return;}
   if(!addr){alert('주소를 입력해주세요');return;}
-  const finalize=(lat,lng)=>{
-    const np={id:Date.now(),name,cat:selectedCat,addr,lat,lng,desc,tags:[...modalTags]};
+  const finalize=async(lat,lng)=>{
+    const imageUrls=[];
+    if(currentUser){
+      for(const file of(window._shopImgFiles||[])){
+        const ext=file.name.split('.').pop();
+        const path='shops/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+        const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+        if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+      }
+    }
+    const cats=selectedCats&&selectedCats.length?[...selectedCats]:[selectedCat];
+    const np={id:Date.now(),name,cat:selectedCat,cats,addr,lat,lng,desc,tags:[...modalTags],images:imageUrls};
     places.push(np);savePlaces();closeOverlay('addOverlay');
     currentCat='전체';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
