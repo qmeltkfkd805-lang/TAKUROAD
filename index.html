@@ -506,7 +506,9 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div class="panel-base panel-center" style="max-width:500px;">
     <h2>글 수정 <button class="icon-close" onclick="closeOverlay('editPostOverlay')">✕</button></h2>
     <div class="form-group"><label>제목 *</label><input type="text" id="editPostTitle" placeholder="제목을 입력하세요"/></div>
+    <div class="form-group" id="editPriceGroup" style="display:none;"><label>가격 (원)</label><input type="number" id="editPostPrice" placeholder="예) 5000"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="editPostContent" rows="6" placeholder="내용을 입력하세요"></textarea></div>
+    <div class="form-group" id="editLinkGroup" style="display:none;"><label>링크 첨부</label><input type="url" id="editPostLink" placeholder="https://..."/></div>
     <div class="form-group">
       <label>이미지</label>
       <div id="editImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
@@ -1427,6 +1429,13 @@ function openEditPost(p){
   window._editExistingImgs=p.images?[...p.images]:[];
   document.getElementById('editPostTitle').value=p.title;
   document.getElementById('editPostContent').value=p.content;
+  const needPrice=['중고거래','공동구매'];
+  const needLink=['이벤트 공지','중고거래','행사 후기'];
+  const subName=currentSub?currentSub.name:'';
+  document.getElementById('editPriceGroup').style.display=needPrice.includes(subName)?'block':'none';
+  document.getElementById('editLinkGroup').style.display=needLink.includes(subName)?'block':'none';
+  document.getElementById('editPostPrice').value=p.price||'';
+  document.getElementById('editPostLink').value=p.link||'';
   renderEditImgPreview();
   document.getElementById('editPostOverlay').classList.add('open');
 }
@@ -1474,9 +1483,12 @@ async function submitEditPost(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('posts').update({title,content:postContent,images:imageUrls.length?imageUrls:null,updated_at:new Date().toISOString()}).eq('id',p.id).eq('user_id',currentUser.id);
+  const priceVal=document.getElementById('editPostPrice').value;
+  const price=priceVal?parseInt(priceVal):null;
+  const link=document.getElementById('editPostLink').value.trim()||null;
+  const{error}=await db.from('posts').update({title,content:postContent,images:imageUrls.length?imageUrls:null,price,link,updated_at:new Date().toISOString()}).eq('id',p.id).eq('user_id',currentUser.id);
   if(error){alert('수정 실패: '+error.message);return;}
-  p.title=title;p.content=postContent;p.images=imageUrls;
+  p.title=title;p.content=postContent;p.images=imageUrls;p.price=price;p.link=link;
   closeOverlay('editPostOverlay');
   openPostDetail(p);
 }
