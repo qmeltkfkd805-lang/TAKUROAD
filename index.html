@@ -464,6 +464,12 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <h2>글 수정 <button class="icon-close" onclick="closeOverlay('editPostOverlay')">✕</button></h2>
     <div class="form-group"><label>제목 *</label><input type="text" id="editPostTitle" placeholder="제목을 입력하세요"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="editPostContent" rows="6" placeholder="내용을 입력하세요"></textarea></div>
+    <div class="form-group">
+      <label>이미지</label>
+      <div id="editImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <button type="button" class="img-attach-btn" onclick="document.getElementById('editImgInput').click()">📷 이미지 추가 (최대 5장)</button>
+      <input type="file" id="editImgInput" accept="image/*" multiple style="display:none" onchange="handleEditImg(event)"/>
+    </div>
     <button class="btn-submit" onclick="submitEditPost()">수정 완료</button>
   </div>
 </div>
@@ -1244,22 +1250,65 @@ function openPostDetail(p){
   loadComments(p.id);
 }
 
+window._editImgFiles=[];
+window._editExistingImgs=[];
+
 function openEditPost(p){
   window._editingPost=p;
+  window._editImgFiles=[];
+  window._editExistingImgs=p.images?[...p.images]:[];
   document.getElementById('editPostTitle').value=p.title;
   document.getElementById('editPostContent').value=p.content;
+  renderEditImgPreview();
   document.getElementById('editPostOverlay').classList.add('open');
+}
+
+function renderEditImgPreview(){
+  const area=document.getElementById('editImgPreview');if(!area)return;
+  area.innerHTML='';
+  // 기존 이미지
+  window._editExistingImgs.forEach((src,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=src;img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._editExistingImgs.splice(i,1);renderEditImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+  // 새 이미지
+  window._editImgFiles.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._editImgFiles.splice(i,1);renderEditImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+}
+
+function handleEditImg(event){
+  const files=Array.from(event.target.files);
+  const total=window._editExistingImgs.length+window._editImgFiles.length;
+  const canAdd=5-total;
+  window._editImgFiles=[...window._editImgFiles,...files.slice(0,canAdd)];
+  renderEditImgPreview();event.target.value='';
 }
 
 async function submitEditPost(){
   const p=window._editingPost;if(!p||!currentUser)return;
   const title=document.getElementById('editPostTitle').value.trim();
-  const content=document.getElementById('editPostContent').value.trim();
+  const postContent=document.getElementById('editPostContent').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
-  if(!content){alert('내용을 입력해주세요');return;}
-  const{error}=await db.from('posts').update({title,content,updated_at:new Date().toISOString()}).eq('id',p.id).eq('user_id',currentUser.id);
+  if(!postContent){alert('내용을 입력해주세요');return;}
+  // 새 이미지 업로드
+  const imageUrls=[...window._editExistingImgs];
+  for(const file of window._editImgFiles){
+    const ext=file.name.split('.').pop();
+    const path=currentUser.id+'/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  const{error}=await db.from('posts').update({title,content:postContent,images:imageUrls.length?imageUrls:null,updated_at:new Date().toISOString()}).eq('id',p.id).eq('user_id',currentUser.id);
   if(error){alert('수정 실패: '+error.message);return;}
-  p.title=title;p.content=content;
+  p.title=title;p.content=postContent;p.images=imageUrls;
   closeOverlay('editPostOverlay');
   openPostDetail(p);
 }
