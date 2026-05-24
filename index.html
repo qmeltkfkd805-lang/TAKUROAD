@@ -910,7 +910,37 @@ function handleSearchInput(){
   else{res.forEach(p=>{const d=document.createElement('div');d.className='s-item';d.innerHTML='<span style="font-size:16px">'+CAT_ICON[p.cat]+'</span><div><div class="sn">'+p.name+'</div><div class="sa">'+p.addr+'</div></div>';d.onclick=()=>{selectPlace(p.id);closeSearchDrop();document.getElementById('searchInput').value='';};dd.appendChild(d);});}
   dd.classList.add('open');
 }
-function doSearch(){const q=document.getElementById('searchInput').value.trim().toLowerCase();const r=places.find(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q));if(r){selectPlace(r.id);closeSearchDrop();}}
+function doSearch(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  if(!q)return;
+  closeSearchDrop();
+  const filtered=places.filter(p=>
+    p.name.toLowerCase().includes(q)||
+    p.addr.toLowerCase().includes(q)||
+    (p.tags&&p.tags.some(t=>t.toLowerCase().includes(q)))
+  );
+  if(!filtered.length){
+    document.getElementById('searchInput').value='';
+    return;
+  }
+  currentCat='전체';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
+  renderListPanel(filtered);
+  // 마커도 검색 결과만 표시
+  clearMarkers();
+  const posMap={};
+  filtered.forEach(p=>{const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);if(!posMap[k])posMap[k]=[];posMap[k].push(p);});
+  filtered.forEach(p=>{
+    const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);const g=posMap[k];const idx=g.indexOf(p);
+    let off={lat:0,lng:0};
+    if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0004,lng:Math.cos(a)*.0004};}
+    addMarker(p,off);
+  });
+  document.getElementById('listPanel').classList.add('open');
+  if(filtered.length===1)selectPlace(filtered[0].id);
+  document.getElementById('searchInput').value='';
+}
 function closeSearchDrop(){document.getElementById('searchDropdown').classList.remove('open');}
 
 // ── 탭 전환 ──
