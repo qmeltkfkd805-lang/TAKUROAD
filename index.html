@@ -1632,8 +1632,13 @@ function selectSub(sub){
   st.subId=sub.id;st.subName=sub.name;st.postId=null;
   localStorage.setItem('tr_state',JSON.stringify(st));
   const pa=document.getElementById('postArea');
-  if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
-  loadBoardPosts();
+  if(pa){
+    let notice='';
+    if(sub.name==='중고거래'){
+      notice='<div style="background:#fff9e6;border:1.5px solid #f0c040;border-radius:var(--r-sm);padding:10px 14px;font-size:12px;color:#7a6000;margin:10px 10px 0;line-height:1.6;">⚠️ <strong>거래 주의사항</strong><br>타쿠로드는 개인간 거래를 중개하는 역할만 할 뿐, 거래되는 물품의 하자나 문제에 대해서는 책임지지 않습니다.</div>';
+    }
+    pa.innerHTML=notice+'<div class="post-table" id="postTable"></div>';
+  }
 }
 
 function renderSubDesc(sub){
