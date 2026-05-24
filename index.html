@@ -1266,7 +1266,7 @@ async function loadComments(postId){
     const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
     const isMine=currentUser&&c.user_id===currentUser.id;
     const liked=likedComments.has(c.id);
-    div.innerHTML='<div class="comment-top" style="display:flex;align-items:center;gap:8px;"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span>'+(isMine?'<button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')" >삭제</button>':'')+'</div><div class="comment-text">'+c.content+'</div>';
+    div.innerHTML='<div class="comment-top" style="display:flex;align-items:center;gap:8px;"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span></div><div class="comment-text">'+c.content+'</div>'+(isMine?'<div style="text-align:right;margin-top:4px;"><button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')" >삭제</button></div>':'');
     const likeBtn=document.createElement('button');
     likeBtn.textContent='❤️ '+(c.likes||0);
     likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;flex-shrink:0;';
