@@ -841,7 +841,7 @@ async function showDetail(p){
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
-    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">'+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button></div>'
+    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">"+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button><a class="da-btn" href="https://map.naver.com/v5/search/'+encodeURIComponent(p.name)+'" target="_blank" style="text-decoration:none;">🗺️ 네이버지도</a></div>'
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
