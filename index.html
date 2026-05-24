@@ -960,7 +960,7 @@ async function selectBoard(board){
   head.innerHTML='';
   head.style.cssText='border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;background:var(--bg2);';
   const headLeft=document.createElement('div');
-  headLeft.style.cssText='width:100px;min-width:100px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:6px 4px;flex-shrink:0;box-sizing:border-box;';
+  headLeft.className='sub-sidebar';headLeft.style.cssText='display:flex;align-items:center;justify-content:center;padding:6px 4px;';
   headLeft.innerHTML='<button onclick="backToBoards()" style="background:var(--accent-l);border:1.5px solid var(--accent);border-radius:10px;padding:3px 4px;font-size:10px;color:var(--accent);cursor:pointer;font-family:inherit;font-weight:700;text-align:center;line-height:1.4;width:88%;">← 게시판<br>목록</button>';
   const headRight=document.createElement('div');
   headRight.style.cssText='flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px;';
