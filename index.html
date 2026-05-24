@@ -957,21 +957,25 @@ async function selectBoard(board){
 
   // 헤더
   const head=document.getElementById('boardDetailHead');
+  const head=document.getElementById('boardDetailHead');
   head.innerHTML='';
   head.style.cssText='border-bottom:1px solid var(--border);display:flex;align-items:stretch;flex-shrink:0;background:var(--bg2);';
   const headLeft=document.createElement('div');
-  headLeft.style.cssText='display:flex;flex-direction:column;gap:4px;min-width:0;';
-  headLeft.innerHTML='<button onclick="backToBoards()" style="background:var(--accent-l);border:1.5px solid var(--accent);border-radius:14px;padding:4px 10px;font-size:11px;color:var(--accent);cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;align-self:flex-start;">← 게시판 목록</button>'
-    +'<div><div class="comm-board-name">'+board.name+'</div>'
-    +'<div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div></div>';
+  headLeft.style.cssText='width:100px;min-width:100px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:8px 6px;flex-shrink:0;';
+  headLeft.innerHTML='<button onclick="backToBoards()" style="background:var(--accent-l);border:1.5px solid var(--accent);border-radius:10px;padding:4px 6px;font-size:10px;color:var(--accent);cursor:pointer;font-family:inherit;font-weight:700;text-align:center;line-height:1.4;width:100%;">← 게시판<br>목록</button>';
   const headRight=document.createElement('div');
-  headRight.style.cssText='display:flex;gap:8px;align-items:center;';
+  headRight.style.cssText='flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;gap:8px;';
+  const headInfo=document.createElement('div');
+  headInfo.innerHTML='<div class="comm-board-name">'+board.name+'</div><div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div>';
+  headRight.appendChild(headInfo);
+  const headBtns=document.createElement('div');
+  headBtns.style.cssText='display:flex;gap:8px;align-items:center;flex-shrink:0;';
   if(isMgr){
-    const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent='👑 매니저 양도';tBtn.onclick=openTransfer;headRight.appendChild(tBtn);
+    const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent='👑 양도';tBtn.onclick=openTransfer;headBtns.appendChild(tBtn);
   }
-  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headRight.appendChild(wBtn);
+  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headBtns.appendChild(wBtn);
+  headRight.appendChild(headBtns);
   head.appendChild(headLeft);head.appendChild(headRight);
-
   // 세부게시판
   const subList=document.getElementById('subBoardList');
   subList.innerHTML='';
