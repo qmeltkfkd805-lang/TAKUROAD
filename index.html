@@ -556,7 +556,7 @@ window.onload=function(){
   // 상태 복원
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   if(st.tab==='comm'){
-    setTimeout(async()=>{
+    (async()=>{
       switchTab('comm');
       if(st.boardId){
         const{data:board}=await db.from('boards').select('*').eq('id',st.boardId).single();
@@ -579,7 +579,7 @@ window.onload=function(){
         }
       }
       
-    },100);
+    })();
   }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
