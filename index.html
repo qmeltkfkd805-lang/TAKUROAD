@@ -1276,6 +1276,12 @@ function openPostDetail(p){
 
   const title=document.createElement('div');
   title.style.cssText='font-size:18px;font-weight:900;margin-bottom:8px;';title.textContent=p.title;detail.appendChild(title);
+  if(p.price){
+    const priceEl=document.createElement('div');
+    priceEl.style.cssText='font-size:20px;font-weight:900;color:var(--accent);margin-bottom:10px;';
+    priceEl.textContent=p.price.toLocaleString()+'원';
+    detail.appendChild(priceEl);
+  }
 
   const meta=document.createElement('div');
   meta.style.cssText='font-size:12px;color:var(--muted);margin-bottom:16px;display:flex;gap:12px;align-items:center;';
@@ -1576,7 +1582,9 @@ async function submitBoardPost(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null});
+  const priceVal=document.getElementById('bwPrice').value;
+  const price=priceVal?parseInt(priceVal):null;
+  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null,price});
   if(error){alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
