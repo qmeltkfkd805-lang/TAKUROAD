@@ -1110,21 +1110,21 @@ async function submitPlace(){
 let currentBoard=null,currentSub=null;
 let bwImgFiles=[];
 
+let _commSearchTimer=null;
 async function doCommSearch(){
+  clearTimeout(_commSearchTimer);
+  _commSearchTimer=setTimeout(async()=>{
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   closeSearchDrop();
-  if(!q)return;
+  if(!q){if(currentBoard)loadBoardPosts();else if(window._allBoards)renderBoardGrid(window._allBoards);return;}
   if(!currentBoard){
-    // 게시판 목록에서 검색
     if(window._allBoards){
       renderBoardGrid(window._allBoards.filter(b=>b.name.toLowerCase().includes(q)));
     }
     return;
   }
-  // 게시판 안에서 검색
   const table=document.getElementById('postTable');
   if(!table)return;
-  table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">검색 중…</div>';
   let query=db.from('posts').select('*').eq('board_id',currentBoard.id);
   if(currentSub)query=query.eq('sub_board_id',currentSub.id);
   const{data:posts}=await query.order('created_at',{ascending:false});
@@ -1232,21 +1232,21 @@ function renderBoardGrid(boards){
   });
 }
 
+let _commSearchTimer=null;
 async function doCommSearch(){
+  clearTimeout(_commSearchTimer);
+  _commSearchTimer=setTimeout(async()=>{
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   closeSearchDrop();
-  if(!q)return;
+  if(!q){if(currentBoard)loadBoardPosts();else if(window._allBoards)renderBoardGrid(window._allBoards);return;}
   if(!currentBoard){
-    // 게시판 목록에서 검색
     if(window._allBoards){
       renderBoardGrid(window._allBoards.filter(b=>b.name.toLowerCase().includes(q)));
     }
     return;
   }
-  // 게시판 안에서 검색
   const table=document.getElementById('postTable');
   if(!table)return;
-  table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">검색 중…</div>';
   let query=db.from('posts').select('*').eq('board_id',currentBoard.id);
   if(currentSub)query=query.eq('sub_board_id',currentSub.id);
   const{data:posts}=await query.order('created_at',{ascending:false});
