@@ -62,6 +62,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .cat-btn[data-cat="게임"].active{background:var(--c-game);}
 .cat-btn[data-cat="쿠지"].active{background:#e03535;}
 .cat-btn[data-cat="프라모델"].active{background:#0891b2;}
+.cat-btn[data-cat="온라인샵"].active{background:#16a34a;}
 .map-view{flex:1 1 0;display:flex;overflow:hidden;position:relative;height:0;}
 #map{flex:1;height:100%;}
 .comm-view{flex:1 1 0;display:none;overflow:hidden;height:0;}
@@ -361,6 +362,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <button class="cat-btn" data-cat="동인지" onclick="filterCat('동인지',this)">🖨️ 동인지</button>
   <button class="cat-btn" data-cat="게임" onclick="filterCat('게임',this)">🎮 게임</button>
   <button class="cat-btn" data-cat="프라모델" onclick="filterCat('프라모델',this)">🔧 프라모델</button>
+  <button class="cat-btn" data-cat="온라인샵" onclick="filterCat('온라인샵',this)">🛒 온라인샵</button>
 </div>
 
 <!-- 지도 뷰 -->
@@ -470,6 +472,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
         <button class="cat-sel-btn" data-c="동인지" onclick="selCat(this)">🖨️ 동인지</button>
         <button class="cat-sel-btn" data-c="게임" onclick="selCat(this)">🎮 게임</button>
         <button class="cat-sel-btn" data-c="프라모델" onclick="selCat(this)">🔧 프라모델</button>
+        <button class="cat-sel-btn" data-c="온라인샵" onclick="selCat(this)">🛒 온라인샵</button>
       </div>
     </div>
     <div class="form-group"><label>주소 *</label><input type="text" id="f-addr" placeholder="예) 서울 마포구 홍익로 22"/></div>
@@ -598,9 +601,9 @@ const SUPA_URL='https://ouhlwmtwgxewrktgrzkd.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91aGx3bXR3Z3hld3JrdGdyemtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDM4NjUsImV4cCI6MjA5NDkxOTg2NX0.Y1BGbubuWUM-8E9ydN0sJk3R3j8wiYwhj0Qkk7F2O_M';
 const db=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-const CAT_ICON={'애니/웹툰':'🌸','피규어':'🗿','카드/TCG':'🃏','중고/빈티지':'📦','팝업/카페':'🎪','동인지':'🖨️','게임':'🎮','쿠지':'🎰','프라모델':'🔧'};
-const CAT_COLOR={'애니/웹툰':'#e8006f','피규어':'#7c3aed','카드/TCG':'#b45309','중고/빈티지':'#059669','팝업/카페':'#0099cc','동인지':'#db2777','게임':'#ea580c','쿠지':'#e03535','프라모델':'#0891b2'};
-const CAT_BG={'애니/웹툰':'rgba(232,0,111,.12)','피규어':'rgba(124,58,237,.12)','카드/TCG':'rgba(180,83,9,.12)','중고/빈티지':'rgba(5,150,105,.12)','팝업/카페':'rgba(0,153,204,.12)','동인지':'rgba(219,39,119,.12)','게임':'rgba(234,88,12,.12)','쿠지':'rgba(224,53,53,.12)','프라모델':'rgba(8,145,178,.12)'};
+const CAT_ICON={'애니/웹툰':'🌸','피규어':'🗿','카드/TCG':'🃏','중고/빈티지':'📦','팝업/카페':'🎪','동인지':'🖨️','게임':'🎮','쿠지':'🎰','프라모델':'🔧','온라인샵':'🛒'};
+const CAT_COLOR={'애니/웹툰':'#e8006f','피규어':'#7c3aed','카드/TCG':'#b45309','중고/빈티지':'#059669','팝업/카페':'#0099cc','동인지':'#db2777','게임':'#ea580c','쿠지':'#e03535','프라모델':'#0891b2','온라인샵':'#16a34a'};
+const CAT_BG={'애니/웹툰':'rgba(232,0,111,.12)','피규어':'rgba(124,58,237,.12)','카드/TCG':'rgba(180,83,9,.12)','중고/빈티지':'rgba(5,150,105,.12)','팝업/카페':'rgba(0,153,204,.12)','동인지':'rgba(219,39,119,.12)','게임':'rgba(234,88,12,.12)','쿠지':'rgba(224,53,53,.12)','프라모델':'rgba(8,145,178,.12)','온라인샵':'rgba(22,163,74,.12)'};
 const SUB_BOARDS=['자유게시판','이벤트 공지','행사 후기','동행구해요','공동구매','교환해요'];
 
 const DUMMY=[
@@ -615,6 +618,8 @@ const DUMMY=[
   {id:40,name:'메가하우스 홍대본점',cat:'피규어',cats:['피규어'],addr:'서울 마포구 양화로 188 AK플라자 홍대 3층',lat:37.5567,lng:126.9229,desc:'메가하우스 국내 최초 공식 컨셉스토어. 룩업/GEM/테노히라 등 공식 피규어.',tags:['홍대','룩업','GEM','피규어']},
   {id:50,name:'이치방쿠지 용산점',cat:'쿠지',cats:['쿠지'],addr:'서울 용산구 한강대로23길 55 아이파크몰 3층',lat:37.5300,lng:126.9645,desc:'용산 아이파크몰 3층 도파민스테이션 내 이치방쿠지 공식 판매점.',tags:['용산','이치방쿠지','제일복권']},
   {id:51,name:'이치방쿠지 홍대점',cat:'쿠지',cats:['쿠지'],addr:'서울 마포구 양화로 188 AK플라자 홍대 5층',lat:37.5565,lng:126.9228,desc:'AK플라자 홍대 5층 애니메이트 내 이치방쿠지 공식 판매점.',tags:['홍대','이치방쿠지','제일복권']},
+  {id:70,name:'애니메이트 온라인',cat:'온라인샵',cats:['온라인샵','애니/웹툰'],addr:'온라인',lat:37.5519,lng:127.0005,desc:'애니메이트 공식 한국 온라인 스토어. 일본 굿즈 직구 가능.',tags:['온라인','굿즈','직구'],images:[]},
+  {id:71,name:'라신반 온라인',cat:'온라인샵',cats:['온라인샵','동인지','중고/빈티지'],addr:'온라인',lat:37.5520,lng:127.0006,desc:'라신반 공식 온라인 스토어. 중고 굿즈/동인지.',tags:['온라인','중고','동인지'],images:[]},
   {id:60,name:'건담베이스 코엑스',cat:'프라모델',cats:['프라모델','피규어'],addr:'서울 강남구 봉은사로 524 스타필드 코엑스몰',lat:37.5126,lng:127.0594,desc:'스타필드 코엑스몰 내 건담베이스. 반다이 공식 건프라 전문점.',tags:['건프라','코엑스','반다이']},
 ];
 
@@ -708,6 +713,7 @@ function filterSubRegion(subRegion){
 }
 
 function getRegion(addr){
+  if(!addr||addr==='온라인')return '온라인';
   if(!addr)return '기타';
   if(addr.startsWith('서울'))return '서울';
   if(addr.startsWith('경기'))return '경기';
@@ -763,7 +769,7 @@ function renderListPanel(filtered,updateRegion=true){
   if(!filtered.length){body.innerHTML='<div class="empty-state"><div class="ei">🗾</div><p>이 카테고리에 성지가 없어요.</p></div>';return;}
   // 지역 드롭다운 업데이트
   if(updateRegion){
-    const regionOrder=['서울','경기','부산','인천','대구','대전','광주','울산','경남','경북','충남','전남','전북','충북','강원','제주','세종','기타'];
+    const regionOrder=['온라인','서울','경기','부산','인천','대구','대전','광주','울산','경남','경북','충남','전남','전북','충북','강원','제주','세종','기타'];
   const foundRegions=new Set(filtered.map(p=>getRegion(p.addr)));
   const regions=['전체',...regionOrder.filter(r=>foundRegions.has(r))];
     const sel=document.getElementById('regionSelect');
