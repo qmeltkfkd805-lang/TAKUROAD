@@ -551,6 +551,11 @@ function toggleSave(id){savedIds=isSaved(id)?savedIds.filter(x=>x!==id):[...save
 let map,markers=[],currentCat='전체',activePlaceId=null;
 
 window.onload=function(){
+  // 탭 상태 복원
+  const savedTab=localStorage.getItem('takuroad_tab');
+  if(savedTab==='comm'){
+    setTimeout(()=>switchTab('comm'),100);
+  }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
     if(!localStorage.getItem('takuroad_places'))geocodeDummy().then(()=>renderAll());
@@ -761,6 +766,7 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 // ── 탭 전환 ──
 function switchTab(tab){
   const isMap=tab==='map';
+  localStorage.setItem('takuroad_tab', tab);
   document.getElementById('tabMap').classList.toggle('active',isMap);
   document.getElementById('tabComm').classList.toggle('active',!isMap);
   document.getElementById('mapView').style.display=isMap?'':'none';
@@ -768,7 +774,6 @@ function switchTab(tab){
   document.getElementById('catBar').style.display=isMap?'':'none';
   document.getElementById('listFab').style.display=isMap?'':'none';
   if(!isMap){
-    // 게시판 상세에서 커뮤니티 탭 누르면 목록으로
     if(currentBoard){
       backToBoards(true);
     } else {
