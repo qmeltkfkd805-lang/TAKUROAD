@@ -748,7 +748,14 @@ function switchTab(tab){
   document.getElementById('commView').style.display=isMap?'none':'flex';
   document.getElementById('catBar').style.display=isMap?'':'none';
   document.getElementById('listFab').style.display=isMap?'':'none';
-  if(!isMap)loadBoards();
+  if(!isMap){
+    // 게시판 상세에서 커뮤니티 탭 누르면 목록으로
+    if(currentBoard){
+      backToBoards(true);
+    } else {
+      loadBoards();
+    }
+  }
 }
 
 // ── 오버레이 ──
