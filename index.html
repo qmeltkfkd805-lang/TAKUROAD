@@ -794,6 +794,7 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
+  history.pushState({view:tab},'',location.pathname+(tab==='map'?'':'?tab=comm'));
   document.getElementById('tabMap').classList.toggle('active',isMap);
   document.getElementById('tabComm').classList.toggle('active',!isMap);
   document.getElementById('mapView').style.display=isMap?'':'none';
@@ -1029,6 +1030,8 @@ async function selectBoard(board){
   head.appendChild(headInfo);head.appendChild(headBtns);
   // 브라우저 히스토리에 추가
   localStorage.setItem('tr_state',JSON.stringify({tab:'comm',boardId:board.id,boardName:board.name}));
+  window._boardCache=window._boardCache||{};
+  window._boardCache[board.id]=board;
   history.pushState({view:'board',boardId:board.id},'',location.pathname+'?board='+encodeURIComponent(board.name));
   // 세부게시판
   const subList=document.getElementById('subBoardList');
@@ -1060,8 +1063,21 @@ async function selectBoard(board){
 }
 
 window.addEventListener('popstate', function(e){
-  if(!e.state||e.state.view==='list'){
+  const state=e.state||{};
+  if(state.view==='board'){
+    // 게시판 상세로 복원
+    if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
+      selectBoard(window._boardCache[state.boardId]);
+    }
+  } else if(state.view==='list'){
     backToBoards(true);
+  } else if(state.view==='post'){
+    // 글에서 뒤로가기 = 게시판 목록
+    const pa=document.getElementById('postArea');
+    if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
+    loadBoardPosts();
+  } else if(state.view==='map'){
+    switchTab('map');
   }
 });
 
@@ -1070,7 +1086,6 @@ function backToBoards(fromPopstate){
   localStorage.setItem('tr_state',JSON.stringify({tab:'comm'}));
   document.getElementById('boardDetailView').style.display='none';
   document.getElementById('boardListView').style.display='flex';
-  if(!fromPopstate) history.back();
   loadBoards();
 }
 
@@ -1248,6 +1263,7 @@ async function loadBoardPosts(){
 }
 
 function openPostDetail(p){
+  history.pushState({view:'post',postId:p.id},'',location.pathname+'?post='+p.id);
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMine=currentUser&&p.user_id===currentUser.id;
