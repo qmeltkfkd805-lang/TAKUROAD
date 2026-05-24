@@ -1278,7 +1278,7 @@ function openPostDetail(p){
   title.style.cssText='font-size:18px;font-weight:900;margin-bottom:8px;';title.textContent=p.title;detail.appendChild(title);
   if(p.price){
     const priceEl=document.createElement('div');
-    priceEl.style.cssText='font-size:20px;font-weight:900;color:var(--accent);margin-bottom:10px;';
+    priceEl.style.cssText='font-size:22px;font-weight:900;color:var(--accent);margin-bottom:8px;display:inline-block;background:var(--accent-l);padding:4px 14px;border-radius:20px;border:1.5px solid var(--accent);';
     priceEl.textContent=p.price.toLocaleString()+'원';
     detail.appendChild(priceEl);
   }
@@ -1576,7 +1576,9 @@ async function submitBoardPost(){
   window._submitting=true;
   if(!currentUser||!currentBoard){window._submitting=false;alert('로그인 후 글을 쓸 수 있어요!');return;}
   const selectedSub=window._bwSelectedSub;
-  if(!selectedSub){alert('세부게시판을 선택해주세요!');return;}
+  if(!selectedSub){window._submitting=false;alert('세부게시판을 선택해주세요!');return;}
+  const requireImg=['중고거래','공동구매','교환해요'];
+  if(requireImg.includes(selectedSub.name)&&bwImgFiles.length===0){window._submitting=false;alert('사진을 최소 1장 첨부해주세요!');return;}
   const title=document.getElementById('bwTitle').value.trim();
   const content=document.getElementById('bwContent').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
