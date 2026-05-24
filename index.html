@@ -1109,6 +1109,9 @@ function selectSubAll(){
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-all');if(el)el.classList.add('active');
   const sd=document.getElementById('subDescBox');if(sd)sd.innerHTML='';
+  const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
+  st.subId=null;st.subName=null;st.postId=null;
+  localStorage.setItem('tr_state',JSON.stringify(st));
   loadBoardPosts();
 }
 
