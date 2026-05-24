@@ -938,7 +938,11 @@ function esAddTag(){
   window._esTags.push(val);inp.value='';renderEsTags();
 }
 function renderEsTags(){
-  document.getElementById('esTagsPreview').innerHTML=window._esTags.map(t=>'<span class="tag-del" onclick="esRemoveTag(''+t+'')">🏷 '+t+' ✕</span>').join('');
+  const area=document.getElementById('esTagsPreview');area.innerHTML='';
+  window._esTags.forEach(t=>{
+    const span=document.createElement('span');span.className='tag-del';
+    span.innerHTML='🏷 '+t+' ✕';span.onclick=()=>esRemoveTag(t);area.appendChild(span);
+  });
 }
 function esRemoveTag(t){window._esTags=window._esTags.filter(x=>x!==t);renderEsTags();}
 
