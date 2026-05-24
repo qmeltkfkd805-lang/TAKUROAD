@@ -794,6 +794,7 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
+  if(isMap)localStorage.setItem('tr_state',JSON.stringify({tab:'map'}));
   document.getElementById('tabMap').classList.toggle('active',isMap);
   document.getElementById('tabComm').classList.toggle('active',!isMap);
   document.getElementById('mapView').style.display=isMap?'':'none';
