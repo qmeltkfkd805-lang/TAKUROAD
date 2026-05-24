@@ -1503,7 +1503,7 @@ async function openBoardWrite(){
   document.getElementById('bwContent').value='';
   document.getElementById('bwImgPreview').innerHTML='';
   document.getElementById('bwPrice').value='';
-  const needPrice=['중고거래','공동구매','교환해요','이벤트 공지'];
+  const needPrice=['중고거래','공동구매'];
   const subName=currentSub?currentSub.name:'';
   document.getElementById('priceGroup').style.display=needPrice.includes(subName)?'block':'none';
 
