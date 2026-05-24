@@ -1573,10 +1573,10 @@ async function openBoardWrite(){
   document.getElementById('bwImgPreview').innerHTML='';
   document.getElementById('bwPrice').value='';
   document.getElementById('bwLink').value='';
+  const subName=currentSub?currentSub.name:'';
   const needLink=['이벤트 공지','중고거래','행사 후기'];
   document.getElementById('linkGroup').style.display=needLink.includes(subName)?'block':'none';
   const needPrice=['중고거래','공동구매'];
-  const subName=currentSub?currentSub.name:'';
   document.getElementById('priceGroup').style.display=needPrice.includes(subName)?'block':'none';
 
   // 세부게시판 버튼 렌더링
