@@ -737,7 +737,7 @@ async function showDetail(p){
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
-    +(p.images&&p.images.length?'<div class="post-images" style="margin-bottom:16px">'+p.images.map(function(src){return'<img class="post-img" src="'+src+'" onclick="openImgFull(\''+src+'\')"/>';}).join('')+'</div>':'')
+    +(p.images&&p.images.length?'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'+p.images.map(function(src){return'<img src="'+src+'" onclick="openImgFull(\''+src+'\')" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;"/>';}).join('')+'</div>':'')
     +'<div class="review-section"><h3>💬 리뷰</h3>'
     +'<div class="review-list" id="reviewList"><p style="font-size:12px;color:var(--muted)">불러오는 중…</p></div>'
     +'<div class="review-form">'
