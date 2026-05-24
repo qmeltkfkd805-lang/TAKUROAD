@@ -1090,7 +1090,7 @@ async function selectSubPopular(){
 }
 
 function selectSub(sub){
-  currentSub=sub;
+  currentSub=sub;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-'+sub.id);if(el)el.classList.add('active');
   renderSubDesc(sub);
