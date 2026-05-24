@@ -214,6 +214,25 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
+    .notif-btn{position:relative;background:var(--surface2);border:1.5px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .notif-btn:hover{border-color:var(--accent);}
+    .notif-badge{position:absolute;top:-4px;right:-4px;background:var(--accent);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none;}
+    .notif-badge.on{display:flex;}
+    .notif-panel{position:fixed;top:56px;right:12px;width:300px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-lg);z-index:600;max-height:400px;overflow-y:auto;display:none;}
+    .notif-panel.open{display:block;}
+    .notif-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:900;display:flex;justify-content:space-between;align-items:center;}
+    .notif-all-read{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;}
+    .notif-all-read:hover{color:var(--accent);}
+    .notif-item{padding:10px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;}
+    .notif-item:hover{background:var(--surface2);}
+    .notif-item.unread{background:var(--accent-l);}
+    .notif-msg{font-size:12px;color:var(--text);line-height:1.5;}
+    .notif-time{font-size:11px;color:var(--muted);margin-top:3px;}
+    .notif-empty{padding:24px;text-align:center;font-size:13px;color:var(--muted);}
+    .transfer-req-item{padding:12px 14px;border-bottom:0.5px solid var(--border);background:var(--purple-l);}
+    .transfer-req-btns{display:flex;gap:8px;margin-top:8px;}
+    .transfer-accept{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:5px 14px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;}
+    .transfer-decline{background:none;border:1px solid var(--border);border-radius:10px;padding:5px 14px;font-size:12px;font-family:inherit;color:var(--muted);cursor:pointer;}
 
     
     
@@ -303,8 +322,15 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <button class="btn-add" onclick="openAddModal()">＋ 추천 샵 추가</button>
-  <div class="header-right">
+  <div class="header-right" style="display:flex;gap:8px;align-items:center;">
+    <div style="position:relative;">
+      <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()" style="display:none;">🔔<div class="notif-badge" id="notifBadge"></div></button>
+    </div>
     <button class="btn-login" id="loginBtn" onclick="openAuth()">로그인</button>
+  </div>
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-head">알림 <button class="notif-all-read" onclick="markAllRead()">모두 읽음</button></div>
+    <div id="notifList"></div>
   </div>
 </header>
 
@@ -846,12 +872,16 @@ async function setUser(user){
   else{mini.textContent='👤';}
   btn.innerHTML='';btn.appendChild(mini);btn.appendChild(document.createTextNode(nick));
   btn.onclick=openProfile;
+  document.getElementById('notifBtn').style.display='flex';
+  loadNotifications();
 }
 function clearUser(){
   currentUser=null;
   const btn=document.getElementById('loginBtn');
   if(!btn)return;
   btn.className='btn-login';btn.textContent='로그인';btn.onclick=openAuth;
+  document.getElementById('notifBtn').style.display='none';
+  document.getElementById('notifBadge').classList.remove('on');
 }
 async function loginWithGoogle(){
   const{error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://takuroad.jonjonnni.com'}});
@@ -1454,6 +1484,12 @@ async function likePost(postId,btn){
   if(!window._likedPosts)window._likedPosts=new Set();
   window._likedPosts.add(postId);
   btn.textContent='❤️ '+n;btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';btn.style.background='var(--accent-l)';btn.style.cursor='default';btn.onclick=null;
+  if(n===5){
+    const{data:post}=await db.from('posts').select('user_id,title').eq('id',postId).single();
+    if(post&&post.user_id!==currentUser.id){
+      await db.from('notifications').insert({user_id:post.user_id,type:'popular',message:'회원님의 글 ['+post.title+']이 인기글에 올랐어요! 🔥',post_id:postId});
+    }
+  }
 }
 
 async function deletePost(postId){
@@ -1666,12 +1702,90 @@ async function submitTransfer(){
   const{data:profile}=await db.from('profiles').select('id,nickname').eq('nickname',nick).maybeSingle();
   if(!profile){errEl.textContent='해당 닉네임의 유저가 없어요';return;}
   if(profile.id===currentUser.id){errEl.textContent='본인에게는 양도할 수 없어요';return;}
-  const{error}=await db.from('boards').update({manager_id:profile.id,manager_nickname:profile.nickname}).eq('id',currentBoard.id);
-  if(error){errEl.textContent='양도 실패: '+error.message;return;}
-  currentBoard.manager_id=profile.id;currentBoard.manager_nickname=profile.nickname;
-  closeOverlay('transferOverlay');alert(profile.nickname+'님께 매니저를 양도했어요!');
-  selectBoard(currentBoard);
+  // 기존 요청 확인
+  const{data:existing}=await db.from('transfer_requests').select('id').eq('board_id',currentBoard.id).eq('status','pending').maybeSingle();
+  if(existing){errEl.textContent='이미 대기 중인 양도 요청이 있어요';return;}
+  const{data:profile2}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const fromNick=profile2?.nickname||currentUser.email.split('@')[0];
+  // 양도 요청 생성
+  const{error}=await db.from('transfer_requests').insert({board_id:currentBoard.id,from_user_id:currentUser.id,from_nickname:fromNick,to_user_id:profile.id,to_nickname:profile.nickname,status:'pending'});
+  if(error){errEl.textContent='요청 실패: '+error.message;return;}
+  // 알림 생성
+  await db.from('notifications').insert({user_id:profile.id,type:'transfer',message:fromNick+'님이 ['+currentBoard.name+'] 게시판 매니저를 양도하려 해요!',post_id:null});
+  closeOverlay('transferOverlay');
+  alert(profile.nickname+'님께 양도 요청을 보냈어요! 상대방이 수락하면 양도돼요 😊');
 }
+
+async function loadNotifications(){
+  if(!currentUser)return;
+  const{data:notifs}=await db.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  const{data:transfers}=await db.from('transfer_requests').select('*').eq('to_user_id',currentUser.id).eq('status','pending');
+  const list=document.getElementById('notifList');
+  const badge=document.getElementById('notifBadge');
+  const all=[...(transfers||[]).map(t=>({...t,_type:'transfer'})),...(notifs||[])];
+  const unread=(notifs||[]).filter(n=>!n.is_read).length+(transfers||[]).length;
+  if(unread>0){badge.textContent=unread>9?'9+':unread;badge.classList.add('on');}
+  else{badge.classList.remove('on');}
+  if(!list)return;
+  if(!all.length){list.innerHTML='<div class="notif-empty">알림이 없어요</div>';return;}
+  list.innerHTML='';
+  all.forEach(item=>{
+    const div=document.createElement('div');
+    if(item._type==='transfer'){
+      div.className='transfer-req-item';
+      div.innerHTML='<div class="notif-msg">👑 <strong>'+item.from_nickname+'</strong>님이 <strong>['+item.board_id+']</strong> 게시판 매니저 양도를 요청했어요!</div>'
+        +'<div class="transfer-req-btns"><button class="transfer-accept" onclick="acceptTransfer(''+item.id+'',''+item.board_id+'',''+item.from_user_id+'',''+item.from_nickname+'')">수락</button><button class="transfer-decline" onclick="declineTransfer(''+item.id+'')">거절</button></div>';
+    } else {
+      div.className='notif-item'+(item.is_read?'':' unread');
+      const date=new Date(item.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+      div.innerHTML='<div class="notif-msg">'+item.message+'</div><div class="notif-time">'+date+'</div>';
+      div.onclick=async()=>{
+        await db.from('notifications').update({is_read:true}).eq('id',item.id);
+        div.classList.remove('unread');
+        loadNotifications();
+      };
+    }
+    list.appendChild(div);
+  });
+}
+
+async function acceptTransfer(reqId,boardId,fromUserId,fromNick){
+  if(!currentUser)return;
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const myNick=profile?.nickname||currentUser.email.split('@')[0];
+  await db.from('boards').update({manager_id:currentUser.id,manager_nickname:myNick}).eq('id',boardId);
+  await db.from('transfer_requests').update({status:'accepted'}).eq('id',reqId);
+  await db.from('notifications').insert({user_id:fromUserId,type:'transfer_accepted',message:myNick+'님이 매니저 양도를 수락했어요! 🎉'});
+  alert('매니저 양도를 수락했어요!');
+  toggleNotifPanel();
+  loadNotifications();
+  loadBoards();
+}
+
+async function declineTransfer(reqId){
+  await db.from('transfer_requests').update({status:'declined'}).eq('id',reqId);
+  alert('양도 요청을 거절했어요');
+  loadNotifications();
+}
+
+async function markAllRead(){
+  if(!currentUser)return;
+  await db.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);
+  loadNotifications();
+}
+
+function toggleNotifPanel(){
+  const panel=document.getElementById('notifPanel');
+  panel.classList.toggle('open');
+  if(panel.classList.contains('open'))loadNotifications();
+}
+
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('notifPanel');
+  if(panel&&panel.classList.contains('open')&&!e.target.closest('#notifPanel')&&!e.target.closest('#notifBtn')){
+    panel.classList.remove('open');
+  }
+});
 
 function openImgFull(src){
   const d=document.createElement('div');d.className='post-img-full';
