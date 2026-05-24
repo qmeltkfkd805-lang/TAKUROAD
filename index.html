@@ -409,7 +409,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div class="list-panel-head">
     <h2>🏪 샵 목록 <span id="listCount" style="font-size:13px;color:var(--muted);font-weight:400;margin-left:4px;"></span></h2>
     <select id="regionSelect" onchange="filterRegion(this.value)" style="border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
-      <option value="전체">🗾 전체 지역</option>
+      <option value="전체">지역 선택</option>
     </select>
     <button class="lp-close" onclick="toggleListPanel()">✕</button>
   </div>
@@ -717,10 +717,12 @@ function renderListPanel(filtered,updateRegion=true){
   if(!filtered.length){body.innerHTML='<div class="empty-state"><div class="ei">🗾</div><p>이 카테고리에 성지가 없어요.</p></div>';return;}
   // 지역 드롭다운 업데이트
   if(updateRegion){
-    const regions=['전체',...new Set(filtered.map(p=>getRegion(p.addr)).sort())];
+    const regionOrder=['서울','경기','부산','인천','대구','대전','광주','울산','경남','경북','충남','전남','전북','충북','강원','제주','세종','기타'];
+  const foundRegions=new Set(filtered.map(p=>getRegion(p.addr)));
+  const regions=['전체',...regionOrder.filter(r=>foundRegions.has(r))];
     const sel=document.getElementById('regionSelect');
     if(sel){
-      sel.innerHTML=regions.map(r=>'<option value="'+r+'">'+(r==='전체'?'🗾 전체 지역':r)+'</option>').join('');
+      sel.innerHTML=regions.map(r=>'<option value="'+r+'">'+(r==='전체'?'지역 선택':r)+'</option>').join('');
       sel.value=_currentRegion;
     }
   }
