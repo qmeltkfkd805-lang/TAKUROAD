@@ -254,14 +254,14 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .post-table::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 .post-row{padding:11px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;}
 .post-row:hover{background:var(--surface2);}
-    .grid-view{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px;}
+    .grid-view{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;}
     .grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .18s;}
     .grid-card:hover{border-color:var(--accent);box-shadow:var(--sh-md);transform:translateY(-2px);}
-    .grid-card-img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--muted);}
+    .grid-card-img{width:100%;aspect-ratio:1;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--muted);}
     .grid-card-img img{width:100%;height:100%;object-fit:cover;}
     .grid-card-body{padding:10px;}
     .grid-card-price{font-size:15px;font-weight:900;color:var(--text);margin-bottom:3px;}
-    .grid-card-title{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+    .grid-card-title{font-size:13px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
     .grid-card-meta{font-size:11px;color:var(--muted);}
 .post-row-title{flex:1;min-width:0;}
 .post-row-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1226,7 +1226,7 @@ async function loadBoardPosts(){
       const imgHtml=p.images&&p.images.length?'<img src="'+p.images[0]+'"  />':'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:32px">📷</div>';
       card.innerHTML='<div class="grid-card-img">'+imgHtml+'</div>'
         +'<div class="grid-card-body">'
-        +(p.price?'<div class="grid-card-price">'+p.price.toLocaleString()+'원</div>':'')
+        +'<div class="grid-card-price">'+(p.price?p.price.toLocaleString()+'원':'가격 미정')+'</div>'
         +'<div class="grid-card-title">'+p.title+'</div>'
         +'<div class="grid-card-meta">'+p.nick+' · '+date+'</div>'
         +'</div>';
