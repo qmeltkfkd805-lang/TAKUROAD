@@ -458,6 +458,16 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+<!-- 글 수정 -->
+<div class="overlay center" id="editPostOverlay" onclick="handleOverlay(event,'editPostOverlay')">
+  <div class="panel-base panel-center" style="max-width:500px;">
+    <h2>글 수정 <button class="icon-close" onclick="closeOverlay('editPostOverlay')">✕</button></h2>
+    <div class="form-group"><label>제목 *</label><input type="text" id="editPostTitle" placeholder="제목을 입력하세요"/></div>
+    <div class="form-group"><label>내용 *</label><textarea id="editPostContent" rows="6" placeholder="내용을 입력하세요"></textarea></div>
+    <button class="btn-submit" onclick="submitEditPost()">수정 완료</button>
+  </div>
+</div>
+
 <!-- 게시판 글쓰기 -->
 <div class="overlay center" id="bwOverlay" onclick="handleOverlay(event,'bwOverlay')">
   <div class="panel-base panel-center" style="max-width:500px;">
@@ -1185,7 +1195,14 @@ function openPostDetail(p){
   meta.innerHTML='<span style="color:var(--cyan);font-weight:700">'+p.nick+'</span><span>'+date+'</span>';
   if(isMine){
     const delBtn=document.createElement('button');
-    delBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;margin-left:auto;';
+    const editBtn=document.createElement('button');
+    editBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;margin-left:auto;margin-right:8px;';
+    editBtn.textContent='수정';
+    editBtn.onmouseover=()=>{editBtn.style.color='var(--accent)';};
+    editBtn.onmouseout=()=>{editBtn.style.color='var(--muted)';};
+    editBtn.onclick=()=>openEditPost(p);
+    meta.appendChild(editBtn);
+    delBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;';
     delBtn.textContent='삭제';
     delBtn.onmouseover=()=>{delBtn.style.color='var(--red)';};
     delBtn.onmouseout=()=>{delBtn.style.color='var(--muted)';};
@@ -1225,6 +1242,26 @@ function openPostDetail(p){
 
   postArea.innerHTML='';postArea.appendChild(detail);
   loadComments(p.id);
+}
+
+function openEditPost(p){
+  window._editingPost=p;
+  document.getElementById('editPostTitle').value=p.title;
+  document.getElementById('editPostContent').value=p.content;
+  document.getElementById('editPostOverlay').classList.add('open');
+}
+
+async function submitEditPost(){
+  const p=window._editingPost;if(!p||!currentUser)return;
+  const title=document.getElementById('editPostTitle').value.trim();
+  const content=document.getElementById('editPostContent').value.trim();
+  if(!title){alert('제목을 입력해주세요');return;}
+  if(!content){alert('내용을 입력해주세요');return;}
+  const{error}=await db.from('posts').update({title,content,updated_at:new Date().toISOString()}).eq('id',p.id).eq('user_id',currentUser.id);
+  if(error){alert('수정 실패: '+error.message);return;}
+  p.title=title;p.content=content;
+  closeOverlay('editPostOverlay');
+  openPostDetail(p);
 }
 
 async function likePost(postId,btn){
