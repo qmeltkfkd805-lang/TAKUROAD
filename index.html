@@ -794,7 +794,12 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
-  if(isMap)localStorage.setItem('tr_state',JSON.stringify({tab:'map'}));
+  if(isMap){
+    localStorage.setItem('tr_state',JSON.stringify({tab:'map'}));
+  } else {
+    const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
+    if(st.tab!=='comm'){localStorage.setItem('tr_state',JSON.stringify({tab:'comm'}));}
+  }
   document.getElementById('tabMap').classList.toggle('active',isMap);
   document.getElementById('tabComm').classList.toggle('active',!isMap);
   document.getElementById('mapView').style.display=isMap?'':'none';
