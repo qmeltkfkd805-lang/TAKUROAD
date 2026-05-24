@@ -1362,7 +1362,8 @@ function openPostDetail(p){
     const linkEl=document.createElement('a');
     linkEl.href=p.link;linkEl.target='_blank';
     linkEl.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--cyan-l);border:1.5px solid var(--cyan);border-radius:20px;font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:12px;text-decoration:none;';
-    linkEl.innerHTML='🔗 링크 바로가기';
+    const linkLabels={'이벤트 공지':'🔗 공식 사이트 바로가기','행사 후기':'📝 후기 블로그 바로가기','중고거래':'🛒 중고거래 링크'};
+    linkEl.innerHTML=linkLabels[currentSub&&currentSub.name]||'🔗 링크 바로가기';
     detail.appendChild(linkEl);
   }
 
@@ -1683,7 +1684,7 @@ async function submitBoardPost(){
   if(!currentUser||!currentBoard){window._submitting=false;alert('로그인 후 글을 쓸 수 있어요!');return;}
   const selectedSub=window._bwSelectedSub;
   if(!selectedSub){window._submitting=false;alert('세부게시판을 선택해주세요!');return;}
-  const requireImg=['중고거래','공동구매','교환해요'];
+  const requireImg=['중고거래','공동구매','교환해요','이벤트 공지'];
   if(requireImg.includes(selectedSub.name)&&bwImgFiles.length===0){window._submitting=false;alert('사진을 최소 1장 첨부해주세요!');return;}
   const title=document.getElementById('bwTitle').value.trim();
   const content=document.getElementById('bwContent').value.trim();
