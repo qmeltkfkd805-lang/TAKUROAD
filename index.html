@@ -214,10 +214,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
-    .loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .3s;}
-    .loading-overlay.hide{opacity:0;pointer-events:none;}
-    .loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
-    @keyframes spin{to{transform:rotate(360deg);}}
+    
     .board-grid-view{flex:1;overflow-y:auto;padding:20px;}
     .board-grid-view::-webkit-scrollbar{width:4px;}
     .board-grid-view::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -287,7 +284,6 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 </style>
 </head>
 <body>
-<div class="loading-overlay" id="loadingOverlay"><div class="loading-spinner"></div></div>
 <header>
   <div class="logo">TAKUROAD</div>
   <div class="search-wrap">
@@ -573,7 +569,7 @@ window.onload=function(){
                 setTimeout(async()=>{
                   const{data:post}=await db.from('posts').select('*').eq('id',st.postId).single();
                   if(post)openPostDetail(post);
-                  hideLoading();
+                  
                 },300);
                 return;
               }
@@ -581,13 +577,13 @@ window.onload=function(){
           }
         }
       }
-      hideLoading();
+      
     },100);
   }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
-    if(!localStorage.getItem('takuroad_places'))geocodeDummy().then(()=>{renderAll();hideLoading();});
-    else{renderAll();hideLoading();}
+    if(!localStorage.getItem('takuroad_places'))geocodeDummy().then(()=>renderAll());
+    else renderAll();
   });
   document.getElementById('searchInput').addEventListener('input',handleSearchInput);
   document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
@@ -792,13 +788,6 @@ function doSearch(){const q=document.getElementById('searchInput').value.trim().
 function closeSearchDrop(){document.getElementById('searchDropdown').classList.remove('open');}
 
 // ── 탭 전환 ──
-function hideLoading(){
-  const ol=document.getElementById('loadingOverlay');
-  if(!ol)return;
-  ol.classList.add('hide');
-  setTimeout(()=>ol.remove(),300);
-}
-
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
