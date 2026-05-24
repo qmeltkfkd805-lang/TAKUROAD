@@ -1039,7 +1039,7 @@ async function selectBoard(board){
   // 전체게시판 추가
   const allEl=document.createElement('div');
   allEl.className='sub-item active';allEl.id='sub-all';allEl.textContent='전체게시판';
-  allEl.onclick=()=>selectSubAll();subList.appendChild(allEl);
+  allEl.onclick=()=>selectSubAll(true);subList.appendChild(allEl);
 
   // 인기글 추가
   const popEl=document.createElement('div');
@@ -1120,7 +1120,7 @@ async function saveDesc(){
   closeOverlay('descOverlay');
 }
 
-function selectSubAll(){
+function selectSubAll(pushHistory){
   currentSub=null;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-all');if(el)el.classList.add('active');
@@ -1130,7 +1130,7 @@ function selectSubAll(){
   localStorage.setItem('tr_state',JSON.stringify(st));
   const pa=document.getElementById('postArea');
   if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
-  history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
+  if(pushHistory)history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
   loadBoardPosts();
 }
 
