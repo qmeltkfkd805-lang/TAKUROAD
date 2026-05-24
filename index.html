@@ -254,6 +254,15 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .post-table::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 .post-row{padding:11px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;}
 .post-row:hover{background:var(--surface2);}
+    .grid-view{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px;}
+    .grid-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .18s;}
+    .grid-card:hover{border-color:var(--accent);box-shadow:var(--sh-md);transform:translateY(-2px);}
+    .grid-card-img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--muted);}
+    .grid-card-img img{width:100%;height:100%;object-fit:cover;}
+    .grid-card-body{padding:10px;}
+    .grid-card-price{font-size:15px;font-weight:900;color:var(--text);margin-bottom:3px;}
+    .grid-card-title{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+    .grid-card-meta{font-size:11px;color:var(--muted);}
 .post-row-title{flex:1;min-width:0;}
 .post-row-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .post-row-sub{font-size:11px;color:var(--muted);margin-top:1px;}
@@ -485,6 +494,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <div id="bwSubBoardRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
     <div class="form-group"><label>제목 *</label><input type="text" id="bwTitle" placeholder="제목을 입력하세요"/></div>
+    <div class="form-group" id="priceGroup" style="display:none;"><label>가격 (원)</label><input type="number" id="bwPrice" placeholder="예) 5000"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="bwContent" rows="6" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
     <div class="form-group">
       <label>이미지 첨부 (최대 5장)</label>
@@ -1477,6 +1487,10 @@ async function openBoardWrite(){
   document.getElementById('bwTitle').value='';
   document.getElementById('bwContent').value='';
   document.getElementById('bwImgPreview').innerHTML='';
+  document.getElementById('bwPrice').value='';
+  const needPrice=['중고거래','공동구매','교환해요','이벤트 공지'];
+  const subName=currentSub?currentSub.name:'';
+  document.getElementById('priceGroup').style.display=needPrice.includes(subName)?'block':'none';
 
   // 세부게시판 버튼 렌더링
   const row=document.getElementById('bwSubBoardRow');
