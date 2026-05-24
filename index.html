@@ -462,6 +462,9 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="overlay center" id="bwOverlay" onclick="handleOverlay(event,'bwOverlay')">
   <div class="panel-base panel-center" style="max-width:500px;">
     <h2>글 쓰기 <button class="icon-close" onclick="closeOverlay('bwOverlay')">✕</button></h2>
+    <div class="form-group"><label>세부게시판 *</label>
+      <div id="bwSubBoardRow" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
     <div class="form-group"><label>제목 *</label><input type="text" id="bwTitle" placeholder="제목을 입력하세요"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="bwContent" rows="6" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
     <div class="form-group">
@@ -1314,11 +1317,32 @@ async function submitBoard(){
 }
 
 // 글쓰기
-function openBoardWrite(){
+async function openBoardWrite(){
   if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
-  if(!currentSub){alert('세부게시판을 먼저 선택해주세요!');return;}
-  bwImgFiles=[];document.getElementById('bwTitle').value='';document.getElementById('bwContent').value='';
+  if(!currentBoard)return;
+  bwImgFiles=[];
+  document.getElementById('bwTitle').value='';
+  document.getElementById('bwContent').value='';
   document.getElementById('bwImgPreview').innerHTML='';
+
+  // 세부게시판 버튼 렌더링
+  const row=document.getElementById('bwSubBoardRow');
+  row.innerHTML='';
+  const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',currentBoard.id).order('order_num',{ascending:true});
+  window._bwSelectedSub=currentSub||null;
+  (subs||[]).forEach(s=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='cat-sel-btn'+(currentSub&&currentSub.id===s.id?' active':'');
+    btn.textContent=s.name;
+    btn.onclick=()=>{
+      window._bwSelectedSub=s;
+      row.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+    row.appendChild(btn);
+  });
+
   document.getElementById('bwOverlay').classList.add('open');
 }
 
@@ -1339,7 +1363,9 @@ function renderBwPreview(){
 }
 
 async function submitBoardPost(){
-  if(!currentUser||!currentBoard||!currentSub){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  if(!currentUser||!currentBoard){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  const selectedSub=window._bwSelectedSub;
+  if(!selectedSub){alert('세부게시판을 선택해주세요!');return;}
   const title=document.getElementById('bwTitle').value.trim();
   const content=document.getElementById('bwContent').value.trim();
   if(!title){alert('제목을 입력해주세요');return;}
@@ -1353,7 +1379,7 @@ async function submitBoardPost(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:currentSub.id,images:imageUrls.length?imageUrls:null});
+  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null});
   if(error){alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
