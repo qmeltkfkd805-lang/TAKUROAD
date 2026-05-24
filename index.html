@@ -459,9 +459,9 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <!-- 장소추가 -->
 <div class="overlay" id="addOverlay" onclick="handleOverlay(event,'addOverlay')">
   <div class="panel-base" style="max-width:520px;">
-    <h2>새 성지 추가 <button class="icon-close" onclick="closeOverlay('addOverlay')">✕</button></h2>
+    <h2>샵 추가하기 <button class="icon-close" onclick="closeOverlay('addOverlay')">✕</button></h2>
     <div class="form-group"><label>샵 이름 *</label><input type="text" id="f-name" placeholder="예) 애니메이트 홍대점"/></div>
-    <div class="form-group"><label>카테고리 *</label>
+    <div class="form-group"><label>카테고리 * <span style="font-size:11px;color:var(--muted);font-weight:400;">중복선택 가능</span></label>
       <div class="cat-select-row">
         <button class="cat-sel-btn" data-c="애니/웹툰" onclick="selCat(this)">🌸 애니/웹툰</button>
         <button class="cat-sel-btn" data-c="피규어" onclick="selCat(this)">🗿 피규어</button>
@@ -475,7 +475,8 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
         <button class="cat-sel-btn" data-c="온라인샵" onclick="selCat(this)">🛒 온라인샵</button>
       </div>
     </div>
-    <div class="form-group"><label>주소 *</label><input type="text" id="f-addr" placeholder="예) 서울 마포구 홍익로 22"/></div>
+    <div class="form-group" id="addrGroup"><label>주소 *</label><input type="text" id="f-addr" placeholder="예) 서울 마포구 홍익로 22"/></div>
+    <div class="form-group" id="shopLinkGroup" style="display:none;"><label>샵 링크 * <span style="font-size:11px;color:var(--muted);font-weight:400;">온라인샵 URL 필수</span></label><input type="url" id="f-shop-link" placeholder="https://..."/></div>
     <div class="form-group"><label>위치 선택</label><div class="map-pick-box" id="mapPickBox" onclick="startPickMode()">📍 지도에서 위치 직접 선택하기</div></div>
     <div class="form-group"><label>한 줄 소개</label><textarea id="f-desc" rows="3" placeholder="어떤 굿즈를 파는지, 특징을 적어주세요"></textarea></div>
     <div class="form-group"><label>사진 (최대 5장)</label>
@@ -490,7 +491,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       </div>
       <div class="tags-preview" id="tagsPreview"></div>
     </div>
-    <button class="btn-submit" onclick="submitPlace()">성지 등록하기</button>
+    <button class="btn-submit" onclick="submitPlace()">샵 등록하기</button>
   </div>
 </div>
 
@@ -498,8 +499,30 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="overlay" id="editShopOverlay" onclick="handleOverlay(event,'editShopOverlay')">
   <div class="panel-base" style="max-width:520px;">
     <h2>샵 정보 수정 <button class="icon-close" onclick="closeOverlay('editShopOverlay')">✕</button></h2>
-    <div class="form-group"><label>샵 이름 *</label><input type="text" id="es-name"/></div>
-    <div class="form-group"><label>한 줄 소개</label><textarea id="es-desc" rows="3"></textarea></div>
+    <div class="form-group"><label>샵 이름 *</label><input type="text" id="es-name" placeholder="예) 애니메이트 홍대점"/></div>
+    <div class="form-group"><label>카테고리 * <span style="font-size:11px;color:var(--muted);font-weight:400;">중복선택 가능</span></label>
+      <div class="cat-select-row" id="esCatRow">
+        <button class="cat-sel-btn" data-c="애니/웹툰" onclick="esSelCat(this)">🌸 애니/웹툰</button>
+        <button class="cat-sel-btn" data-c="피규어" onclick="esSelCat(this)">🗿 피규어</button>
+        <button class="cat-sel-btn" data-c="쿠지" onclick="esSelCat(this)">🎰 쿠지</button>
+        <button class="cat-sel-btn" data-c="팝업/카페" onclick="esSelCat(this)">🎪 팝업/카페</button>
+        <button class="cat-sel-btn" data-c="중고/빈티지" onclick="esSelCat(this)">📦 중고/빈티지</button>
+        <button class="cat-sel-btn" data-c="카드/TCG" onclick="esSelCat(this)">🃏 카드/TCG</button>
+        <button class="cat-sel-btn" data-c="동인지" onclick="esSelCat(this)">🖨️ 동인지</button>
+        <button class="cat-sel-btn" data-c="게임" onclick="esSelCat(this)">🎮 게임</button>
+        <button class="cat-sel-btn" data-c="프라모델" onclick="esSelCat(this)">🔧 프라모델</button>
+        <button class="cat-sel-btn" data-c="온라인샵" onclick="esSelCat(this)">🛒 온라인샵</button>
+      </div>
+    </div>
+    <div class="form-group"><label>주소</label><input type="text" id="es-addr" placeholder="예) 서울 마포구 양화로 188"/></div>
+    <div class="form-group"><label>한 줄 소개</label><textarea id="es-desc" rows="3" placeholder="어떤 굿즈를 파는지, 특징을 적어주세요"></textarea></div>
+    <div class="form-group"><label>태그</label>
+      <div class="tag-input-row">
+        <input type="text" id="es-tag" placeholder="예) 원피스, 포켓몬" onkeydown="if(event.key==='Enter'){esAddTag();event.preventDefault();}"/>
+        <button class="btn-tag-add" onclick="esAddTag()">추가</button>
+      </div>
+      <div class="tags-preview" id="esTagsPreview"></div>
+    </div>
     <div class="form-group"><label>사진 (최대 5장)</label>
       <div id="esImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
       <button type="button" class="img-attach-btn" onclick="document.getElementById('esImgInput').click()">📷 사진 추가</button>
@@ -878,6 +901,12 @@ async function showDetail(p){
     naverBtn.target='_blank';naverBtn.style.textDecoration='none';
     naverBtn.textContent='🗺️ 네이버지도';
     actionsEl.appendChild(naverBtn);
+    if(p.shopLink){
+      const shopLinkBtn=document.createElement('a');
+      shopLinkBtn.className='da-btn';shopLinkBtn.href=p.shopLink;shopLinkBtn.target='_blank';
+      shopLinkBtn.style.textDecoration='none';shopLinkBtn.textContent='🛒 온라인샵';
+      actionsEl.appendChild(shopLinkBtn);
+    }
   }
   document.getElementById('detailPanel').classList.add('open');
   if(p.images&&p.images.length){const sc=document.getElementById('shopImgSlider');if(sc){sc.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;';p.images.forEach(src=>{const img=document.createElement('img');img.src=src;img.onclick=()=>openImgFull(src,p.images);img.style.cssText='width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;';sc.appendChild(img);});}}
@@ -902,14 +931,32 @@ async function showDetail(p){
   }catch(e){const ce=document.getElementById('detailCnt');if(ce)ce.textContent='리뷰를 불러올 수 없어요';}
 }
 
+function esSelCat(btn){btn.classList.toggle('active');}
+function esAddTag(){
+  const inp=document.getElementById('es-tag');const val=inp.value.trim();
+  if(!val||window._esTags.includes(val)){inp.value='';return;}
+  window._esTags.push(val);inp.value='';renderEsTags();
+}
+function renderEsTags(){
+  document.getElementById('esTagsPreview').innerHTML=window._esTags.map(t=>'<span class="tag-del" onclick="esRemoveTag(''+t+'')">🏷 '+t+' ✕</span>').join('');
+}
+function esRemoveTag(t){window._esTags=window._esTags.filter(x=>x!==t);renderEsTags();}
+
 function openEditShop(id){
   if(!currentUser){alert('로그인이 필요해요');return;}
   const p=places.find(x=>x.id===id);if(!p)return;
   window._editingShop=p;
   window._esImgFiles=[];
   window._esExistingImgs=p.images?[...p.images]:[];
+  window._esTags=p.tags?[...p.tags]:[];
   document.getElementById('es-name').value=p.name;
+  document.getElementById('es-addr').value=p.addr||'';
   document.getElementById('es-desc').value=p.desc||'';
+  // 카테고리 버튼 초기화
+  document.querySelectorAll('#esCatRow .cat-sel-btn').forEach(b=>{
+    b.classList.toggle('active',(p.cats||[p.cat]).includes(b.dataset.c));
+  });
+  renderEsTags();
   renderEsImgPreview();
   document.getElementById('editShopOverlay').classList.add('open');
 }
@@ -945,8 +992,11 @@ function renderEsImgPreview(){
 async function submitEditShop(){
   const p=window._editingShop;if(!p)return;
   const name=document.getElementById('es-name').value.trim();
+  const addr=document.getElementById('es-addr').value.trim();
   const desc=document.getElementById('es-desc').value.trim();
   if(!name){alert('샵 이름을 입력해주세요');return;}
+  const activeCats=[...document.querySelectorAll('#esCatRow .cat-sel-btn.active')].map(b=>b.dataset.c);
+  if(!activeCats.length){alert('카테고리를 선택해주세요');return;}
   const imageUrls=[...window._esExistingImgs];
   if(currentUser){
     for(const file of window._esImgFiles){
@@ -956,7 +1006,9 @@ async function submitEditShop(){
       if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
     }
   }
-  p.name=name;p.desc=desc;p.images=imageUrls;
+  p.name=name;p.cat=activeCats[0];p.cats=activeCats;
+  if(addr)p.addr=addr;
+  p.desc=desc;p.tags=[...window._esTags];p.images=imageUrls;
   savePlaces();
   closeOverlay('editShopOverlay');
   await showDetail(p);
@@ -1187,6 +1239,9 @@ let pickMode=false;
 function resetAddForm(){
   ['f-name','f-addr','f-desc','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   modalTags=[];selectedCat=null;selectedCats=[];pickedLat=null;pickedLng=null;
+  document.getElementById('f-shop-link').value='';
+  document.getElementById('shopLinkGroup').style.display='none';
+  document.getElementById('addrGroup').style.display='';
   document.getElementById('tagsPreview').innerHTML='';
   window._shopImgFiles=[];
   document.getElementById('shopImgPreview').innerHTML='';
@@ -1214,9 +1269,15 @@ function renderShopImgPreview(){
 
 function selCat(btn){
   btn.classList.toggle('active');
-  const activeBtns=document.querySelectorAll('.cat-sel-btn.active');
+  const activeBtns=document.querySelectorAll('#addOverlay .cat-sel-btn.active');
   selectedCats=[...activeBtns].map(b=>b.dataset.c);
   selectedCat=selectedCats[0]||null;
+  const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  const hasOnline=selectedCats.includes('온라인샵');
+  document.getElementById('addrGroup').style.display=onlineOnly?'none':'';
+  document.getElementById('shopLinkGroup').style.display=hasOnline?'block':'none';
+  if(onlineOnly)document.getElementById('addrGroup').querySelector('label').textContent='주소';
+  else document.getElementById('addrGroup').querySelector('label').textContent='주소 *';
 }
 function addTag(){const inp=document.getElementById('f-tag');const val=inp.value.trim();if(!val||modalTags.includes(val)){inp.value='';return;}modalTags.push(val);inp.value='';renderTags();}
 function removeTag(t){modalTags=modalTags.filter(x=>x!==t);renderTags();}
@@ -1237,7 +1298,11 @@ async function submitPlace(){
   const desc=document.getElementById('f-desc').value.trim();
   if(!name){alert('샵 이름을 입력해주세요');return;}
   if(!selectedCat){alert('카테고리를 선택해주세요');return;}
-  if(!addr){alert('주소를 입력해주세요');return;}
+  const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  const hasOnline=selectedCats.includes('온라인샵');
+  const shopLink=document.getElementById('f-shop-link').value.trim();
+  if(hasOnline&&!shopLink){alert('온라인샵 링크를 입력해주세요');return;}
+  if(!onlineOnly&&!addr){alert('주소를 입력해주세요');return;}
   const finalize=async(lat,lng)=>{
     const imageUrls=[];
     if(currentUser){
@@ -1249,7 +1314,9 @@ async function submitPlace(){
       }
     }
     const cats=selectedCats&&selectedCats.length?[...selectedCats]:[selectedCat];
-    const np={id:Date.now(),name,cat:selectedCat,cats,addr,lat,lng,desc,tags:[...modalTags],images:imageUrls};
+    const shopLink=document.getElementById('f-shop-link').value.trim();
+    const finalAddr=onlineOnly?'온라인':addr;
+    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null};
     places.push(np);savePlaces();closeOverlay('addOverlay');
     currentCat='전체';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
