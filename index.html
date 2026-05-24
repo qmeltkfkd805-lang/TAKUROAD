@@ -558,6 +558,8 @@ function toggleSave(id){savedIds=isSaved(id)?savedIds.filter(x=>x!==id):[...save
 let map,markers=[],currentCat='전체',activePlaceId=null;
 
 window.onload=function(){
+  // 최대 3초 후 강제로 로딩 숨기기
+  setTimeout(hideLoading, 3000);
   // 상태 복원
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   if(st.tab==='comm'){
