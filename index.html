@@ -903,7 +903,7 @@ function handleSearchInput(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
   const dd=document.getElementById('searchDropdown');
   const isComm=document.getElementById('tabComm').classList.contains('active');
-  if(!q||isComm){dd.classList.remove('open');if(isComm)doCommSearch();return;}
+  if(!q||isComm){dd.classList.remove('open');return;}
   const res=places.filter(p=>p.name.toLowerCase().includes(q)||p.addr.toLowerCase().includes(q)||p.tags.some(t=>t.toLowerCase().includes(q)));
   dd.innerHTML='';
   if(!res.length){dd.innerHTML='<div class="no-result">검색 결과가 없어요</div>';}
@@ -927,7 +927,7 @@ function switchTab(tab){
     const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
     if(st.tab!=='comm'){localStorage.setItem('tr_state',JSON.stringify({tab:'comm'}));}
     searchInput.placeholder='제목, 내용, 글쓴이 검색…';
-    searchInput.oninput=()=>doCommSearch();
+    searchInput.oninput=null;
     searchInput.onkeydown=e=>{if(e.key==='Enter')doCommSearch();};
   }
   document.getElementById('tabMap').classList.toggle('active',isMap);
