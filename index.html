@@ -838,6 +838,15 @@ async function selectPlace(id){
 async function showDetail(p){
   const color=CAT_COLOR[p.cat]||'#e8006f';
   const dp=document.getElementById('detailContent');
+  // 수정 버튼 X 아래에
+  let existEdit=document.getElementById('detailEditBtn');if(existEdit)existEdit.remove();
+  const editShopBtn=document.createElement('button');
+  editShopBtn.id='detailEditBtn';
+  editShopBtn.className='da-btn';
+  editShopBtn.style.cssText='position:absolute;top:48px;right:14px;font-size:11px;padding:4px 10px;';
+  editShopBtn.textContent='✏️ 수정';
+  editShopBtn.onclick=()=>openEditShop(p.id);
+  document.getElementById('detailPanel').appendChild(editShopBtn);
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
@@ -862,11 +871,6 @@ async function showDetail(p){
     saveBtn.textContent=isSaved(p.id)?'🔖 저장됨':'🏷️ 저장';
     saveBtn.onclick=()=>handleDetailSave(p.id);
     actionsEl.appendChild(saveBtn);
-    // 수정 버튼
-    const editBtn=document.createElement('button');
-    editBtn.className='da-btn';editBtn.textContent='✏️ 수정';
-    editBtn.onclick=()=>openEditShop(p.id);
-    actionsEl.appendChild(editBtn);
     // 네이버지도 버튼
     const naverBtn=document.createElement('a');
     naverBtn.className='da-btn';
