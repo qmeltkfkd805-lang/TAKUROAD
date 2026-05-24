@@ -753,7 +753,7 @@ async function submitReview(placeId,placeName){
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
   const{error}=await db.from('reviews').insert({place_id:placeId,place_name:placeName,nick,stars,content,likes:0,user_id:currentUser.id,images:imageUrls.length?imageUrls:null});
-  if(error){alert('등록 실패: '+error.message);return;}
+  if(error){window._submitting=false;alert('등록 실패: '+error.message);return;}
   window._rvImgFiles=[];
   const p=places.find(x=>x.id===placeId);if(p)await showDetail(p);
 }
@@ -1472,7 +1472,7 @@ async function submitComment(postId,ta){
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile&&profile.nickname?profile.nickname:currentUser.email.split('@')[0];
   const{error}=await db.from('comments').insert({post_id:postId,user_id:currentUser.id,nick,content});
-  if(error){alert('등록 실패: '+error.message);return;}
+  if(error){window._submitting=false;alert('등록 실패: '+error.message);return;}
   ta.value='';loadComments(postId);
 }
 
@@ -1572,7 +1572,9 @@ function renderBwPreview(){
 }
 
 async function submitBoardPost(){
-  if(!currentUser||!currentBoard){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  if(window._submitting)return;
+  window._submitting=true;
+  if(!currentUser||!currentBoard){window._submitting=false;alert('로그인 후 글을 쓸 수 있어요!');return;}
   const selectedSub=window._bwSelectedSub;
   if(!selectedSub){alert('세부게시판을 선택해주세요!');return;}
   const title=document.getElementById('bwTitle').value.trim();
@@ -1591,10 +1593,10 @@ async function submitBoardPost(){
   const priceVal=document.getElementById('bwPrice').value;
   const price=priceVal?parseInt(priceVal):null;
   const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null,price});
-  if(error){alert('등록 실패: '+error.message);return;}
+  if(error){window._submitting=false;alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
-  bwImgFiles=[];closeOverlay('bwOverlay');loadBoardPosts();
+  window._submitting=false;bwImgFiles=[];closeOverlay('bwOverlay');loadBoardPosts();
 }
 
 // 매니저 양도
