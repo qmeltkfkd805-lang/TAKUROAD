@@ -1116,6 +1116,8 @@ function selectSubAll(){
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   st.subId=null;st.subName=null;st.postId=null;
   localStorage.setItem('tr_state',JSON.stringify(st));
+  const pa=document.getElementById('postArea');
+  if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
   loadBoardPosts();
 }
 
@@ -1124,6 +1126,8 @@ async function selectSubPopular(){
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-popular');if(el)el.classList.add('active');
   const sd=document.getElementById('subDescBox');if(sd)sd.innerHTML='';
+  const pa=document.getElementById('postArea');
+  if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
   const table=document.getElementById('postTable');
   if(!table)return;
   table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div>';
@@ -1151,6 +1155,8 @@ function selectSub(sub){
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   st.subId=sub.id;st.subName=sub.name;st.postId=null;
   localStorage.setItem('tr_state',JSON.stringify(st));
+  const pa=document.getElementById('postArea');
+  if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
   loadBoardPosts();
 }
 
