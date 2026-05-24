@@ -812,7 +812,7 @@ function switchTab(tab){
     if(currentBoard){
       backToBoards(true);
     } else {
-      loadBoards().then(()=>hideLoading());
+      loadBoards();
     }
   }
 }
@@ -950,6 +950,7 @@ function filterBoards(q){
 }
 
 async function loadBoards(){
+  hideLoading();
   const{data:boards}=await db.from('boards').select('*').order('created_at',{ascending:true});
   const grid=document.getElementById('boardGrid');
   if(!grid)return;
