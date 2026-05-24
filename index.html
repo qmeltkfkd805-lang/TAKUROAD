@@ -1420,6 +1420,9 @@ async function deletePost(postId){
     await db.from('boards').update({post_count:Math.max(0,(currentBoard.post_count||1)-1)}).eq('id',currentBoard.id);
     currentBoard.post_count=Math.max(0,(currentBoard.post_count||1)-1);
   }
+  const pa=document.getElementById('postArea');
+  if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
+  history.back();
   loadBoardPosts();
 }
 
