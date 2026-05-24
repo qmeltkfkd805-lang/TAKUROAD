@@ -407,10 +407,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 
 <div class="list-panel" id="listPanel">
   <div class="list-panel-head">
-    <h2>🏪 샵 목록 <span id="listCount" style="font-size:13px;color:var(--muted);font-weight:400;margin-left:4px;"></span></h2>
-    <select id="regionSelect" onchange="filterRegion(this.value)" style="border:1.5px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;">
-      <option value="전체">지역 선택</option>
-    </select>
+    <h2 style="display:flex;align-items:center;gap:8px;flex:1;">🏪 샵 목록 <span id="listCount" style="font-size:13px;color:var(--muted);font-weight:400;"></span>
+      <select id="regionSelect" onchange="filterRegion(this.value)" style="border:1.5px solid var(--border);border-radius:20px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;font-weight:400;">
+        <option value="전체">지역 선택</option>
+      </select>
+    </h2>
     <button class="lp-close" onclick="toggleListPanel()">✕</button>
   </div>
   <div class="list-panel-body" id="listPanelBody"></div>
