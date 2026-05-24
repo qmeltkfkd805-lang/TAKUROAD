@@ -1597,6 +1597,8 @@ async function openBoardWrite(){
       document.getElementById('priceGroup').style.display=needPrice.includes(s.name)?'block':'none';
       const needLink=['이벤트 공지','중고거래','행사 후기'];
       document.getElementById('linkGroup').style.display=needLink.includes(s.name)?'block':'none';
+      const linkPlaceholders={'이벤트 공지':'이벤트 공식 링크를 첨부해주세요','행사 후기':'블로그 홍보 가능','중고거래':'번개장터, 당근 등 상품 링크 첨부'};
+      document.getElementById('bwLink').placeholder=linkPlaceholders[s.name]||'https://...'
     };
     row.appendChild(btn);
   });
