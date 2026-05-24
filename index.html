@@ -577,10 +577,10 @@ window.onload=function(){
             const{data:sub}=await db.from('sub_boards').select('*').eq('id',st.subId).single();
             if(sub){
               selectSub(sub);
+            }
           }
         }
       }
-      
     })();
   }
   kakao.maps.load(()=>{
