@@ -1356,6 +1356,13 @@ function openPostDetail(p){
     priceEl.textContent=p.price.toLocaleString()+'원';
     detail.appendChild(priceEl);
   }
+  if(p.link){
+    const linkEl=document.createElement('a');
+    linkEl.href=p.link;linkEl.target='_blank';
+    linkEl.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--cyan-l);border:1.5px solid var(--cyan);border-radius:20px;font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:12px;text-decoration:none;';
+    linkEl.innerHTML='🔗 링크 바로가기';
+    detail.appendChild(linkEl);
+  }
 
   const meta=document.createElement('div');
   meta.style.cssText='font-size:12px;color:var(--muted);margin-bottom:16px;display:flex;gap:12px;align-items:center;';
