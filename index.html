@@ -473,6 +473,21 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+<!-- 샵 수정 -->
+<div class="overlay" id="editShopOverlay" onclick="handleOverlay(event,'editShopOverlay')">
+  <div class="panel-base" style="max-width:520px;">
+    <h2>샵 정보 수정 <button class="icon-close" onclick="closeOverlay('editShopOverlay')">✕</button></h2>
+    <div class="form-group"><label>샵 이름 *</label><input type="text" id="es-name"/></div>
+    <div class="form-group"><label>한 줄 소개</label><textarea id="es-desc" rows="3"></textarea></div>
+    <div class="form-group"><label>사진 (최대 5장)</label>
+      <div id="esImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <button type="button" class="img-attach-btn" onclick="document.getElementById('esImgInput').click()">📷 사진 추가</button>
+      <input type="file" id="esImgInput" accept="image/*" multiple style="display:none" onchange="handleEsImg(event)"/>
+    </div>
+    <button class="btn-submit" onclick="submitEditShop()">수정 완료</button>
+  </div>
+</div>
+
 <!-- 게시판 개설 -->
 <div class="overlay center" id="boardModalOverlay" onclick="handleOverlay(event,'boardModalOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
