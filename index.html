@@ -1521,6 +1521,8 @@ async function openBoardWrite(){
       window._bwSelectedSub=s;
       row.querySelectorAll('.cat-sel-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
+      const needPrice=['중고거래','공동구매'];
+      document.getElementById('priceGroup').style.display=needPrice.includes(s.name)?'block':'none';
     };
     row.appendChild(btn);
   });
