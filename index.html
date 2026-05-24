@@ -1256,11 +1256,23 @@ async function loadComments(postId){
   list.innerHTML='';
   const arr=cs||[];
   if(!arr.length){list.innerHTML='<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 댓글을 남겨보세요!</p>';return;}
+  const likedComments=new Set();
+  if(currentUser){
+    const{data:cl}=await db.from('comment_likes').select('comment_id').eq('user_id',currentUser.id);
+    (cl||[]).forEach(x=>likedComments.add(x.comment_id));
+  }
   arr.forEach(c=>{
     const div=document.createElement('div');div.className='comment-item';
     const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
     const isMine=currentUser&&c.user_id===currentUser.id;
-    div.innerHTML='<div class="comment-top"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span>'+(isMine?'<button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')">삭제</button>':'')+'</div><div class="comment-text">'+c.content+'</div>';
+    const liked=likedComments.has(c.id);
+    div.innerHTML='<div class="comment-top"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span>'+(isMine?'<button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')" >삭제</button>':'')+'</div><div class="comment-text">'+c.content+'</div>';
+    const likeBtn=document.createElement('button');
+    likeBtn.textContent='❤️ '+(c.likes||0);
+    likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;display:block;margin-top:6px;';
+    likeBtn.disabled=liked;
+    if(!liked)likeBtn.onclick=()=>likeComment(c.id,postId,likeBtn);
+    div.appendChild(likeBtn);
     list.appendChild(div);
   });
 }
