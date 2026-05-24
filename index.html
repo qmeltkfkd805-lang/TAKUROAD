@@ -753,6 +753,67 @@ async function showDetail(p){
   }catch(e){const ce=document.getElementById('detailCnt');if(ce)ce.textContent='리뷰를 불러올 수 없어요';}
 }
 
+function openEditShop(id){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const p=places.find(x=>x.id===id);if(!p)return;
+  window._editingShop=p;
+  window._esImgFiles=[];
+  window._esExistingImgs=p.images?[...p.images]:[];
+  document.getElementById('es-name').value=p.name;
+  document.getElementById('es-desc').value=p.desc||'';
+  renderEsImgPreview();
+  document.getElementById('editShopOverlay').classList.add('open');
+}
+
+function handleEsImg(event){
+  const files=Array.from(event.target.files);
+  const canAdd=5-window._esExistingImgs.length-window._esImgFiles.length;
+  window._esImgFiles=[...window._esImgFiles,...files.slice(0,canAdd)];
+  renderEsImgPreview();event.target.value='';
+}
+
+function renderEsImgPreview(){
+  const area=document.getElementById('esImgPreview');if(!area)return;
+  area.innerHTML='';
+  window._esExistingImgs.forEach((src,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=src;
+    img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._esExistingImgs.splice(i,1);renderEsImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+  window._esImgFiles.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);
+    img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._esImgFiles.splice(i,1);renderEsImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+}
+
+async function submitEditShop(){
+  const p=window._editingShop;if(!p)return;
+  const name=document.getElementById('es-name').value.trim();
+  const desc=document.getElementById('es-desc').value.trim();
+  if(!name){alert('샵 이름을 입력해주세요');return;}
+  const imageUrls=[...window._esExistingImgs];
+  if(currentUser){
+    for(const file of window._esImgFiles){
+      const ext=file.name.split('.').pop();
+      const path='shops/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+      const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+      if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+    }
+  }
+  p.name=name;p.desc=desc;p.images=imageUrls;
+  savePlaces();
+  closeOverlay('editShopOverlay');
+  await showDetail(p);
+  renderAll();
+}
+
 function handleDetailSave(id){toggleSave(id);const btn=document.getElementById('dSaveBtn');if(btn){btn.className='da-btn '+(isSaved(id)?'saved':'');btn.textContent=isSaved(id)?'🔖 저장됨':'🏷️ 저장';}renderAll();}
 function setStar(n){window._pickedStar=n;document.querySelectorAll('#starPicker span').forEach((s,i)=>s.classList.toggle('on',i<n));}
 window._rvImgFiles=[];
