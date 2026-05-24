@@ -1061,6 +1061,7 @@ function selectSubAll(){
   currentSub=null;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-all');if(el)el.classList.add('active');
+  const sd=document.getElementById('subDescBox');if(sd)sd.innerHTML='';
   loadBoardPosts();
 }
 
@@ -1068,6 +1069,7 @@ async function selectSubPopular(){
   currentSub=null;window._popularMode=true;
   document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('sub-popular');if(el)el.classList.add('active');
+  const sd=document.getElementById('subDescBox');if(sd)sd.innerHTML='';
   const table=document.getElementById('postTable');
   if(!table)return;
   table.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">불러오는 중…</div>';
