@@ -191,7 +191,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .empty-state .ei{font-size:40px;margin-bottom:12px;}
 .empty-state p{font-size:14px;line-height:1.6;}
 .post-images{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.post-img{width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);}
+.post-img{width:200px;height:200px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);}
 .img-preview-wrap{position:relative;display:inline-block;}
 .img-preview-wrap img{width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
 .img-preview-del{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
@@ -1263,6 +1263,16 @@ async function loadComments(postId){
     div.innerHTML='<div class="comment-top"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span>'+(isMine?'<button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')">삭제</button>':'')+'</div><div class="comment-text">'+c.content+'</div>';
     list.appendChild(div);
   });
+}
+
+async function likeComment(commentId, postId, btn){
+  if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
+  const{error}=await db.from('comment_likes').insert({comment_id:commentId,user_id:currentUser.id});
+  if(error)return;
+  const{data}=await db.from('comments').select('likes').eq('id',commentId).single();if(!data)return;
+  const n=(data.likes||0)+1;
+  await db.from('comments').update({likes:n}).eq('id',commentId);
+  btn.textContent='❤️ '+n;btn.style.color='var(--accent)';btn.disabled=true;btn.style.cursor='default';
 }
 
 async function submitComment(postId,ta){
