@@ -1733,8 +1733,15 @@ async function loadNotifications(){
     const div=document.createElement('div');
     if(item._type==='transfer'){
       div.className='transfer-req-item';
-      div.innerHTML='<div class="notif-msg">👑 <strong>'+item.from_nickname+'</strong>님이 <strong>['+item.board_id+']</strong> 게시판 매니저 양도를 요청했어요!</div>'
-        +'<div class="transfer-req-btns"><button class="transfer-accept" onclick="acceptTransfer(''+item.id+'',''+item.board_id+'',''+item.from_user_id+'',''+item.from_nickname+'')">수락</button><button class="transfer-decline" onclick="declineTransfer(''+item.id+'')">거절</button></div>';
+      const msg=document.createElement('div');msg.className='notif-msg';
+      msg.innerHTML='👑 <strong>'+item.from_nickname+'</strong>님이 매니저 양도를 요청했어요!';
+      const btns=document.createElement('div');btns.className='transfer-req-btns';
+      const acc=document.createElement('button');acc.className='transfer-accept';acc.textContent='수락';
+      acc.onclick=()=>acceptTransfer(item.id,item.board_id,item.from_user_id,item.from_nickname);
+      const dec=document.createElement('button');dec.className='transfer-decline';dec.textContent='거절';
+      dec.onclick=()=>declineTransfer(item.id);
+      btns.appendChild(acc);btns.appendChild(dec);
+      div.appendChild(msg);div.appendChild(btns);
     } else {
       div.className='notif-item'+(item.is_read?'':' unread');
       const date=new Date(item.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
