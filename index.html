@@ -794,7 +794,6 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
-  history.pushState({view:tab},'',location.pathname+(tab==='map'?'':'?tab=comm'));
   document.getElementById('tabMap').classList.toggle('active',isMap);
   document.getElementById('tabComm').classList.toggle('active',!isMap);
   document.getElementById('mapView').style.display=isMap?'':'none';
@@ -1076,8 +1075,6 @@ window.addEventListener('popstate', function(e){
     const pa=document.getElementById('postArea');
     if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
     loadBoardPosts();
-  } else if(state.view==='map'){
-    switchTab('map');
   }
 });
 
@@ -1263,7 +1260,6 @@ async function loadBoardPosts(){
 }
 
 function openPostDetail(p){
-  history.pushState({view:'post',postId:p.id},'',location.pathname+'?post='+p.id);
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   const isMine=currentUser&&p.user_id===currentUser.id;
