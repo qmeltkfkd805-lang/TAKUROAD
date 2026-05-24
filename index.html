@@ -947,7 +947,7 @@ function onMapPick(e){
   try{new kakao.maps.services.Geocoder().coord2Address(pickedLng,pickedLat,(result,status)=>{if(status===kakao.maps.services.Status.OK&&result[0])document.getElementById('f-addr').value=result[0].address.address_name;});}catch(e){}
 }
 function cancelPickMode(){pickMode=false;document.getElementById('pickModeBar').classList.remove('on');map.setCursor('');kakao.maps.event.removeListener(map,'click',onMapPick);}
-function submitPlace(){
+async function submitPlace(){
   const name=document.getElementById('f-name').value.trim();
   const addr=document.getElementById('f-addr').value.trim();
   const desc=document.getElementById('f-desc').value.trim();
@@ -962,10 +962,10 @@ function submitPlace(){
     renderAll();setTimeout(()=>selectPlace(np.id),300);
   };
   if(pickedLat&&pickedLng){await finalize(pickedLat,pickedLng);return;}
-  try{new kakao.maps.services.Geocoder().addressSearch(addr,(result,status)=>{
-    if(status===kakao.maps.services.Status.OK)finalize(parseFloat(result[0].y),parseFloat(result[0].x));
-    else finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);
-  });}catch(e){finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
+  try{new kakao.maps.services.Geocoder().addressSearch(addr,async(result,status)=>{
+    if(status===kakao.maps.services.Status.OK)await finalize(parseFloat(result[0].y),parseFloat(result[0].x));
+    else await finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);
+  });}catch(e){await finalize(37.5519+(Math.random()-.5)*.05,127.0005+(Math.random()-.5)*.05);}
 }
 
 // ── 커뮤니티 ──
