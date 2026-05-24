@@ -1130,6 +1130,7 @@ function selectSubAll(){
   localStorage.setItem('tr_state',JSON.stringify(st));
   const pa=document.getElementById('postArea');
   if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
+  history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
   loadBoardPosts();
 }
 
