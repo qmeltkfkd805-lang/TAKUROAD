@@ -411,6 +411,9 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <select id="regionSelect" onchange="filterRegion(this.value)" style="border:1.5px solid var(--border);border-radius:20px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;font-weight:400;">
         <option value="전체">지역 선택</option>
       </select>
+      <select id="subRegionSelect" onchange="filterSubRegion(this.value)" style="border:1.5px solid var(--border);border-radius:20px;padding:4px 8px;font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;cursor:pointer;font-weight:400;display:none;">
+        <option value="전체">세부 지역</option>
+      </select>
     </h2>
     <button class="lp-close" onclick="toggleListPanel()">✕</button>
   </div>
@@ -679,6 +682,31 @@ function renderAll(){
   renderListPanel(filtered);
 }
 
+function getSubRegion(addr){
+  if(!addr)return null;
+  // 서울 구
+  const seoulGu=['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구','노원구','도봉구','동대문구','동작구','마포구','서대문구','서초구','성동구','성북구','송파구','양천구','영등포구','용산구','은평구','종로구','중구','중랑구'];
+  // 경기 시/군
+  const gyeonggiCity=['수원시','성남시','의정부시','안양시','부천시','광명시','평택시','동두천시','안산시','고양시','과천시','구리시','남양주시','오산시','시흥시','군포시','의왕시','하남시','용인시','파주시','이천시','안성시','김포시','화성시','광주시','양주시','포천시','여주시','연천군','가평군','양평군'];
+  for(const g of [...seoulGu,...gyeonggiCity]){
+    if(addr.includes(g))return g;
+  }
+  // 부산 구
+  const busanGu=['중구','서구','동구','영도구','부산진구','동래구','남구','북구','해운대구','사하구','금정구','강서구','연제구','수영구','사상구','기장군'];
+  for(const g of busanGu){if(addr.includes(g))return '부산 '+g;}
+  return null;
+}
+
+let _currentSubRegion='전체';
+
+function filterSubRegion(subRegion){
+  _currentSubRegion=subRegion;
+  const base=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
+  const regionFiltered=_currentRegion==='전체'?base:base.filter(p=>getRegion(p.addr)===_currentRegion);
+  const filtered=subRegion==='전체'?regionFiltered:regionFiltered.filter(p=>p.addr.includes(subRegion.replace(/^부산 /,'')));
+  renderListPanel(filtered,false);
+}
+
 function getRegion(addr){
   if(!addr)return '기타';
   if(addr.startsWith('서울'))return '서울';
@@ -705,8 +733,25 @@ let _currentRegion='전체';
 
 function filterRegion(region){
   _currentRegion=region;
+  _currentSubRegion='전체';
   const base=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
   const filtered=region==='전체'?base:base.filter(p=>getRegion(p.addr)===region);
+  // 세부지역 드롭다운 업데이트
+  const subSel=document.getElementById('subRegionSelect');
+  if(subSel){
+    if(region==='전체'){
+      subSel.style.display='none';
+    } else {
+      const subs=new Set(filtered.map(p=>getSubRegion(p.addr)).filter(Boolean));
+      if(subs.size>0){
+        subSel.innerHTML='<option value="전체">세부 지역</option>'+[...subs].sort().map(s=>'<option value="'+s+'">'+s+'</option>').join('');
+        subSel.value='전체';
+        subSel.style.display='';
+      } else {
+        subSel.style.display='none';
+      }
+    }
+  }
   renderListPanel(filtered,false);
 }
 
@@ -940,8 +985,9 @@ function closeDetail(){document.getElementById('detailPanel').classList.remove('
 
 function filterCat(cat,btn){
   currentCat=cat;
-  _currentRegion='전체';
+  _currentRegion='전체';_currentSubRegion='전체';
   const sel=document.getElementById('regionSelect');if(sel)sel.value='전체';
+  const subSel=document.getElementById('subRegionSelect');if(subSel)subSel.style.display='none';
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   closeDetail();renderAll();
   document.getElementById('listPanel').classList.add('open');
