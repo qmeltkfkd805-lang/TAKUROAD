@@ -757,7 +757,7 @@ async function showDetail(p){
     +'<button class="btn-review" onclick="submitReview('+p.id+',\''+p.name+'\')">리뷰 등록</button>'
     +'</div></div>';
   document.getElementById('detailPanel').classList.add('open');
-  if(p.images&&p.images.length)makeSlider(p.images,'shopImgSlider');
+  if(p.images&&p.images.length){const sc=document.getElementById('shopImgSlider');if(sc){sc.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;';p.images.forEach(src=>{const img=document.createElement('img');img.src=src;img.onclick=()=>openImgFull(src,p.images);img.style.cssText='width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;';sc.appendChild(img);});}}
   window._pickedStar=0;
   try{
     const{data:rv}=await db.from('reviews').select('*').eq('place_id',p.id).order('created_at',{ascending:false});
@@ -1490,9 +1490,9 @@ function openPostDetail(p){
   body.textContent=p.content;detail.appendChild(body);
 
   if(p.images&&p.images.length){
-    const sliderWrap=document.createElement('div');sliderWrap.id='postImgSlider';sliderWrap.style.marginBottom='14px';
-    detail.appendChild(sliderWrap);
-    setTimeout(()=>makeSlider(p.images,'postImgSlider'),0);
+    const imgs=document.createElement('div');imgs.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
+    p.images.forEach((src,i)=>{const img=document.createElement('img');img.className='post-img';img.src=src;img.onclick=()=>openImgFull(src,p.images,i);imgs.appendChild(img);});
+    detail.appendChild(imgs);
   }
 
   const likeBtn=document.createElement('button');
@@ -1945,9 +1945,26 @@ function makeSlider(images, containerId){
   container.appendChild(wrap);container.appendChild(dots);
 }
 
-function openImgFull(src){
-  const d=document.createElement('div');d.className='post-img-full';
-  const img=document.createElement('img');img.src=src;d.appendChild(img);
+function openImgFull(src,images,startIdx){
+  const imgs=images&&images.length?images:[src];
+  let cur=startIdx||imgs.indexOf(src);if(cur<0)cur=0;
+  const d=document.createElement('div');d.className='post-img-full';d.style.flexDirection='column';
+  const img=document.createElement('img');img.src=imgs[cur];
+  function update(){img.src=imgs[cur];}
+  if(imgs.length>1){
+    const prev=document.createElement('button');
+    prev.style.cssText='position:fixed;left:16px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;font-size:28px;padding:8px 14px;border-radius:8px;cursor:pointer;z-index:901;';
+    prev.textContent='❮';prev.onclick=(e)=>{e.stopPropagation();cur=(cur-1+imgs.length)%imgs.length;update();};
+    const next=document.createElement('button');
+    next.style.cssText='position:fixed;right:16px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;font-size:28px;padding:8px 14px;border-radius:8px;cursor:pointer;z-index:901;';
+    next.textContent='❯';next.onclick=(e)=>{e.stopPropagation();cur=(cur+1)%imgs.length;update();};
+    d.appendChild(prev);d.appendChild(next);
+    // 스와이프
+    let startX=0;
+    d.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+    d.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(dx<-40){cur=(cur+1)%imgs.length;update();}else if(dx>40){cur=(cur-1+imgs.length)%imgs.length;update();}});
+  }
+  d.appendChild(img);
   d.onclick=()=>d.remove();document.body.appendChild(d);
 }
 </script>
