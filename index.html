@@ -841,7 +841,7 @@ async function showDetail(p){
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
-    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">"+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button><a class="da-btn" href="https://map.naver.com/v5/search/'+encodeURIComponent(p.name)+'" target="_blank" style="text-decoration:none;">🗺️ 네이버지도</a></div>'
+    +'<div class="detail-actions"><button class="da-btn '+(isSaved(p.id)?'saved':'')+'" id="dSaveBtn" onclick="handleDetailSave('+p.id+')">"+(isSaved(p.id)?'🔖 저장됨':'🏷️ 저장')+'</button><button class="da-btn" onclick="openEditShop('+p.id+')">✏️ 수정</button></div>'
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
@@ -853,6 +853,17 @@ async function showDetail(p){
     +'<textarea id="rv-text" rows="2" placeholder="방문 후기를 남겨주세요"></textarea>'
     +'<button class="btn-review" onclick="submitReview('+p.id+',\''+p.name+'\')">리뷰 등록</button>'
     +'</div></div>';
+  // 네이버지도 버튼 추가
+  const actionsEl=document.querySelector('#detailContent .detail-actions');
+  if(actionsEl){
+    const naverBtn=document.createElement('a');
+    naverBtn.className='da-btn';
+    naverBtn.href='https://map.naver.com/v5/search/'+encodeURIComponent(p.name);
+    naverBtn.target='_blank';
+    naverBtn.style.textDecoration='none';
+    naverBtn.textContent='🗺️ 네이버지도';
+    actionsEl.appendChild(naverBtn);
+  }
   document.getElementById('detailPanel').classList.add('open');
   if(p.images&&p.images.length){const sc=document.getElementById('shopImgSlider');if(sc){sc.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;';p.images.forEach(src=>{const img=document.createElement('img');img.src=src;img.onclick=()=>openImgFull(src,p.images);img.style.cssText='width:120px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer;';sc.appendChild(img);});}}
   window._pickedStar=0;
