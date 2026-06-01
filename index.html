@@ -2616,15 +2616,26 @@ async function loadSavedRoutes(){
     const shops=r.shop_ids||[];
     const liked=likedRoutes.has(r.id);
     const card=document.createElement('div');card.className='route-saved-item';
-    card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-      +'<div><div class="route-saved-title">'+r.title+'</div>'
-      +'<div class="route-saved-meta">'+r.nickname+' · '+shops.length+'개 샵</div>'
-      +(r.description?'<div style="font-size:12px;color:var(--muted);margin-top:4px;">'+r.description+'</div>':'')
-      +'</div>'
-      +'<button onclick="likeRoute(''+r.id+'',this)" '+(liked?'disabled':'')+' style="background:none;border:none;font-size:13px;cursor:'+(liked?'default':'pointer')+';color:'+(liked?'var(--accent)':'var(--muted)')+';">❤️ '+(r.likes||0)+'</button>'
-      +'</div>'
-      +'<div class="route-saved-shops">'+shops.map((s,i)=>'<span class="route-saved-tag">'+(i+1)+'. '+s.name+'</span>').join('')+'</div>'
-      +'<button onclick="viewRoute('+JSON.stringify(shops).replace(/"/g,"'")+')" style="width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;">🗺️ 지도에서 보기</button>';
+    // 상단 행
+    const topRow=document.createElement('div');topRow.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;';
+    const infoDiv=document.createElement('div');
+    const titleEl=document.createElement('div');titleEl.className='route-saved-title';titleEl.textContent=r.title;
+    const metaEl=document.createElement('div');metaEl.className='route-saved-meta';metaEl.textContent=r.nickname+' · '+shops.length+'개 샵';
+    infoDiv.appendChild(titleEl);infoDiv.appendChild(metaEl);
+    if(r.description){const descEl=document.createElement('div');descEl.style.cssText='font-size:12px;color:var(--muted);margin-top:4px;';descEl.textContent=r.description;infoDiv.appendChild(descEl);}
+    const likeBtn=document.createElement('button');
+    likeBtn.style.cssText='background:none;border:none;font-size:13px;cursor:'+(liked?'default':'pointer')+';color:'+(liked?'var(--accent)':'var(--muted)');
+    likeBtn.textContent='❤️ '+(r.likes||0);likeBtn.disabled=liked;
+    if(!liked)likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
+    topRow.appendChild(infoDiv);topRow.appendChild(likeBtn);
+    // 샵 태그
+    const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
+    shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
+    // 지도보기 버튼
+    const viewBtn=document.createElement('button');
+    viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
+    card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(viewBtn);
     list.appendChild(card);
   });
 }
