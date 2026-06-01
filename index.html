@@ -1292,7 +1292,12 @@ function switchTab(tab){
 }
 
 // ── 오버레이 ──
-function handleOverlay(e,id){if(e.target===document.getElementById(id))closeOverlay(id);}
+function handleOverlay(e,id){
+  if(e.target===document.getElementById(id)&&!window._dragging)closeOverlay(id);
+}
+document.addEventListener('mousedown',()=>{window._dragging=false;});
+document.addEventListener('mousemove',()=>{window._dragging=true;});
+document.addEventListener('mouseup',()=>{setTimeout(()=>{window._dragging=false;},0);});
 function closeOverlay(id){document.getElementById(id).classList.remove('open');}
 function openAuth(){document.getElementById('authOverlay').classList.add('open');}
 function openAddModal(){document.getElementById('addOverlay').classList.add('open');resetAddForm();}
