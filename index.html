@@ -215,6 +215,29 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
+    .route-btn{background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:20px;padding:7px 13px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+    .route-btn:hover{background:var(--purple);color:#fff;}
+    .route-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--sh-lg);z-index:500;height:85dvh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);}
+    .route-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:20px 20px 0 0;}
+    .route-panel.open{transform:translateY(0);}
+    .route-panel-head{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .route-shop-item{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:0.5px solid var(--border);cursor:grab;}
+    .route-shop-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .route-shop-info{flex:1;min-width:0;}
+    .route-shop-name{font-size:13px;font-weight:700;}
+    .route-shop-addr{font-size:11px;color:var(--muted);}
+    .route-shop-del{background:none;border:none;font-size:16px;color:var(--muted);cursor:pointer;padding:4px;}
+    .route-shop-del:hover{color:var(--red);}
+    .route-list-view{flex:1;overflow-y:auto;}
+    .route-saved-item{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;}
+    .route-saved-item:hover{border-color:var(--purple);}
+    .route-saved-title{font-size:14px;font-weight:900;margin-bottom:4px;}
+    .route-saved-meta{font-size:12px;color:var(--muted);}
+    .route-saved-shops{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .route-saved-tag{font-size:11px;background:var(--purple-l);color:var(--purple);padding:2px 8px;border-radius:10px;}
+    .route-num-marker{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+    .tab-btn{padding:8px 16px;border:none;background:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;}
+    .tab-btn.active{color:var(--purple);border-bottom-color:var(--purple);}
     .period-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-bottom:8px;}
     .period-badge.ongoing{background:#e8f5e9;color:#2e7d32;}
     .period-badge.upcoming{background:#fff3e0;color:#e65100;}
@@ -345,6 +368,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="search-dropdown" id="searchDropdown"></div>
   </div>
   <button class="btn-add" onclick="openAddModal()">＋ 추천 샵 추가</button>
+  <button class="route-btn" onclick="openRoutePanel()">🗺️ 루트</button>
   <div class="header-right" style="display:flex;gap:8px;align-items:center;">
     <div style="position:relative;">
       <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()" style="display:none;">🔔<div class="notif-badge" id="notifBadge"></div></button>
@@ -412,6 +436,44 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
           <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px">세부게시판을 선택해주세요</div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 루트 패널 -->
+<div class="route-panel" id="routePanel">
+  <div class="route-panel-head">
+    <div>
+      <h2 style="font-size:16px;font-weight:900;margin-bottom:0;">🗺️ 성지순례 루트</h2>
+    </div>
+    <button class="lp-close" onclick="closeRoutePanel()">✕</button>
+  </div>
+  <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;">
+    <button class="tab-btn active" id="routeTabMake" onclick="switchRouteTab('make')">루트 만들기</button>
+    <button class="tab-btn" id="routeTabList" onclick="switchRouteTab('list')">공유된 루트</button>
+  </div>
+  <!-- 루트 만들기 탭 -->
+  <div id="routeMakeTab" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">저장한 샵에서 추가하거나 지도에서 샵을 클릭해 루트에 추가하세요</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="routeTitle" placeholder="루트 이름 (예: 홍대 덕질 코스)" style="flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;"/>
+        <button onclick="addSavedToRoute()" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap;color:var(--text);">🔖 저장샵 추가</button>
+      </div>
+      <textarea id="routeDesc" rows="2" placeholder="루트 소개 (선택)" style="width:100%;margin-top:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;resize:none;"></textarea>
+    </div>
+    <div class="route-list-view" id="routeShopList">
+      <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">샵을 추가해서 루트를 만들어보세요!</div>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;">
+      <button onclick="previewRoute()" style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">🗺️ 지도에서 미리보기</button>
+      <button onclick="saveRoute()" style="flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">공유하기</button>
+    </div>
+  </div>
+  <!-- 공유된 루트 탭 -->
+  <div id="routeListTab" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+    <div class="route-list-view" id="savedRouteList" style="padding:12px 16px;">
+      <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">불러오는 중…</div>
     </div>
   </div>
 </div>
@@ -994,6 +1056,13 @@ async function showDetail(p){
     naverBtn.target='_blank';naverBtn.style.textDecoration='none';
     naverBtn.textContent='🗺️ 네이버지도';
     actionsEl.appendChild(naverBtn);
+    // 루트 추가 버튼
+    const routeAddBtn=document.createElement('button');
+    routeAddBtn.className='da-btn';
+    routeAddBtn.style.cssText='background:var(--purple-l);color:var(--purple);border-color:var(--purple);';
+    routeAddBtn.textContent='📍 루트에 추가';
+    routeAddBtn.onclick=()=>addToRoute(p.id);
+    actionsEl.appendChild(routeAddBtn);
     if(p.shopLink){
       const shopLinkBtn=document.createElement('a');
       shopLinkBtn.className='da-btn';shopLinkBtn.href=p.shopLink;shopLinkBtn.target='_blank';
@@ -2425,6 +2494,165 @@ function makeSlider(images, containerId){
   wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(dx<-40)goTo(cur+1);else if(dx>40)goTo(cur-1);});
   wrap.appendChild(prev);wrap.appendChild(next);
   container.appendChild(wrap);container.appendChild(dots);
+}
+
+// ── 루트 기능 ──
+let currentRoute=[];
+let routePolyline=null;
+let routeMarkers=[];
+
+function openRoutePanel(){
+  document.getElementById('routePanel').classList.add('open');
+  renderRouteShopList();
+}
+function closeRoutePanel(){
+  document.getElementById('routePanel').classList.remove('open');
+  clearRoutePreview();
+}
+function switchRouteTab(tab){
+  document.getElementById('routeTabMake').classList.toggle('active',tab==='make');
+  document.getElementById('routeTabList').classList.toggle('active',tab==='list');
+  document.getElementById('routeMakeTab').style.display=tab==='make'?'flex':'none';
+  document.getElementById('routeListTab').style.display=tab==='list'?'flex':'none';
+  if(tab==='list')loadSavedRoutes();
+}
+
+function addToRoute(shopId){
+  const p=places.find(x=>x.id==shopId);if(!p)return;
+  if(currentRoute.find(r=>r.id==shopId)){alert('이미 추가된 샵이에요!');return;}
+  currentRoute.push(p);
+  renderRouteShopList();
+  if(!document.getElementById('routePanel').classList.contains('open'))openRoutePanel();
+}
+
+function addSavedToRoute(){
+  const saved=places.filter(p=>savedIds.includes(p.id)||savedIds.includes(String(p.id)));
+  if(!saved.length){alert('저장한 샵이 없어요! 샵 상세에서 🔖 눌러 저장해주세요.');return;}
+  saved.forEach(p=>{if(!currentRoute.find(r=>r.id==p.id))currentRoute.push(p);});
+  renderRouteShopList();
+}
+
+function removeFromRoute(idx){
+  currentRoute.splice(idx,1);
+  renderRouteShopList();
+  clearRoutePreview();
+}
+
+function renderRouteShopList(){
+  const list=document.getElementById('routeShopList');
+  if(!currentRoute.length){
+    list.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">샵을 추가해서 루트를 만들어보세요!</div>';
+    return;
+  }
+  list.innerHTML='';
+  currentRoute.forEach((p,i)=>{
+    const div=document.createElement('div');div.className='route-shop-item';
+    const color=CAT_COLOR[p.cat]||'#e8006f';
+    div.innerHTML='<div class="route-shop-num" style="background:'+color+';">'+(i+1)+'</div>'
+      +'<div class="route-shop-info"><div class="route-shop-name">'+p.name+'</div><div class="route-shop-addr">'+p.addr+'</div></div>'
+      +'<button class="route-shop-del" onclick="removeFromRoute('+i+')">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+function previewRoute(){
+  if(currentRoute.length<2){alert('샵을 2개 이상 추가해주세요!');return;}
+  clearRoutePreview();
+  closeRoutePanel();
+  // 번호 마커
+  currentRoute.forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.className='route-num-marker';
+    el.style.background=CAT_COLOR[p.cat]||'#e8006f';
+    el.textContent=i+1;
+    const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(p.lat,p.lng),content:el,yAnchor:1.5});
+    overlay.setMap(map);
+    routeMarkers.push(overlay);
+  });
+  // 폴리라인
+  const path=currentRoute.map(p=>new kakao.maps.LatLng(p.lat,p.lng));
+  routePolyline=new kakao.maps.Polyline({path,strokeWeight:3,strokeColor:'#7c3aed',strokeOpacity:0.8,strokeStyle:'dashed'});
+  routePolyline.setMap(map);
+  // 지도 범위 조정
+  const bounds=new kakao.maps.LatLngBounds();
+  currentRoute.forEach(p=>bounds.extend(new kakao.maps.LatLng(p.lat,p.lng)));
+  map.setBounds(bounds);
+}
+
+function clearRoutePreview(){
+  routeMarkers.forEach(m=>m.setMap(null));routeMarkers=[];
+  if(routePolyline){routePolyline.setMap(null);routePolyline=null;}
+}
+
+async function saveRoute(){
+  if(!currentUser){alert('로그인 후 루트를 공유할 수 있어요!');return;}
+  if(currentRoute.length<2){alert('샵을 2개 이상 추가해주세요!');return;}
+  const title=document.getElementById('routeTitle').value.trim();
+  if(!title){alert('루트 이름을 입력해주세요!');return;}
+  const desc=document.getElementById('routeDesc').value.trim();
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const shopIds=currentRoute.map(p=>({id:p.id,name:p.name,cat:p.cat,lat:p.lat,lng:p.lng,addr:p.addr}));
+  const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0});
+  if(error){alert('저장 실패: '+error.message);return;}
+  alert('루트가 공유됐어요! 🎉');
+  currentRoute=[];
+  document.getElementById('routeTitle').value='';
+  document.getElementById('routeDesc').value='';
+  renderRouteShopList();
+  clearRoutePreview();
+  switchRouteTab('list');
+}
+
+async function loadSavedRoutes(){
+  const list=document.getElementById('savedRouteList');
+  list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">불러오는 중…</div>';
+  const{data:routes}=await db.from('routes').select('*').order('created_at',{ascending:false});
+  list.innerHTML='';
+  if(!routes||!routes.length){list.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">아직 공유된 루트가 없어요</div>';return;}
+  const likedRoutes=new Set();
+  if(currentUser){const{data:rl}=await db.from('route_likes').select('route_id').eq('user_id',currentUser.id);(rl||[]).forEach(r=>likedRoutes.add(r.route_id));}
+  routes.forEach(r=>{
+    const shops=r.shop_ids||[];
+    const liked=likedRoutes.has(r.id);
+    const card=document.createElement('div');card.className='route-saved-item';
+    card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+      +'<div><div class="route-saved-title">'+r.title+'</div>'
+      +'<div class="route-saved-meta">'+r.nickname+' · '+shops.length+'개 샵</div>'
+      +(r.description?'<div style="font-size:12px;color:var(--muted);margin-top:4px;">'+r.description+'</div>':'')
+      +'</div>'
+      +'<button onclick="likeRoute(''+r.id+'',this)" '+(liked?'disabled':'')+' style="background:none;border:none;font-size:13px;cursor:'+(liked?'default':'pointer')+';color:'+(liked?'var(--accent)':'var(--muted)')+';">❤️ '+(r.likes||0)+'</button>'
+      +'</div>'
+      +'<div class="route-saved-shops">'+shops.map((s,i)=>'<span class="route-saved-tag">'+(i+1)+'. '+s.name+'</span>').join('')+'</div>'
+      +'<button onclick="viewRoute('+JSON.stringify(shops).replace(/"/g,"'")+')" style="width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;">🗺️ 지도에서 보기</button>';
+    list.appendChild(card);
+  });
+}
+
+async function likeRoute(routeId,btn){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const{error}=await db.from('route_likes').insert({route_id:routeId,user_id:currentUser.id});
+  if(error)return;
+  const{data}=await db.from('routes').select('likes').eq('id',routeId).single();if(!data)return;
+  const n=(data.likes||0)+1;await db.from('routes').update({likes:n}).eq('id',routeId);
+  btn.textContent='❤️ '+n;btn.style.color='var(--accent)';btn.disabled=true;
+}
+
+function viewRoute(shops){
+  clearRoutePreview();
+  closeRoutePanel();
+  shops.forEach((s,i)=>{
+    const el=document.createElement('div');el.className='route-num-marker';
+    el.style.background=CAT_COLOR[s.cat]||'#e8006f';el.textContent=i+1;
+    const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(s.lat,s.lng),content:el,yAnchor:1.5});
+    overlay.setMap(map);routeMarkers.push(overlay);
+  });
+  const path=shops.map(s=>new kakao.maps.LatLng(s.lat,s.lng));
+  routePolyline=new kakao.maps.Polyline({path,strokeWeight:3,strokeColor:'#7c3aed',strokeOpacity:0.8,strokeStyle:'dashed'});
+  routePolyline.setMap(map);
+  const bounds=new kakao.maps.LatLngBounds();
+  shops.forEach(s=>bounds.extend(new kakao.maps.LatLng(s.lat,s.lng)));
+  map.setBounds(bounds);
 }
 
 function openImgFull(src,images,startIdx){
