@@ -690,12 +690,30 @@ let places=JSON.parse(localStorage.getItem('takuroad_places')||'null')||DUMMY;
 const CAT_MIGRATE={'애니/만화':'애니/웹툰','팝업스토어':'팝업/카페','동인샵':'동인지','게임샵':'게임','쿠지샵':'쿠지'};
 places=places.map(p=>({...p,cat:CAT_MIGRATE[p.cat]||p.cat,cats:(p.cats||[p.cat]).map(c=>CAT_MIGRATE[c]||c)}));
 savePlaces();
-function savePlaces(){localStorage.setItem('takuroad_places',JSON.stringify(places));}
+function savePlaces(){} // DB 기반으로 전환됨
 let savedIds=JSON.parse(localStorage.getItem('takuroad_saves')||'[]');
 const isSaved=id=>savedIds.includes(id);
 function toggleSave(id){savedIds=isSaved(id)?savedIds.filter(x=>x!==id):[...savedIds,id];localStorage.setItem('takuroad_saves',JSON.stringify(savedIds));}
 
 let map,markers=[],currentCat='전체',activePlaceId=null;
+
+async function loadShops(){
+  const{data:shops}=await db.from('shops').select('*').order('created_at',{ascending:true});
+  if(shops&&shops.length){
+    // DB 데이터를 places 형식으로 변환
+    const dbPlaces=shops.map(s=>({
+      id:s.id,name:s.name,cat:s.cat,cats:s.cats||[s.cat],
+      addr:s.addr,lat:s.lat,lng:s.lng,desc:s.description,
+      tags:s.tags||[],images:s.images||[],shopLink:s.shop_link,
+      startDate:s.start_date,endDate:s.end_date,hours:s.hours,
+      eventInfo:s.event_info,addedBy:s.added_by,addedNickname:s.added_nickname
+    }));
+    // DUMMY 중 DB에 없는 것만 유지 (id가 숫자인 것)
+    const dummyOnly=DUMMY.filter(d=>typeof d.id==='number');
+    places=[...dummyOnly,...dbPlaces];
+  }
+  renderAll();
+}
 
 window.onload=function(){
   // 상태 복원
@@ -719,8 +737,7 @@ window.onload=function(){
   }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
-    if(!localStorage.getItem('takuroad_places'))geocodeDummy().then(()=>renderAll());
-    else renderAll();
+    geocodeDummy().then(()=>loadShops());
   });
   document.getElementById('searchInput').addEventListener('input',handleSearchInput);
   document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
@@ -729,10 +746,11 @@ window.onload=function(){
 
 async function geocodeDummy(){
   const g=new kakao.maps.services.Geocoder();
-  for(const p of places){
-    await new Promise(r=>{g.addressSearch(p.addr,(res,st)=>{if(st===kakao.maps.services.Status.OK){p.lat=parseFloat(res[0].y);p.lng=parseFloat(res[0].x);}r();});});
+  for(const p of DUMMY){
+    if(!p.lat||p.lat===37.5519){
+      await new Promise(r=>{g.addressSearch(p.addr,(res,st)=>{if(st===kakao.maps.services.Status.OK){p.lat=parseFloat(res[0].y);p.lng=parseFloat(res[0].x);}r();});});
+    }
   }
-  savePlaces();
 }
 
 function renderAll(){
@@ -914,6 +932,17 @@ async function showDetail(p){
   editShopBtn.textContent='✏️ 수정';
   editShopBtn.onclick=()=>openEditShop(p.id);
   document.getElementById('detailPanel').appendChild(editShopBtn);
+  // 삭제 버튼 (본인이 추가한 샵만)
+  if(currentUser&&p.addedBy===currentUser.id){
+    let existDel=document.getElementById('detailDelBtn');if(existDel)existDel.remove();
+    const delShopBtn=document.createElement('button');
+    delShopBtn.id='detailDelBtn';
+    delShopBtn.className='da-btn';
+    delShopBtn.style.cssText='position:absolute;top:84px;right:14px;font-size:11px;padding:4px 10px;background:var(--red-l);color:var(--red);border-color:var(--red);';
+    delShopBtn.textContent='🗑️ 삭제';
+    delShopBtn.onclick=()=>deleteShop(p.id);
+    document.getElementById('detailPanel').appendChild(delShopBtn);
+  }
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
@@ -1015,6 +1044,19 @@ function renderEsTags(){
 }
 function esRemoveTag(t){window._esTags=window._esTags.filter(x=>x!==t);renderEsTags();}
 
+async function deleteShop(id){
+  if(!currentUser)return;
+  if(!confirm('이 샵을 삭제할까요?'))return;
+  // UUID면 DB에서 삭제
+  if(typeof id==='string'){
+    const{error}=await db.from('shops').delete().eq('id',id).eq('added_by',currentUser.id);
+    if(error){alert('삭제 실패: '+error.message);return;}
+  }
+  places=places.filter(p=>p.id!==id);
+  closeDetail();
+  renderAll();
+}
+
 function openEditShop(id){
   if(!currentUser){alert('로그인이 필요해요');return;}
   const p=places.find(x=>x.id===id);if(!p)return;
@@ -1094,7 +1136,15 @@ async function submitEditShop(){
     p.hours=document.getElementById('es-hours').value.trim()||null;
     p.eventInfo=document.getElementById('es-event').value.trim()||null;
   }
-  savePlaces();
+  // DB에 저장된 샵이면 업데이트
+  if(currentUser&&typeof p.id==='string'){
+    await db.from('shops').update({
+      name:p.name,cat:p.cat,cats:p.cats,addr:p.addr,description:p.desc,
+      tags:p.tags,images:p.images,
+      start_date:p.startDate||null,end_date:p.endDate||null,
+      hours:p.hours||null,event_info:p.eventInfo||null
+    }).eq('id',p.id).eq('added_by',currentUser.id);
+  }
   closeOverlay('editShopOverlay');
   await showDetail(p);
   renderAll();
@@ -1417,7 +1467,7 @@ async function submitPlace(){
     const endDate=document.getElementById('f-end').value||null;
     const hours=document.getElementById('f-hours').value.trim()||null;
     const eventInfo=document.getElementById('f-event').value.trim()||null;
-    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null,startDate,endDate,hours,eventInfo};
+    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null,startDate,endDate,hours,eventInfo,addedBy:currentUser?currentUser.id:null};
     places.push(np);savePlaces();closeOverlay('addOverlay');
     currentCat='전체';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
