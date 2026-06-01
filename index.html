@@ -1498,7 +1498,11 @@ async function selectBoard(board){
   const headBtns=document.createElement('div');
   headBtns.style.cssText='display:flex;gap:8px;align-items:center;';
   if(isMgr){
+  if(isMgr){
     const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent='👑 매니저 양도';tBtn.onclick=openTransfer;headBtns.appendChild(tBtn);
+    const dBtn=document.createElement('button');
+    dBtn.style.cssText='background:var(--red-l);color:var(--red);border:1px solid var(--red);border-radius:14px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;';
+    dBtn.textContent='🗑️ 게시판 삭제';dBtn.onclick=openDeleteBoard;headBtns.appendChild(dBtn);
   }
   const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headBtns.appendChild(wBtn);
   head.appendChild(headInfo);head.appendChild(headBtns);
