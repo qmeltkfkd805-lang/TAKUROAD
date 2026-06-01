@@ -737,8 +737,11 @@ async function geocodeDummy(){
 
 function renderAll(){
   clearMarkers();
-  const allPlaces=places.filter(p=>!(p.cats||[p.cat]).every(c=>c==='온라인샵'));
-  const filtered=currentCat==='전체'?allPlaces:allPlaces.filter(p=>(p.cats||[p.cat]).includes(currentCat));
+  const mapPlaces=places.filter(p=>!(p.cats||[p.cat]).every(c=>c==='온라인샵'));
+  const filtered=currentCat==='전체'?mapPlaces:mapPlaces.filter(p=>(p.cats||[p.cat]).includes(currentCat));
+  // 목록에는 온라인샵 포함
+  const listFiltered=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
+  renderListPanel(listFiltered);
   const posMap={};
   filtered.forEach(p=>{const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);if(!posMap[k])posMap[k]=[];posMap[k].push(p);});
   filtered.forEach(p=>{
@@ -1189,6 +1192,9 @@ function doSearch(){
   renderListPanel(filtered);
   // 마커도 검색 결과만 표시
   clearMarkers();
+  // 목록에는 온라인샵 포함
+  const listFiltered=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
+  renderListPanel(listFiltered);
   const posMap={};
   filtered.forEach(p=>{const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);if(!posMap[k])posMap[k]=[];posMap[k].push(p);});
   filtered.forEach(p=>{
