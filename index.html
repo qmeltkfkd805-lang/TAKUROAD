@@ -737,6 +737,7 @@ window.onload=function(){
   }
   kakao.maps.load(()=>{
     map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
+    kakao.maps.event.addListener(map,'click',function(){closeDetail();});
     geocodeDummy().then(()=>loadShops());
   });
   document.getElementById('searchInput').addEventListener('input',handleSearchInput);
