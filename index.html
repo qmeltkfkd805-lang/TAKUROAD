@@ -964,7 +964,8 @@ async function showDetail(p){
     if(p.shopLink){
       const shopLinkBtn=document.createElement('a');
       shopLinkBtn.className='da-btn';shopLinkBtn.href=p.shopLink;shopLinkBtn.target='_blank';
-      shopLinkBtn.style.textDecoration='none';shopLinkBtn.textContent='🛒 온라인샵';
+      shopLinkBtn.style.cssText='text-decoration:none;background:var(--green,#059669);color:#fff;border-color:var(--green,#059669);';
+      shopLinkBtn.textContent='🛒 샵 바로가기';
       actionsEl.appendChild(shopLinkBtn);
     }
   }
