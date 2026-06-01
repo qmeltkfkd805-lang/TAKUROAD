@@ -750,7 +750,7 @@ function renderAll(){
     if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0004,lng:Math.cos(a)*.0004};}
     addMarker(p,off);
   });
-  renderListPanel(filtered);
+  renderListPanel(listFiltered);
 }
 
 function getSubRegion(addr){
