@@ -960,7 +960,7 @@ async function showDetail(p){
     // 네이버지도 버튼
     const naverBtn=document.createElement('a');
     naverBtn.className='da-btn';
-    naverBtn.href='https://map.naver.com/v5/search/'+encodeURIComponent(p.name);
+    naverBtn.href='https://map.naver.com/v5/search/'+encodeURIComponent(p.addr&&p.addr!=='온라인'?p.addr:p.name);
     naverBtn.target='_blank';naverBtn.style.textDecoration='none';
     naverBtn.textContent='🗺️ 네이버지도';
     actionsEl.appendChild(naverBtn);
