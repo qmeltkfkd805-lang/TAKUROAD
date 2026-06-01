@@ -215,6 +215,17 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
+    .period-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-bottom:8px;}
+    .period-badge.ongoing{background:#e8f5e9;color:#2e7d32;}
+    .period-badge.upcoming{background:#fff3e0;color:#e65100;}
+    .period-badge.ended{background:#f5f5f5;color:#9e9e9e;}
+    .popup-info-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.8;}
+    .popup-info-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:4px;}
+    .popup-info-row:last-child{margin-bottom:0;}
+    .popup-info-icon{flex-shrink:0;width:18px;}
+    .shop-card-period{font-size:11px;color:var(--muted);margin-top:4px;}
+    .shop-card-period.ongoing{color:#2e7d32;font-weight:700;}
+    .shop-card-period.upcoming{color:#e65100;font-weight:700;}
     .img-slider{position:relative;width:100%;overflow:hidden;margin-bottom:16px;}
     .img-slider-track{display:flex;transition:transform .3s ease;will-change:transform;}
     .img-slider-track img{width:100%;flex-shrink:0;object-fit:cover;border-radius:8px;cursor:pointer;max-height:400px;}
@@ -479,6 +490,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="form-group" id="shopLinkGroup" style="display:none;"><label>샵 링크 * <span style="font-size:11px;color:var(--muted);font-weight:400;">온라인샵 URL 필수</span></label><input type="url" id="f-shop-link" placeholder="https://..."/></div>
     <div class="form-group"><label>위치 선택</label><div class="map-pick-box" id="mapPickBox" onclick="startPickMode()">📍 지도에서 위치 직접 선택하기</div></div>
     <div class="form-group"><label>한 줄 소개</label><textarea id="f-desc" rows="3" placeholder="어떤 굿즈를 파는지, 특징을 적어주세요"></textarea></div>
+    <div id="popupFields" style="display:none;">
+      <div class="form-group"><label>📅 기간</label><div style="display:flex;gap:8px;align-items:center;"><input type="date" id="f-start"/><span>~</span><input type="date" id="f-end"/></div></div>
+      <div class="form-group"><label>🕐 운영시간</label><input type="text" id="f-hours" placeholder="예) 11:00 ~ 22:00 (월~일)"/></div>
+      <div class="form-group"><label>🎉 이벤트 정보</label><textarea id="f-event" rows="3" placeholder="특별 이벤트, 포토존, 굿즈 판매 등 상세 정보"></textarea></div>
+    </div>
     <div class="form-group"><label>사진 (최대 5장)</label>
       <div id="shopImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
       <button type="button" class="img-attach-btn" onclick="document.getElementById('shopImgInput').click()">📷 사진 추가</button>
@@ -516,6 +532,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     </div>
     <div class="form-group"><label>주소</label><input type="text" id="es-addr" placeholder="예) 서울 마포구 양화로 188"/></div>
     <div class="form-group"><label>한 줄 소개</label><textarea id="es-desc" rows="3" placeholder="어떤 굿즈를 파는지, 특징을 적어주세요"></textarea></div>
+    <div id="esPopupFields" style="display:none;">
+      <div class="form-group"><label>📅 기간</label><div style="display:flex;gap:8px;align-items:center;"><input type="date" id="es-start"/><span>~</span><input type="date" id="es-end"/></div></div>
+      <div class="form-group"><label>🕐 운영시간</label><input type="text" id="es-hours" placeholder="예) 11:00 ~ 22:00 (월~일)"/></div>
+      <div class="form-group"><label>🎉 이벤트 정보</label><textarea id="es-event" rows="3" placeholder="특별 이벤트, 포토존, 굿즈 판매 등 상세 정보"></textarea></div>
+    </div>
     <div class="form-group"><label>태그</label>
       <div class="tag-input-row">
         <input type="text" id="es-tag" placeholder="예) 원피스, 포켓몬" onkeydown="if(event.key==='Enter'){esAddTag();event.preventDefault();}"/>
@@ -656,10 +677,11 @@ const DUMMY=[
   {id:70,name:'애니메이트 온라인',cat:'온라인샵',cats:['온라인샵','애니/웹툰'],addr:'온라인',lat:37.5519,lng:127.0005,desc:'애니메이트 공식 한국 온라인 스토어. 일본 굿즈 직구 가능.',tags:['온라인','굿즈','직구'],images:[]},
   {id:71,name:'라신반 온라인',cat:'온라인샵',cats:['온라인샵','동인지','중고/빈티지'],addr:'온라인',lat:37.5520,lng:127.0006,desc:'라신반 공식 온라인 스토어. 중고 굿즈/동인지.',tags:['온라인','중고','동인지'],images:[]},
   // 현재 진행중 팝업/카페 (2026년 6월 기준)
-  {id:80,name:'귀멸의 칼날: 전집중展',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 연무장길 8 에스팩토리 D동 1F',lat:37.5445,lng:127.0557,desc:'귀멸의 칼날 몰입형 전시. 귀살대 본부, 무한열차 등 주요 장면 체험. 2026년 6월 27일~9월 27일.',tags:['귀멸의칼날','전시','성수','체험'],images:[]},
-  {id:81,name:'미츄 X 애니플러스 콜라보카페',cat:'팝업/카페',cats:['팝업/카페'],addr:'부산 부산진구 중앙대로 672 애니플러스 부산 서면점',lat:35.1566,lng:129.0597,desc:'미츄 X 애니플러스 콜라보카페. 한정 메뉴와 굿즈. 2026년 5월 14일~6월 28일.',tags:['미츄','애니플러스','콜라보카페','부산','서면'],images:[]},
-  {id:82,name:'토이스토리 팝업 하우스',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 성수동',lat:37.5447,lng:127.0560,desc:'토이스토리 팝업 하우스 @성수. 2026년 6월 진행중.',tags:['토이스토리','디즈니','성수','팝업'],images:[]},
-  {id:83,name:'귀멸의 칼날 X 카우보이 비밥 팝업',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 성수동',lat:37.5448,lng:127.0558,desc:'나이스고스트클럽 X 카우보이 비밥 팝업 @성수. 2026년 6월 진행중.',tags:['카우보이비밥','성수','콜라보','팝업'],images:[]},
+  {id:80,name:'귀멸의 칼날: 전집중展',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 연무장길 8 에스팩토리 D동 1F',lat:37.5445,lng:127.0557,desc:'귀멸의 칼날 몰입형 전시. 귀살대 본부, 무한열차, 나타구모 산 전투 등 주요 장면 체험.',tags:['귀멸의칼날','전시','성수','체험'],images:[],startDate:'2026-06-27',endDate:'2026-09-27',hours:'11:00 ~ 21:00 (입장마감 20:00)',eventInfo:'귀살대 본부, 무한열차, 혈귀의 방 등 작품 속 주요 장면 직접 체험\n약 500평 규모 몰입형 전시\n성수역 3번출구 도보 5분'},
+  {id:81,name:'미츄 X 애니플러스 콜라보카페',cat:'팝업/카페',cats:['팝업/카페'],addr:'부산 부산진구 중앙대로 672 애니플러스 부산 서면점',lat:35.1566,lng:129.0597,desc:'미츄 X 애니플러스 콜라보카페. 한정 콜라보 메뉴와 굿즈, 주차별 특전.',tags:['미츄','애니플러스','콜라보카페','부산','서면'],images:[],startDate:'2026-05-14',endDate:'2026-06-28',hours:'애니플러스 부산 서면점 운영시간',eventInfo:'한정 콜라보 메뉴 및 굿즈 판매\n주차별 특전 제공'},
+  {id:82,name:'토이스토리 팝업 하우스',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 성수동',lat:37.5447,lng:127.0560,desc:'토이스토리 팝업 하우스 @성수. 포토존, 게임 콘텐츠, DIY 체험.',tags:['토이스토리','디즈니','성수','팝업'],images:[],startDate:'2026-06-01',endDate:'2026-06-15',hours:'11:00 ~ 20:00',eventInfo:'포토존, 게임 콘텐츠, DIY 체험\n성수역 인근'},
+  {id:83,name:'나이스고스트클럽 X 카우보이 비밥',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 성동구 성수동',lat:37.5448,lng:127.0558,desc:'나이스고스트클럽 X 카우보이 비밥 팝업 @성수.',tags:['카우보이비밥','성수','콜라보','팝업'],images:[],startDate:'2026-06-01',endDate:'2026-06-30',hours:'미정',eventInfo:'성수 팝업'},
+  {id:84,name:'윈드브레이커 5주년 기념전',cat:'팝업/카페',cats:['팝업/카페'],addr:'서울 마포구 양화로 188 AK플라자 홍대 3층 Space Galleria',lat:37.5567,lng:126.9230,desc:'WIND BREAKER 5th ANNIVERSARY EXHIBITION 한국 개최.',tags:['윈드브레이커','홍대','전시','5주년'],images:[],startDate:'2026-07-09',endDate:'2026-08-23',hours:'11:00 ~ 22:00 (월~토)',eventInfo:'WIND BREAKER 5주년 기념 전시\nAK플라자 홍대 3층 Space Galleria'},
   {id:60,name:'건담베이스 코엑스',cat:'프라모델',cats:['프라모델','피규어'],addr:'서울 강남구 봉은사로 524 스타필드 코엑스몰',lat:37.5126,lng:127.0594,desc:'스타필드 코엑스몰 내 건담베이스. 반다이 공식 건프라 전문점.',tags:['건프라','코엑스','반다이']},
 ];
 
@@ -893,6 +915,25 @@ async function showDetail(p){
     +'<div class="detail-actions" id="detailActions"></div>'
     +'<div class="detail-stars-row"><span class="stars" id="detailStars">☆☆☆☆☆</span><span class="cnt" id="detailCnt">리뷰 불러오는 중…</span></div>'
     +'<div class="detail-desc">'+(p.desc||'설명이 없어요.')+'</div>'
+    +(function(){
+      const cats=p.cats||[p.cat];
+      if(!cats.includes('팝업/카페'))return'';
+      let html='<div class="popup-info-box">';
+      if(p.startDate||p.endDate){
+        const today=new Date();today.setHours(0,0,0,0);
+        const start=p.startDate?new Date(p.startDate):null;
+        const end=p.endDate?new Date(p.endDate):null;
+        let status='ongoing',label='진행중';
+        if(start&&today<start){status='upcoming';label='예정';}
+        else if(end&&today>end){status='ended';label='종료';}
+        html+='<div class="period-badge '+status+'">'+(status==='ongoing'?'🟢':status==='upcoming'?'🟡':'⚫')+' '+label+'</div>';
+        html+='<div class="popup-info-row"><span class="popup-info-icon">📅</span><span>'+(p.startDate||'?')+' ~ '+(p.endDate||'?')+'</span></div>';
+      }
+      if(p.hours)html+='<div class="popup-info-row"><span class="popup-info-icon">🕐</span><span>'+p.hours+'</span></div>';
+      if(p.eventInfo)html+='<div class="popup-info-row"><span class="popup-info-icon">🎉</span><span>'+p.eventInfo.replace(/\n/g,'<br>')+'</span></div>';
+      html+='</div>';
+      return html==='<div class="popup-info-box"></div>'?'':html;
+    })()
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
     +(p.images&&p.images.length?'<div id="shopImgSlider"></div>':'')
     +'<div class="review-section"><h3>💬 리뷰</h3>'
@@ -948,7 +989,12 @@ async function showDetail(p){
   }catch(e){const ce=document.getElementById('detailCnt');if(ce)ce.textContent='리뷰를 불러올 수 없어요';}
 }
 
-function esSelCat(btn){btn.classList.toggle('active');}
+function esSelCat(btn){
+  btn.classList.toggle('active');
+  const activeCats=[...document.querySelectorAll('#esCatRow .cat-sel-btn.active')].map(b=>b.dataset.c);
+  const hasPopup=activeCats.includes('팝업/카페');
+  const epf=document.getElementById('esPopupFields');if(epf)epf.style.display=hasPopup?'block':'none';
+}
 function esAddTag(){
   const inp=document.getElementById('es-tag');const val=inp.value.trim();
   if(!val||window._esTags.includes(val)){inp.value='';return;}
@@ -979,6 +1025,12 @@ function openEditShop(id){
   });
   renderEsTags();
   renderEsImgPreview();
+  const hasPopup=(p.cats||[p.cat]).includes('팝업/카페');
+  const epf=document.getElementById('esPopupFields');if(epf)epf.style.display=hasPopup?'block':'none';
+  document.getElementById('es-start').value=p.startDate||'';
+  document.getElementById('es-end').value=p.endDate||'';
+  document.getElementById('es-hours').value=p.hours||'';
+  document.getElementById('es-event').value=p.eventInfo||'';
   document.getElementById('editShopOverlay').classList.add('open');
 }
 
@@ -1030,6 +1082,12 @@ async function submitEditShop(){
   p.name=name;p.cat=activeCats[0];p.cats=activeCats;
   if(addr)p.addr=addr;
   p.desc=desc;p.tags=[...window._esTags];p.images=imageUrls;
+  if(activeCats.includes('팝업/카페')){
+    p.startDate=document.getElementById('es-start').value||null;
+    p.endDate=document.getElementById('es-end').value||null;
+    p.hours=document.getElementById('es-hours').value.trim()||null;
+    p.eventInfo=document.getElementById('es-event').value.trim()||null;
+  }
   savePlaces();
   closeOverlay('editShopOverlay');
   await showDetail(p);
@@ -1263,6 +1321,11 @@ function resetAddForm(){
   document.getElementById('f-shop-link').value='';
   document.getElementById('shopLinkGroup').style.display='none';
   document.getElementById('addrGroup').style.display='';
+  document.getElementById('f-start').value='';
+  document.getElementById('f-end').value='';
+  document.getElementById('f-hours').value='';
+  document.getElementById('f-event').value='';
+  document.getElementById('popupFields').style.display='none';
   document.getElementById('tagsPreview').innerHTML='';
   window._shopImgFiles=[];
   document.getElementById('shopImgPreview').innerHTML='';
@@ -1294,6 +1357,8 @@ function selCat(btn){
   selectedCats=[...activeBtns].map(b=>b.dataset.c);
   selectedCat=selectedCats[0]||null;
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  const hasPopup=selectedCats.includes('팝업/카페');
+  const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
   document.getElementById('addrGroup').style.display=onlineOnly?'none':'';
   document.getElementById('shopLinkGroup').style.display=hasOnline?'block':'none';
@@ -1320,6 +1385,8 @@ async function submitPlace(){
   if(!name){alert('샵 이름을 입력해주세요');return;}
   if(!selectedCat){alert('카테고리를 선택해주세요');return;}
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  const hasPopup=selectedCats.includes('팝업/카페');
+  const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
   const shopLink=document.getElementById('f-shop-link').value.trim();
   if(hasOnline&&!shopLink){alert('온라인샵 링크를 입력해주세요');return;}
@@ -1337,7 +1404,11 @@ async function submitPlace(){
     const cats=selectedCats&&selectedCats.length?[...selectedCats]:[selectedCat];
     const shopLink=document.getElementById('f-shop-link').value.trim();
     const finalAddr=onlineOnly?'온라인':addr;
-    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null};
+    const startDate=document.getElementById('f-start').value||null;
+    const endDate=document.getElementById('f-end').value||null;
+    const hours=document.getElementById('f-hours').value.trim()||null;
+    const eventInfo=document.getElementById('f-event').value.trim()||null;
+    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null,startDate,endDate,hours,eventInfo};
     places.push(np);savePlaces();closeOverlay('addOverlay');
     currentCat='전체';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
