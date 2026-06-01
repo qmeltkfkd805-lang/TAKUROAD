@@ -599,6 +599,18 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+<!-- 게시판 삭제 -->
+<div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
+  <div class="panel-base panel-center" style="max-width:380px;">
+    <h2>게시판 삭제 <button class="icon-close" onclick="closeOverlay('deleteBoardOverlay')">✕</button></h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:6px;">삭제하면 모든 글과 댓글이 영구적으로 사라져요.</p>
+    <p style="font-size:13px;color:var(--red);font-weight:700;margin-bottom:16px;">확인을 위해 게시판 이름을 정확히 입력해주세요.</p>
+    <div class="form-group"><label id="deleteBoardLabel">게시판 이름</label><input type="text" id="deleteBoardInput" placeholder="게시판 이름 입력"/></div>
+    <button class="btn-submit" style="background:var(--red);" onclick="submitDeleteBoard()">삭제하기</button>
+    <div id="deleteBoardError" style="font-size:12px;margin-top:8px;text-align:center;color:var(--red);"></div>
+  </div>
+</div>
+
 <!-- 매니저 양도 -->
 <div class="overlay center" id="transferOverlay" onclick="handleOverlay(event,'transferOverlay')">
   <div class="panel-base panel-center" style="max-width:360px;">
@@ -2110,6 +2122,29 @@ async function submitBoardPost(){
 }
 
 // 매니저 양도
+function openDeleteBoard(){
+  if(!currentBoard)return;
+  document.getElementById('deleteBoardLabel').textContent='게시판 이름 ("'+currentBoard.name+'" 입력)';
+  document.getElementById('deleteBoardInput').value='';
+  document.getElementById('deleteBoardError').textContent='';
+  document.getElementById('deleteBoardOverlay').classList.add('open');
+}
+
+async function submitDeleteBoard(){
+  if(!currentUser||!currentBoard)return;
+  const errEl=document.getElementById('deleteBoardError');
+  // 글 50개 이상이면 삭제 불가
+  const{count}=await db.from('posts').select('*',{count:'exact',head:true}).eq('board_id',currentBoard.id);
+  if(count>=50){errEl.textContent='글이 50개 이상인 게시판은 삭제할 수 없어요.';return;}
+  const input=document.getElementById('deleteBoardInput').value.trim();
+  if(input!==currentBoard.name){errEl.textContent='게시판 이름이 일치하지 않아요';return;}
+  const{error}=await db.from('boards').delete().eq('id',currentBoard.id).eq('manager_id',currentUser.id);
+  if(error){errEl.textContent='삭제 실패: '+error.message;return;}
+  closeOverlay('deleteBoardOverlay');
+  backToBoards(true);
+  alert(currentBoard.name+' 게시판이 삭제됐어요.');
+}
+
 function openTransfer(){
   document.getElementById('transferNick').value='';document.getElementById('transferError').textContent='';
   document.getElementById('transferOverlay').classList.add('open');
