@@ -2504,6 +2504,36 @@ let routeMarkers=[];
 function openRoutePanel(){
   document.getElementById('routePanel').classList.add('open');
   renderRouteShopList();
+  renderSavedShopsForRoute();
+}
+
+function renderSavedShopsForRoute(){
+  const saved=places.filter(p=>savedIds.includes(p.id)||savedIds.includes(String(p.id)));
+  let area=document.getElementById('routeSavedArea');
+  if(!area){
+    area=document.createElement('div');
+    area.id='routeSavedArea';
+    area.style.cssText='padding:10px 16px;border-top:1px solid var(--border);flex-shrink:0;';
+    const routeList=document.getElementById('routeShopList');
+    routeList.parentNode.insertBefore(area,routeList);
+  }
+  if(!saved.length){area.innerHTML='';return;}
+  area.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;">🔖 저장한 샵</div>';
+  const wrap=document.createElement('div');wrap.style.cssText='display:flex;gap:6px;flex-wrap:wrap;';
+  saved.forEach(p=>{
+    const btn=document.createElement('button');
+    const color=CAT_COLOR[p.cat]||'#e8006f';
+    btn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:16px;padding:4px 10px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--text);';
+    btn.textContent=CAT_ICON[p.cat]+' '+p.name;
+    btn.onclick=()=>{
+      if(currentRoute.find(r=>r.id==p.id)){alert('이미 추가됐어요!');return;}
+      currentRoute.push(p);renderRouteShopList();
+      btn.style.background=color;btn.style.color='#fff';btn.style.borderColor=color;btn.disabled=true;
+    };
+    if(currentRoute.find(r=>r.id==p.id)){btn.style.background=color;btn.style.color='#fff';btn.style.borderColor=color;btn.disabled=true;}
+    wrap.appendChild(btn);
+  });
+  area.appendChild(wrap);
 }
 function closeRoutePanel(){
   document.getElementById('routePanel').classList.remove('open');
