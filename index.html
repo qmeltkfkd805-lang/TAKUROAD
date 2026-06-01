@@ -2004,8 +2004,17 @@ async function submitBoard(){
   const category=document.getElementById('boardCategory').value.trim()||'기타';
   const{data:newBoard,error}=await db.from('boards').insert({name,description:desc,manager_id:currentUser.id,manager_nickname:nick,post_count:0,category}).select().single();
   if(error){errEl.textContent='개설 실패: '+error.message;return;}
+  const SUB_DESCS={
+    '자유게시판':'자유롭게 글을 작성해주세요',
+    '이벤트 공지':'팝업, 행사 등 다양한 정보 공유 게시판',
+    '행사 후기':'행사 후기를 자유롭게 써주세요',
+    '동행구해요':'행사 같이 갈 동행 구해요!',
+    '공동구매':'공동구매 게시판입니다.',
+    '중고거래':'중고거래 게시판입니다.',
+    '교환해요':'중복 굿즈 등 교환 게시판 입니다.'
+  };
   for(let i=0;i<SUB_BOARDS.length;i++){
-    await db.from('sub_boards').insert({board_id:newBoard.id,name:SUB_BOARDS[i],order_num:i+1});
+    await db.from('sub_boards').insert({board_id:newBoard.id,name:SUB_BOARDS[i],order_num:i+1,description:SUB_DESCS[SUB_BOARDS[i]]||null});
   }
   closeOverlay('boardModalOverlay');loadBoards();
 }
