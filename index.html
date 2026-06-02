@@ -216,9 +216,9 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
     .fav-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
-    .profile-tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;scrollbar-width:none;}
+    .profile-tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
     .profile-tab-bar::-webkit-scrollbar{display:none;}
-    .profile-tab{padding:8px 14px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
+    .profile-tab{padding:8px 10px;border:none;background:none;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
     .profile-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
     .profile-content{min-height:100px;}
     .profile-post-item{padding:10px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
@@ -522,7 +522,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 
 <!-- 로그인 -->
 <div class="overlay center" id="authOverlay" onclick="handleOverlay(event,'authOverlay')">
-  <div class="panel-base panel-center" style="max-width:460px;height:80dvh;display:flex;flex-direction:column;overflow:hidden;">
+  <div class="panel-base panel-center" style="max-width:460px;width:460px;height:80dvh;display:flex;flex-direction:column;overflow:hidden;">
     <h2>타쿠로드에 오신걸 환영합니다! <button class="icon-close" onclick="closeOverlay('authOverlay')">✕</button></h2>
     <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">회원가입없이 구글로 로그인하고 타쿠로드를 이용해보세요 😊</p>
     <button class="btn-google" onclick="loginWithGoogle()">
@@ -541,7 +541,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('posts',this)">내 게시글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('comments',this)">댓글 단 글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('bookmarks',this)">관심 글</button>
-      <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('favboards',this)">즐겨찾기 게시판</button>
+      <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('favboards',this)">⭐즐겨찾기</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('notifications',this)">알림내역</button>
     </div>
     <div id="profileTabContent" style="flex:1;overflow-y:auto;">
