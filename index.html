@@ -1902,6 +1902,23 @@ async function loadBoards(){
   renderBoardGrid(boards);
 }
 
+function makeBoardCard(b){
+  const card=document.createElement('div');
+  card.className='board-grid-card'+(currentBoard&&currentBoard.id===b.id?' active':'');
+  card.dataset.name=b.name.toLowerCase();
+  const cardTop=document.createElement('div');cardTop.style.cssText='display:flex;align-items:flex-start;justify-content:space-between;';
+  const cardInfo=document.createElement('div');cardInfo.style.flex='1';
+  cardInfo.innerHTML='<div class="board-grid-name">'+b.name+'</div><div class="board-grid-cnt">글 '+(b._realCount||0)+'개</div>';
+  cardInfo.onclick=()=>selectBoard(b);
+  const favBtn=document.createElement('button');favBtn.className='fav-btn';
+  favBtn.textContent=window._favBoards&&window._favBoards.has(b.id)?'⭐':'☆';
+  favBtn.style.cssText='font-size:16px;background:none;border:none;cursor:pointer;padding:0;line-height:1;flex-shrink:0;';
+  favBtn.onclick=(e)=>{e.stopPropagation();toggleFavBoard(b.id,favBtn);};
+  cardTop.appendChild(cardInfo);cardTop.appendChild(favBtn);
+  card.appendChild(cardTop);
+  return card;
+}
+
 function renderBoardGrid(boards){
   const grid=document.getElementById('boardGrid');if(!grid)return;
   grid.innerHTML='';
