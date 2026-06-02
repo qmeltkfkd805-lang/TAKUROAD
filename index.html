@@ -2434,7 +2434,7 @@ function openPostDetail(p){
 
   const body=document.createElement('div');
   body.style.cssText='font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px;';
-  body.textContent=p.content;detail.appendChild(body);
+  body.innerHTML=p.content;detail.appendChild(body);
 
   if(p.images&&p.images.length){
     const imgs=document.createElement('div');imgs.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
