@@ -863,9 +863,16 @@ window.onload=function(){
 async function geocodeDummy(){
   const g=new kakao.maps.services.Geocoder();
   for(const p of DUMMY){
-    if(!p.lat||p.lat===37.5519){
-      await new Promise(r=>{g.addressSearch(p.addr,(res,st)=>{if(st===kakao.maps.services.Status.OK){p.lat=parseFloat(res[0].y);p.lng=parseFloat(res[0].x);}r();});});
-    }
+    if(!p.addr||p.addr==='온라인')continue;
+    await new Promise(r=>{
+      g.addressSearch(p.addr,(res,st)=>{
+        if(st===kakao.maps.services.Status.OK){
+          p.lat=parseFloat(res[0].y);
+          p.lng=parseFloat(res[0].x);
+        }
+        r();
+      });
+    });
   }
 }
 
@@ -877,11 +884,15 @@ function renderAll(){
   const listFiltered=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
   renderListPanel(listFiltered);
   const posMap={};
-  filtered.forEach(p=>{const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);if(!posMap[k])posMap[k]=[];posMap[k].push(p);});
   filtered.forEach(p=>{
-    const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);const g=posMap[k];const idx=g.indexOf(p);
+    const k=Math.round(p.lat*1000)/1000+','+Math.round(p.lng*1000)/1000;
+    if(!posMap[k])posMap[k]=[];posMap[k].push(p);
+  });
+  filtered.forEach(p=>{
+    const k=Math.round(p.lat*1000)/1000+','+Math.round(p.lng*1000)/1000;
+    const g=posMap[k];const idx=g.indexOf(p);
     let off={lat:0,lng:0};
-    if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0004,lng:Math.cos(a)*.0004};}
+    if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0003,lng:Math.cos(a)*.0003};}
     addMarker(p,off);
   });
   renderListPanel(listFiltered);
@@ -1369,11 +1380,15 @@ function doSearch(){
   const listFiltered=currentCat==='전체'?places:places.filter(p=>(p.cats||[p.cat]).includes(currentCat));
   renderListPanel(listFiltered);
   const posMap={};
-  filtered.forEach(p=>{const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);if(!posMap[k])posMap[k]=[];posMap[k].push(p);});
   filtered.forEach(p=>{
-    const k=p.lat.toFixed(4)+','+p.lng.toFixed(4);const g=posMap[k];const idx=g.indexOf(p);
+    const k=Math.round(p.lat*1000)/1000+','+Math.round(p.lng*1000)/1000;
+    if(!posMap[k])posMap[k]=[];posMap[k].push(p);
+  });
+  filtered.forEach(p=>{
+    const k=Math.round(p.lat*1000)/1000+','+Math.round(p.lng*1000)/1000;
+    const g=posMap[k];const idx=g.indexOf(p);
     let off={lat:0,lng:0};
-    if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0004,lng:Math.cos(a)*.0004};}
+    if(g.length>1){const a=(2*Math.PI/g.length)*idx;off={lat:Math.sin(a)*.0003,lng:Math.cos(a)*.0003};}
     addMarker(p,off);
   });
   document.getElementById('listPanel').classList.add('open');
