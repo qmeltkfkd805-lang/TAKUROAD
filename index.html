@@ -2815,12 +2815,8 @@ async function submitShareRoute(){
   const r=window._sharingRoute;
   const addContent=document.getElementById('shareRouteContent').value.trim();
   const shops=r.shop_ids||[];
-  const routeText=shops.map((s,i)=>(i+1)+'. '+s.name+' ('+s.addr+')').join('
-');
-  const content=(addContent?addContent+'
-
-':'')+'📍 성지순례 루트: '+r.title+'
-'+routeText;
+  const routeText=shops.map((s,i)=>(i+1)+'. '+s.name+' ('+s.addr+')').join('\n');
+  const content=(addContent?addContent+'\n\n':'')+'📍 성지순례 루트: '+r.title+'\n'+routeText;
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   const{error}=await db.from('posts').insert({
