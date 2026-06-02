@@ -2015,17 +2015,17 @@ function openPostDetail(p){
   detail.appendChild(backBtn);
 
   const title=document.createElement('div');
-  title.style.cssText='font-size:18px;font-weight:900;margin-bottom:8px;';title.textContent=p.title;detail.appendChild(title);
+  title.style.cssText='font-size:18px;font-weight:900;margin-bottom:14px;';title.textContent=p.title;detail.appendChild(title);
   if(p.price){
     const priceEl=document.createElement('div');
-    priceEl.style.cssText='font-size:22px;font-weight:900;color:var(--accent);margin-bottom:8px;display:inline-block;background:var(--accent-l);padding:4px 14px;border-radius:20px;border:1.5px solid var(--accent);';
+    priceEl.style.cssText='font-size:22px;font-weight:900;color:var(--accent);margin-bottom:12px;display:inline-block;background:var(--accent-l);padding:6px 16px;border-radius:20px;border:1.5px solid var(--accent);';
     priceEl.textContent=p.price.toLocaleString()+'원';
     detail.appendChild(priceEl);
   }
   if(p.link){
     const linkEl=document.createElement('a');
     linkEl.href=p.link;linkEl.target='_blank';
-    linkEl.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--cyan-l);border:1.5px solid var(--cyan);border-radius:20px;font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:12px;text-decoration:none;';
+    linkEl.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--cyan-l);border:1.5px solid var(--cyan);border-radius:20px;font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:16px;text-decoration:none;margin-left:8px;';
     const linkLabels={'이벤트 공지':'🔗 공식 사이트 바로가기','행사 후기':'📝 후기 블로그 바로가기','중고거래':'🛒 중고거래 링크'};
     linkEl.innerHTML=linkLabels[currentSub&&currentSub.name]||'🔗 링크 바로가기';
     detail.appendChild(linkEl);
