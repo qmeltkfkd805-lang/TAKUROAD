@@ -765,6 +765,92 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+
+<!-- 풀 에디터 -->
+<div class="editor-overlay" id="editorOverlay">
+  <div class="editor-header">
+    <button class="editor-back" onclick="closeEditor()">←</button>
+    <input type="text" class="editor-title-input" id="editorTitle" placeholder="제목을 입력하세요"/>
+    <button class="editor-publish-btn" onclick="publishPost()">게시하기</button>
+  </div>
+  <div class="editor-toolbar">
+    <div class="editor-toolbar-group">
+      <select class="tb-select" id="tbFontSize" onchange="execCmd('fontSize',this.value)">
+        <option value="2">소</option>
+        <option value="3" selected>중</option>
+        <option value="4">대</option>
+        <option value="5">특대</option>
+      </select>
+    </div>
+    <div class="editor-toolbar-group">
+      <button class="tb-btn" onclick="execCmd('bold')" title="굵게"><b>B</b></button>
+      <button class="tb-btn" onclick="execCmd('italic')" title="기울임"><i>I</i></button>
+      <button class="tb-btn" onclick="execCmd('underline')" title="밑줄"><u>U</u></button>
+      <button class="tb-btn" onclick="execCmd('strikeThrough')" title="취소선"><s>S</s></button>
+    </div>
+    <div class="editor-toolbar-group color-picker-wrap">
+      <button class="tb-btn" onclick="toggleColorPicker()" title="글씨색" id="tbColorBtn" style="font-weight:900;color:var(--accent);">A</button>
+      <div class="color-swatches" id="colorSwatches">
+        <div class="color-swatch" style="background:#000000" onclick="setColor('#000000')"></div>
+        <div class="color-swatch" style="background:#e8006f" onclick="setColor('#e8006f')"></div>
+        <div class="color-swatch" style="background:#ff6600" onclick="setColor('#ff6600')"></div>
+        <div class="color-swatch" style="background:#ffcc00" onclick="setColor('#ffcc00')"></div>
+        <div class="color-swatch" style="background:#00aa44" onclick="setColor('#00aa44')"></div>
+        <div class="color-swatch" style="background:#0066cc" onclick="setColor('#0066cc')"></div>
+        <div class="color-swatch" style="background:#7c3aed" onclick="setColor('#7c3aed')"></div>
+        <div class="color-swatch" style="background:#ffffff;border:1px solid #ddd;" onclick="setColor('#ffffff')"></div>
+        <div class="color-swatch" style="background:#666666" onclick="setColor('#666666')"></div>
+        <div class="color-swatch" style="background:#ff9999" onclick="setColor('#ff9999')"></div>
+        <div class="color-swatch" style="background:#ffcc99" onclick="setColor('#ffcc99')"></div>
+        <div class="color-swatch" style="background:#ffffcc" onclick="setColor('#ffffcc')"></div>
+        <div class="color-swatch" style="background:#ccffcc" onclick="setColor('#ccffcc')"></div>
+        <div class="color-swatch" style="background:#cceeff" onclick="setColor('#cceeff')"></div>
+      </div>
+    </div>
+    <div class="editor-toolbar-group">
+      <button class="tb-btn" onclick="execCmd('justifyLeft')" title="왼쪽">≡</button>
+      <button class="tb-btn" onclick="execCmd('justifyCenter')" title="가운데">≣</button>
+      <button class="tb-btn" onclick="execCmd('justifyRight')" title="오른쪽">≡</button>
+    </div>
+    <div class="editor-toolbar-group">
+      <button class="tb-btn" onclick="execCmd('insertUnorderedList')" title="불릿목록">• 목록</button>
+      <button class="tb-btn" onclick="execCmd('insertOrderedList')" title="번호목록">1. 목록</button>
+    </div>
+    <div class="editor-toolbar-group">
+      <button class="tb-btn" onclick="insertBlockquote()" title="인용구">❝</button>
+      <button class="tb-btn" onclick="insertHr()" title="구분선">─</button>
+      <button class="tb-btn" onclick="insertLink()" title="링크">🔗</button>
+      <button class="tb-btn" onclick="document.getElementById('editorImgInput').click()" title="이미지">🖼️</button>
+      <input type="file" id="editorImgInput" accept="image/*" multiple style="display:none" onchange="insertImages(event)"/>
+    </div>
+  </div>
+  <div class="editor-body">
+    <div class="editor-content" id="editorContent" contenteditable="true" data-placeholder="내용을 입력하세요..."></div>
+  </div>
+  <div class="editor-meta">
+    <div class="editor-meta-group">
+      <label>게시판</label>
+      <select id="editorBoard" onchange="loadEditorSubBoards(this.value)">
+        <option value="">게시판 선택</option>
+      </select>
+    </div>
+    <div class="editor-meta-group">
+      <label>세부게시판</label>
+      <select id="editorSubBoard">
+        <option value="">선택</option>
+      </select>
+    </div>
+    <div class="editor-meta-group" id="editorPriceGroup" style="display:none;">
+      <label>가격</label>
+      <input type="number" id="editorPrice" placeholder="원" style="width:100px;"/>
+    </div>
+    <div class="editor-meta-group" id="editorLinkGroup" style="display:none;">
+      <label>링크</label>
+      <input type="url" id="editorLinkInput" placeholder="https://..." style="width:180px;"/>
+    </div>
+  </div>
+</div>
+
 <!-- 게시판 삭제 -->
 <div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
@@ -2030,7 +2116,7 @@ async function selectBoard(board){
     dBtn.style.cssText='background:var(--red-l);color:var(--red);border:1px solid var(--red);border-radius:14px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;';
     dBtn.textContent='🗑️ 게시판 삭제';dBtn.onclick=openDeleteBoard;headBtns.appendChild(dBtn);
   }
-  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openBoardWrite;headBtns.appendChild(wBtn);
+  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openEditor;headBtns.appendChild(wBtn);
   head.appendChild(headInfo);head.appendChild(headBtns);
   // 브라우저 히스토리에 추가
   localStorage.setItem('tr_state',JSON.stringify({tab:'comm',boardId:board.id,boardName:board.name}));
@@ -3261,6 +3347,143 @@ function viewRoute(shops){
   shops.forEach(s=>bounds.extend(new kakao.maps.LatLng(s.lat,s.lng)));
   map.setBounds(bounds);
 }
+
+
+// ── 풀 에디터 ──
+let _editorSavedRange=null;
+
+function openEditor(){
+  if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
+  // 게시판 목록 로드
+  db.from('boards').select('*').order('created_at',{ascending:true}).then(({data:boards})=>{
+    const sel=document.getElementById('editorBoard');
+    sel.innerHTML='<option value="">게시판 선택</option>';
+    (boards||[]).forEach(b=>{const opt=document.createElement('option');opt.value=b.id;opt.dataset.name=b.name;opt.textContent=b.name;sel.appendChild(opt);});
+    // 현재 게시판 자동 선택
+    if(currentBoard){sel.value=currentBoard.id;loadEditorSubBoards(currentBoard.id);}
+  });
+  document.getElementById('editorTitle').value='';
+  document.getElementById('editorContent').innerHTML='';
+  document.getElementById('editorPrice').value='';
+  document.getElementById('editorLinkInput').value='';
+  document.getElementById('editorPriceGroup').style.display='none';
+  document.getElementById('editorLinkGroup').style.display='none';
+  document.getElementById('editorOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('editorTitle').focus(),300);
+}
+
+function closeEditor(){
+  document.getElementById('editorOverlay').classList.remove('open');
+}
+
+async function loadEditorSubBoards(boardId){
+  if(!boardId)return;
+  const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',boardId).order('order_num',{ascending:true});
+  const sel=document.getElementById('editorSubBoard');
+  sel.innerHTML='<option value="">전체게시판</option>';
+  (subs||[]).forEach(s=>{const opt=document.createElement('option');opt.value=s.id;opt.dataset.name=s.name;opt.textContent=s.name;sel.appendChild(opt);});
+  // 현재 세부게시판 자동 선택
+  if(currentSub)sel.value=currentSub.id;
+  updateEditorMeta();
+}
+
+function updateEditorMeta(){
+  const subSel=document.getElementById('editorSubBoard');
+  const subName=subSel.selectedOptions[0]?.dataset.name||'';
+  const needPrice=['중고거래','공동구매'];
+  const needLink=['이벤트 공지','중고거래','행사 후기'];
+  document.getElementById('editorPriceGroup').style.display=needPrice.includes(subName)?'flex':'none';
+  document.getElementById('editorLinkGroup').style.display=needLink.includes(subName)?'flex':'none';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const subSel=document.getElementById('editorSubBoard');
+  if(subSel)subSel.addEventListener('change',updateEditorMeta);
+});
+
+function execCmd(cmd,val){
+  document.getElementById('editorContent').focus();
+  document.execCommand(cmd,false,val||null);
+}
+
+function setColor(color){
+  document.getElementById('colorSwatches').classList.remove('open');
+  document.getElementById('editorContent').focus();
+  document.execCommand('foreColor',false,color);
+}
+
+function toggleColorPicker(){
+  document.getElementById('colorSwatches').classList.toggle('open');
+}
+
+function insertBlockquote(){
+  const ed=document.getElementById('editorContent');ed.focus();
+  document.execCommand('formatBlock',false,'blockquote');
+}
+
+function insertHr(){
+  const ed=document.getElementById('editorContent');ed.focus();
+  document.execCommand('insertHTML',false,'<hr/><p><br></p>');
+}
+
+function insertLink(){
+  const url=prompt('링크 URL을 입력하세요:');
+  if(!url)return;
+  const text=prompt('링크 텍스트를 입력하세요:','링크');
+  document.getElementById('editorContent').focus();
+  document.execCommand('insertHTML',false,'<a href="'+url+'" target="_blank">'+(text||url)+'</a>');
+}
+
+async function insertImages(event){
+  const files=Array.from(event.target.files);event.target.value='';
+  const ed=document.getElementById('editorContent');ed.focus();
+  for(const file of files){
+    const ext=file.name.split('.').pop();
+    const path='posts/'+currentUser.id+'/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){
+      const{data:u}=db.storage.from('post-images').getPublicUrl(path);
+      document.execCommand('insertHTML',false,'<img src="'+u.publicUrl+'" style="max-width:100%;border-radius:8px;margin:8px 0;"/>');
+    }
+  }
+}
+
+async function publishPost(){
+  if(!currentUser)return;
+  const title=document.getElementById('editorTitle').value.trim();
+  const content=document.getElementById('editorContent').innerHTML.trim();
+  const boardId=document.getElementById('editorBoard').value;
+  const subSel=document.getElementById('editorSubBoard');
+  const subId=subSel.value||null;
+  const subName=subSel.selectedOptions[0]?.dataset.name||'';
+  if(!title){alert('제목을 입력해주세요');return;}
+  if(!content||content==='<br>'){alert('내용을 입력해주세요');return;}
+  if(!boardId){alert('게시판을 선택해주세요');return;}
+  const requireImg=['중고거래','공동구매','교환해요','이벤트 공지'];
+  if(requireImg.includes(subName)&&!document.getElementById('editorContent').querySelector('img')){
+    alert('사진을 최소 1장 첨부해주세요!');return;
+  }
+  const priceVal=document.getElementById('editorPrice').value;
+  const price=priceVal?parseInt(priceVal):null;
+  const link=document.getElementById('editorLinkInput').value.trim()||null;
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  // 이미지 URL 추출
+  const imgs=[...document.getElementById('editorContent').querySelectorAll('img')].map(i=>i.src);
+  const{error}=await db.from('posts').insert({
+    type:'일반',nick,title,content,likes:0,
+    user_id:currentUser.id,board_id:boardId,
+    sub_board_id:subId||null,
+    images:imgs.length?imgs:null,price,link
+  });
+  if(error){alert('게시 실패: '+error.message);return;}
+  closeEditor();
+  if(currentBoard&&currentBoard.id===boardId)loadBoardPosts();
+  alert('게시됐어요! 🎉');
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.color-picker-wrap'))document.getElementById('colorSwatches')?.classList.remove('open');
+});
 
 function openImgFull(src,images,startIdx){
   const imgs=images&&images.length?images:[src];
