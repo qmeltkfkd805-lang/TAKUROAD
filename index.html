@@ -1948,7 +1948,7 @@ function renderBoardGrid(boards){
       favBtn.onclick=(e)=>{e.stopPropagation();toggleFavBoard(b.id,favBtn);};
       cardTop.appendChild(cardInfo);cardTop.appendChild(favBtn);
       card.appendChild(cardTop);
-      card.onclick=()=>selectBoard(b);
+      // card 클릭은 cardInfo에서 처리
       row.appendChild(card);
     });
     section.appendChild(row);
