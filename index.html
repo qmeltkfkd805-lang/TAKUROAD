@@ -539,7 +539,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="profile-tab-bar">
       <button class="profile-tab active" onclick="event.stopPropagation();switchProfileTab('info',this)">프로필</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('posts',this)">내 게시글</button>
-      <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('comments',this)">내 댓글</button>
+      <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('comments',this)">댓글 단 글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('bookmarks',this)">관심 글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('favboards',this)">즐겨찾기 게시판</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('notifications',this)">알림내역</button>
@@ -1585,13 +1585,33 @@ async function loadMyComments(){
   const el=document.getElementById('profileCommentsTab');
   el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
   if(!currentUser)return;
-  const{data:comments}=await db.from('comments').select('id,content,created_at,post_id').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  const{data:comments}=await db.from('comments').select('post_id,content,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
   el.innerHTML='';
-  if(!comments||!comments.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">작성한 댓글이 없어요</div>';return;}
-  comments.forEach(c=>{
+  if(!comments||!comments.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">댓글 단 글이 없어요</div>';return;}
+  // 중복 post_id 제거
+  const seen=new Set();
+  const uniquePostIds=[...new Set(comments.map(c=>c.post_id))].slice(0,30);
+  const{data:posts}=await db.from('posts').select('id,title,likes,created_at,board_id').in('id',uniquePostIds);
+  if(!posts||!posts.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">댓글 단 글이 없어요</div>';return;}
+  // 내 댓글 내용도 함께 표시
+  const commentMap={};comments.forEach(c=>{if(!commentMap[c.post_id])commentMap[c.post_id]=c.content;});
+  posts.forEach(p=>{
     const div=document.createElement('div');div.className='profile-post-item';
-    const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-    div.innerHTML='<div class="profile-post-title">'+c.content+'</div><div class="profile-post-meta">'+date+'</div>';
+    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    const myComment=commentMap[p.id]||'';
+    div.innerHTML='<div class="profile-post-title">'+p.title+'</div>'
+      +'<div class="profile-post-meta" style="color:var(--accent);margin-top:2px;">💬 '+myComment+'</div>'
+      +'<div class="profile-post-meta">'+date+' · ❤️ '+(p.likes||0)+'</div>';
+    div.onclick=async()=>{
+      const{data:post}=await db.from('posts').select('*').eq('id',p.id).single();
+      if(!post)return;
+      const{data:b}=await db.from('boards').select('*').eq('id',post.board_id).single();
+      if(!b)return;
+      closeOverlay('profileOverlay');
+      switchTab('comm');
+      await selectBoard(b);
+      setTimeout(()=>openPostDetail(post),300);
+    };
     el.appendChild(div);
   });
 }
