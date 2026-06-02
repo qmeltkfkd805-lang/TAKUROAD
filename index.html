@@ -706,6 +706,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <h2>루트 수정 <button class="icon-close" onclick="closeOverlay('editRouteOverlay')">✕</button></h2>
     <div class="form-group"><label>루트 이름 *</label><input type="text" id="editRouteTitle"/></div>
     <div class="form-group"><label>소개</label><textarea id="editRouteDesc" rows="2"></textarea></div>
+    <div class="form-group"><label>이미지</label>
+      <div id="editRouteImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+      <button type="button" class="img-attach-btn" onclick="document.getElementById('editRouteImgInput').click()" style="font-size:12px;padding:6px 12px;">📷 이미지 추가</button>
+      <input type="file" id="editRouteImgInput" accept="image/*" multiple style="display:none" onchange="handleEditRouteImg(event)"/>
+    </div>
     <button class="btn-submit" onclick="submitEditRoute()">수정 완료</button>
   </div>
 </div>
@@ -2077,7 +2082,7 @@ function openPostDetail(p){
     const viewRouteBtn=document.createElement('button');
     viewRouteBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewRouteBtn.textContent='🗺️ 지도에서 루트 보기';
-    viewRouteBtn.onclick=()=>viewRoute(p.route_data);
+    viewRouteBtn.onclick=()=>{viewRoute(p.route_data);};
     routeBox.appendChild(rtitle);routeBox.appendChild(rlist);routeBox.appendChild(viewRouteBtn);
     detail.appendChild(routeBox);
   }
@@ -2667,7 +2672,7 @@ async function loadMyRoutes(){
     const titleEl=document.createElement('div');titleEl.className='route-saved-title';titleEl.textContent=r.title;
     const shareBtn=document.createElement('button');
     shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;';
-    shareBtn.textContent='📢 공유';shareBtn.onclick=()=>openShareRoute(r);
+    shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
     const editBtn=document.createElement('button');
     editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
     editBtn.textContent='✏️ 수정';editBtn.onclick=()=>openEditRoute(r);
@@ -2861,10 +2866,37 @@ async function likeRoute(routeId,btn){
   btn.textContent='❤️ '+n;btn.style.color='var(--accent)';btn.disabled=true;
 }
 
+function handleEditRouteImg(event){
+  const files=Array.from(event.target.files);
+  window._editRouteImgFiles=[...(window._editRouteImgFiles||[]),...files].slice(0,5);
+  renderEditRouteImgPreview();event.target.value='';
+}
+function renderEditRouteImgPreview(){
+  const area=document.getElementById('editRouteImgPreview');if(!area)return;
+  area.innerHTML='';
+  window._editRouteExistingImgs=window._editRouteExistingImgs||[];
+  window._editRouteExistingImgs.forEach((src,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=src;img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._editRouteExistingImgs.splice(i,1);renderEditRouteImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+  (window._editRouteImgFiles||[]).forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{window._editRouteImgFiles.splice(i,1);renderEditRouteImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+}
 function openEditRoute(r){
   window._editingRoute=r;
+  window._editRouteImgFiles=[];
+  window._editRouteExistingImgs=r.images?[...r.images]:[];
   document.getElementById('editRouteTitle').value=r.title;
   document.getElementById('editRouteDesc').value=r.description||'';
+  renderEditRouteImgPreview();
   document.getElementById('editRouteOverlay').classList.add('open');
 }
 async function submitEditRoute(){
@@ -2872,9 +2904,16 @@ async function submitEditRoute(){
   const title=document.getElementById('editRouteTitle').value.trim();
   if(!title){alert('루트 이름을 입력해주세요');return;}
   const description=document.getElementById('editRouteDesc').value.trim();
-  await db.from('routes').update({title,description}).eq('id',r.id).eq('user_id',currentUser.id);
+  const imageUrls=[...(window._editRouteExistingImgs||[])];
+  for(const file of(window._editRouteImgFiles||[])){
+    const ext=file.name.split('.').pop();
+    const path='routes/'+currentUser.id+'/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  await db.from('routes').update({title,description,images:imageUrls.length?imageUrls:null}).eq('id',r.id).eq('user_id',currentUser.id);
   closeOverlay('editRouteOverlay');
-  loadSavedRoutes();
+  loadSavedRoutes();loadMyRoutes();
 }
 async function deleteRoute(routeId,card){
   if(!confirm('루트를 삭제할까요?'))return;
