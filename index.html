@@ -432,7 +432,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <input class="board-search" id="boardSearch" style="flex:1;max-width:240px;margin-bottom:0;" placeholder="🔍 게시판 검색…" oninput="filterBoards(this.value)"/>
       <button class="btn-new-board" style="margin-left:auto;" onclick="openBoardModal()">+ 개설</button>
     </div>
-    <div class="board-grid-view">
+    <div class="board-grid-view" id="commLayout">
       <div class="board-grid" id="boardGrid"></div>
     </div>
   </div>
