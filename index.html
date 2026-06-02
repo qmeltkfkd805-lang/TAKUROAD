@@ -801,7 +801,12 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="editor-overlay" id="editorOverlay">
   <div class="editor-header">
     <button class="editor-back" onclick="closeEditor()">←</button>
-    <input type="text" class="editor-title-input" id="editorTitle" placeholder="제목을 입력하세요"/>
+    <select id="editorBoard" onchange="loadEditorSubBoards(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;">
+      <option value="">게시판 선택</option>
+    </select>
+    <select id="editorSubBoard" onchange="updateEditorMeta()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;">
+      <option value="">세부게시판</option>
+    </select>
     <button class="editor-publish-btn" onclick="publishPost()">게시하기</button>
   </div>
   <div class="editor-toolbar">
@@ -859,18 +864,6 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="editor-content" id="editorContent" contenteditable="true" data-placeholder="내용을 입력하세요..."></div>
   </div>
   <div class="editor-meta">
-    <div class="editor-meta-group">
-      <label>게시판</label>
-      <select id="editorBoard" onchange="loadEditorSubBoards(this.value)">
-        <option value="">게시판 선택</option>
-      </select>
-    </div>
-    <div class="editor-meta-group">
-      <label>세부게시판</label>
-      <select id="editorSubBoard">
-        <option value="">선택</option>
-      </select>
-    </div>
     <div class="editor-meta-group" id="editorPriceGroup" style="display:none;">
       <label>가격</label>
       <input type="number" id="editorPrice" placeholder="원" style="width:100px;"/>
