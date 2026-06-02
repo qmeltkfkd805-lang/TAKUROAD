@@ -3420,8 +3420,10 @@ async function updatePost(){
   // 버튼 원래대로
   const btn=document.querySelector('.editor-publish-btn');
   btn.textContent='게시하기';btn.onclick=publishPost;
+  // 수정된 글 바로 보여주기
+  const{data:updatedPost}=await db.from('posts').select('*').eq('id',p_id).single();
+  if(updatedPost)openPostDetail(updatedPost);
   loadBoardPosts();
-  alert('수정됐어요! 🎉');
 }
 
 function openEditor(){
