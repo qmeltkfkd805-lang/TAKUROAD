@@ -860,20 +860,21 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <input type="file" id="editorImgInput" accept="image/*" multiple style="display:none" onchange="insertImages(event)"/>
     </div>
   </div>
-  <div style="padding:12px 24px;max-width:800px;margin:0 auto;width:100%;box-sizing:border-box;border-bottom:1px solid var(--border);"><input type="text" id="editorTitle" class="editor-title-input" placeholder="제목을 입력하세요"/></div>
+  <div style="padding:12px 24px;max-width:800px;margin:0 auto;width:100%;box-sizing:border-box;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <input type="text" id="editorTitle" class="editor-title-input" placeholder="제목을 입력하세요" style="flex:1;min-width:160px;"/>
+    <div id="editorPriceGroup" style="display:none;align-items:center;gap:6px;">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;">가격</label>
+      <input type="number" id="editorPrice" placeholder="원" style="width:90px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;"/>
+    </div>
+    <div id="editorLinkGroup" style="display:none;align-items:center;gap:6px;">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;">링크</label>
+      <input type="url" id="editorLinkInput" placeholder="https://..." style="width:160px;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;"/>
+    </div>
+  </div>
   <div class="editor-body">
     <div class="editor-content" id="editorContent" contenteditable="true" data-placeholder="내용을 입력하세요..."></div>
   </div>
-  <div class="editor-meta">
-    <div class="editor-meta-group" id="editorPriceGroup" style="display:none;">
-      <label>가격</label>
-      <input type="number" id="editorPrice" placeholder="원" style="width:100px;"/>
-    </div>
-    <div class="editor-meta-group" id="editorLinkGroup" style="display:none;">
-      <label>링크</label>
-      <input type="url" id="editorLinkInput" placeholder="https://..." style="width:180px;"/>
-    </div>
-  </div>
+
 </div>
 
 <!-- 게시판 삭제 -->
@@ -3471,6 +3472,13 @@ function updateEditorMeta(){
   const needLink=['이벤트 공지','중고거래','행사 후기'];
   document.getElementById('editorPriceGroup').style.display=needPrice.includes(subName)?'flex':'none';
   document.getElementById('editorLinkGroup').style.display=needLink.includes(subName)?'flex':'none';
+  // 플레이스홀더 변경
+  const editor=document.getElementById('editorContent');
+  if(subName==='중고거래'){
+    editor.dataset.placeholder='최소 사진 1장과 물품을 올려 둔 중고거래사이트 링크를 첨부해주세요.';
+  } else {
+    editor.dataset.placeholder='내용을 입력하세요...';
+  }
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const subSel=document.getElementById('editorSubBoard');
