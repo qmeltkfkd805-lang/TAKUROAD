@@ -462,6 +462,11 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
         <button onclick="addSavedToRoute()" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap;color:var(--text);">🔖 저장샵 추가</button>
       </div>
       <textarea id="routeDesc" rows="2" placeholder="루트 소개 (선택)" style="width:100%;margin-top:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;resize:none;"></textarea>
+      <div style="margin-top:8px;">
+        <div id="routeImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;"></div>
+        <button type="button" class="img-attach-btn" onclick="document.getElementById('routeImgInput').click()" style="font-size:12px;padding:6px 12px;">📷 이미지 추가 (최대 5장)</button>
+        <input type="file" id="routeImgInput" accept="image/*" multiple style="display:none" onchange="handleRouteImg(event)"/>
+      </div>
     </div>
     <div class="route-list-view" id="routeShopList">
       <div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">샵을 추가해서 루트를 만들어보세요!</div>
@@ -2574,10 +2579,31 @@ let routePolyline=null;
 let routeMarkers=[];
 const ROUTE_COLORS=['#e8006f','#ff6600','#ffcc00','#00aa44','#0066cc','#4400aa','#8800cc'];
 
+let _routeImgFiles=[];
+function handleRouteImg(event){
+  const files=Array.from(event.target.files);
+  _routeImgFiles=[..._routeImgFiles,...files].slice(0,5);
+  renderRouteImgPreview();event.target.value='';
+}
+function renderRouteImgPreview(){
+  const area=document.getElementById('routeImgPreview');if(!area)return;
+  area.innerHTML='';
+  _routeImgFiles.forEach((file,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-preview-wrap';
+    const img=document.createElement('img');img.src=URL.createObjectURL(file);
+    img.style.cssText='width:70px;height:70px;object-fit:cover;border-radius:8px;border:1px solid var(--border);';
+    const del=document.createElement('button');del.className='img-preview-del';del.textContent='✕';
+    del.onclick=()=>{_routeImgFiles.splice(i,1);renderRouteImgPreview();};
+    wrap.appendChild(img);wrap.appendChild(del);area.appendChild(wrap);
+  });
+}
+
 function openRoutePanel(){
+  _routeImgFiles=[];
   document.getElementById('routePanel').classList.add('open');
   renderRouteShopList();
   renderSavedShopsForRoute();
+  renderRouteImgPreview();
 }
 
 function renderSavedShopsForRoute(){
@@ -2653,6 +2679,16 @@ async function loadMyRoutes(){
     shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
     const viewBtn=document.createElement('button');
     viewBtn.style.cssText='width:100%;margin-top:8px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    // 루트 이미지 표시
+    if(r.images&&r.images.length){
+      const imgRow=document.createElement('div');imgRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;';
+      r.images.forEach(src=>{
+        const img=document.createElement('img');img.src=src;
+        img.style.cssText='width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);';
+        img.onclick=()=>openImgFull(src,r.images);imgRow.appendChild(img);
+      });
+      card.appendChild(imgRow);
+    }
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
     card.appendChild(titleRow);card.appendChild(metaEl);card.appendChild(tagsDiv);card.appendChild(viewBtn);
     list.appendChild(card);
@@ -2738,13 +2774,21 @@ async function saveRoute(){
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   const shopIds=currentRoute.map(p=>({id:p.id,name:p.name,cat:p.cat,lat:p.lat,lng:p.lng,addr:p.addr}));
-  const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0});
+  // 이미지 업로드
+  const imageUrls=[];
+  for(const file of _routeImgFiles){
+    const ext=file.name.split('.').pop();
+    const path='routes/'+currentUser.id+'/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+    const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
+    if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
+  }
+  const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0,images:imageUrls.length?imageUrls:null});
   if(error){alert('저장 실패: '+error.message);return;}
   alert('루트가 공유됐어요! 🎉');
-  currentRoute=[];
+  currentRoute=[];_routeImgFiles=[];
   document.getElementById('routeTitle').value='';
   document.getElementById('routeDesc').value='';
-  renderRouteShopList();
+  renderRouteShopList();renderRouteImgPreview();
   clearRoutePreview();
   switchRouteTab('list');
 }
@@ -2788,7 +2832,7 @@ async function loadSavedRoutes(){
     titleRow.appendChild(titleEl2);
     const shareBtn=document.createElement('button');
     shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;white-space:nowrap;';
-    shareBtn.textContent='📢 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
+    shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
     titleRow.appendChild(shareBtn);
     if(currentUser&&r.user_id===currentUser.id){
       const editBtn=document.createElement('button');
