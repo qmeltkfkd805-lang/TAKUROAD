@@ -3475,7 +3475,13 @@ function updateEditorMeta(){
   // 플레이스홀더 변경
   const editor=document.getElementById('editorContent');
   if(subName==='중고거래'){
-    editor.dataset.placeholder='중고거래 게시판 글 작성 안내<br>1. 최소 사진 1장 필수<br>2. 물품을 올려둔 중고거래 사이트가 있다면 링크 첨부해주세요. (필수 아님)<br>⚠️ 주의사항<br>타쿠로드는 개인간 거래를 중개하는 역할만 할 뿐, 거래되는 물품의 하자나 문제에 대해서는 책임지지 않습니다.';
+    editor.dataset.placeholder=`중고거래 게시판 글 작성 안내
+
+1. 최소 사진 1장 필수
+2. 물품을 올려둔 중고거래 사이트가 있다면 링크 첨부해주세요. (필수 아님)
+
+⚠️ 주의사항
+타쿠로드는 개인간 거래를 중개하는 역할만 할 뿐, 거래되는 물품의 하자나 문제에 대해서는 책임지지 않습니다.`;
   } else {
     editor.dataset.placeholder='내용을 입력하세요...';
   }
