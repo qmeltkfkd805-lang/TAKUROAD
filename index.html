@@ -2984,14 +2984,6 @@ function viewRoute(shops){
   const bounds=new kakao.maps.LatLngBounds();
   shops.forEach(s=>bounds.extend(new kakao.maps.LatLng(s.lat,s.lng)));
   map.setBounds(bounds);
-  };
-  // 지도 탭으로 전환 후 렌더링
-  if(!document.getElementById('tabMap').classList.contains('active')){
-    switchTab('map');
-    setTimeout(doRender, 300);
-  } else {
-    doRender();
-  }
 }
 
 function openImgFull(src,images,startIdx){
