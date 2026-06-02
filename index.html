@@ -215,6 +215,19 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .board-item.active .board-cnt{color:var(--accent);opacity:.7;}
     .board-search{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:12px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;margin-bottom:6px;}
     .board-search:focus{border-color:var(--accent);}
+    .fav-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:2px;line-height:1;flex-shrink:0;}
+    .profile-tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto;scrollbar-width:none;}
+    .profile-tab-bar::-webkit-scrollbar{display:none;}
+    .profile-tab{padding:8px 14px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;}
+    .profile-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .profile-content{min-height:100px;}
+    .profile-post-item{padding:10px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
+    .profile-post-item:hover{color:var(--accent);}
+    .profile-post-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+    .profile-post-meta{font-size:11px;color:var(--muted);}
+    .fav-board-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--border);}
+    .fav-board-name{font-size:13px;font-weight:700;cursor:pointer;}
+    .fav-board-name:hover{color:var(--accent);}
     .route-btn{background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:20px;padding:7px 13px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
     .route-btn:hover{background:var(--purple);color:#fff;}
     .route-panel{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--sh-lg);z-index:500;height:85dvh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);}
@@ -523,6 +536,16 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="overlay center" id="profileOverlay" onclick="handleOverlay(event,'profileOverlay')">
   <div class="panel-base panel-center" style="max-width:400px;">
     <h2>내 프로필 <button class="icon-close" onclick="closeOverlay('profileOverlay')">✕</button></h2>
+    <div class="profile-tab-bar">
+      <button class="profile-tab active" onclick="switchProfileTab('info',this)">프로필</button>
+      <button class="profile-tab" onclick="switchProfileTab('posts',this)">내 게시글</button>
+      <button class="profile-tab" onclick="switchProfileTab('comments',this)">내 댓글</button>
+      <button class="profile-tab" onclick="switchProfileTab('bookmarks',this)">관심 글</button>
+      <button class="profile-tab" onclick="switchProfileTab('favboards',this)">즐겨찾기 게시판</button>
+      <button class="profile-tab" onclick="switchProfileTab('notifications',this)">알림내역</button>
+    </div>
+    <div id="profileTabContent">
+    <div id="profileInfoTab">
     <div class="avatar-wrap">
       <div class="avatar-ring" id="avatarRing" onclick="document.getElementById('avatarInput').click()">
         <div class="avatar" id="profileAvatar"><span>👤</span></div>
@@ -538,6 +561,13 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="form-group"><label>자기소개</label><textarea id="editBio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
     <button class="btn-submit" onclick="saveProfile()">저장하기</button>
     <button class="btn-logout" onclick="logout()">로그아웃</button>
+    </div><!-- profileInfoTab end -->
+    <div id="profilePostsTab" style="display:none;" class="profile-content"></div>
+    <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
+    <div id="profileBookmarksTab" style="display:none;" class="profile-content"></div>
+    <div id="profileFavBoardsTab" style="display:none;" class="profile-content"></div>
+    <div id="profileNotiTab" style="display:none;" class="profile-content"></div>
+    </div><!-- profileTabContent end -->
   </div>
 </div>
 
@@ -1511,6 +1541,122 @@ async function saveProfile(){
   await db.from('profiles').upsert({id:currentUser.id,nickname,bio});
   await setUser(currentUser);closeOverlay('profileOverlay');alert('프로필이 저장됐어요!');
 }
+async function switchProfileTab(tab, btn){
+  document.querySelectorAll('.profile-tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const tabs=['Info','Posts','Comments','Bookmarks','FavBoards','Noti'];
+  tabs.forEach(t=>{ const el=document.getElementById('profile'+t+'Tab'); if(el)el.style.display='none'; });
+  const map={info:'Info',posts:'Posts',comments:'Comments',bookmarks:'Bookmarks',favboards:'FavBoards',notifications:'Noti'};
+  const el=document.getElementById('profile'+map[tab]+'Tab');
+  if(el)el.style.display='';
+  if(tab==='posts')loadMyPosts();
+  if(tab==='comments')loadMyComments();
+  if(tab==='bookmarks')loadMyBookmarks();
+  if(tab==='favboards')loadMyFavBoards();
+  if(tab==='notifications')loadMyNotifications();
+}
+
+async function loadMyPosts(){
+  const el=document.getElementById('profilePostsTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:posts}=await db.from('posts').select('id,title,likes,created_at,board_id').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  el.innerHTML='';
+  if(!posts||!posts.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">작성한 글이 없어요</div>';return;}
+  posts.forEach(p=>{
+    const div=document.createElement('div');div.className='profile-post-item';
+    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    div.innerHTML='<div class="profile-post-title">'+p.title+'</div><div class="profile-post-meta">'+date+' · ❤️ '+(p.likes||0)+'</div>';
+    div.onclick=async()=>{
+      const{data:post}=await db.from('posts').select('*').eq('id',p.id).single();
+      if(post){closeOverlay('profileOverlay');const{data:b}=await db.from('boards').select('*').eq('id',post.board_id).single();if(b){await selectBoard(b);openPostDetail(post);switchTab('comm');}}
+    };
+    el.appendChild(div);
+  });
+}
+
+async function loadMyComments(){
+  const el=document.getElementById('profileCommentsTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:comments}=await db.from('comments').select('id,content,created_at,post_id').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  el.innerHTML='';
+  if(!comments||!comments.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">작성한 댓글이 없어요</div>';return;}
+  comments.forEach(c=>{
+    const div=document.createElement('div');div.className='profile-post-item';
+    const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    div.innerHTML='<div class="profile-post-title">'+c.content+'</div><div class="profile-post-meta">'+date+'</div>';
+    el.appendChild(div);
+  });
+}
+
+async function loadMyBookmarks(){
+  const el=document.getElementById('profileBookmarksTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:bms}=await db.from('post_bookmarks').select('post_id,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  if(!bms||!bms.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">관심 글이 없어요</div>';return;}
+  const ids=bms.map(b=>b.post_id);
+  const{data:posts}=await db.from('posts').select('id,title,likes,created_at,board_id').in('id',ids);
+  el.innerHTML='';
+  (posts||[]).forEach(p=>{
+    const div=document.createElement('div');div.className='profile-post-item';
+    const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    div.innerHTML='<div class="profile-post-title">'+p.title+'</div><div class="profile-post-meta">'+date+' · ❤️ '+(p.likes||0)+'</div>';
+    div.onclick=async()=>{
+      const{data:post}=await db.from('posts').select('*').eq('id',p.id).single();
+      if(post){closeOverlay('profileOverlay');const{data:b}=await db.from('boards').select('*').eq('id',post.board_id).single();if(b){await selectBoard(b);openPostDetail(post);switchTab('comm');}}
+    };
+    el.appendChild(div);
+  });
+}
+
+async function loadMyFavBoards(){
+  const el=document.getElementById('profileFavBoardsTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:favs}=await db.from('board_favorites').select('board_id,boards(id,name,post_count)').eq('user_id',currentUser.id);
+  el.innerHTML='';
+  if(!favs||!favs.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">즐겨찾기한 게시판이 없어요</div>';return;}
+  favs.forEach(f=>{
+    const b=f.boards;if(!b)return;
+    const div=document.createElement('div');div.className='fav-board-item';
+    const name=document.createElement('span');name.className='fav-board-name';name.textContent='⭐ '+b.name;
+    name.onclick=()=>{closeOverlay('profileOverlay');db.from('boards').select('*').eq('id',b.id).single().then(({data:board})=>{if(board){selectBoard(board);switchTab('comm');}});};
+    const cnt=document.createElement('span');cnt.style.cssText='font-size:11px;color:var(--muted);';cnt.textContent='글 '+(b.post_count||0)+'개';
+    div.appendChild(name);div.appendChild(cnt);el.appendChild(div);
+  });
+}
+
+async function loadMyNotifications(){
+  const el=document.getElementById('profileNotiTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:notifs}=await db.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  el.innerHTML='';
+  if(!notifs||!notifs.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">알림이 없어요</div>';return;}
+  notifs.forEach(n=>{
+    const div=document.createElement('div');div.className='profile-post-item';
+    const date=new Date(n.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    div.innerHTML='<div class="profile-post-title" style="color:'+(n.is_read?'var(--muted)':'var(--text)')+'">'+n.message+'</div><div class="profile-post-meta">'+date+'</div>';
+    if(!n.is_read)db.from('notifications').update({is_read:true}).eq('id',n.id);
+    el.appendChild(div);
+  });
+}
+
+// 글에서 관심 추가/제거
+async function toggleBookmark(postId, btn){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const{data:existing}=await db.from('post_bookmarks').select('id').eq('user_id',currentUser.id).eq('post_id',postId).maybeSingle();
+  if(existing){
+    await db.from('post_bookmarks').delete().eq('id',existing.id);
+    if(btn){btn.textContent='🤍 관심';btn.style.color='var(--muted)';}
+  } else {
+    await db.from('post_bookmarks').insert({user_id:currentUser.id,post_id:postId});
+    if(btn){btn.textContent='❤️ 관심';btn.style.color='var(--accent)';}
+  }
+}
+
 async function logout(){await db.auth.signOut();closeOverlay('profileOverlay');}
 
 // ── 장소 추가 ──
@@ -1681,6 +1827,22 @@ async function doCommSearch(){
   },300);
 }
 
+async function toggleFavBoard(boardId, btn){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  if(!window._favBoards)window._favBoards=new Set();
+  if(window._favBoards.has(boardId)){
+    await db.from('board_favorites').delete().eq('user_id',currentUser.id).eq('board_id',boardId);
+    window._favBoards.delete(boardId);
+    btn.textContent='☆';
+  } else {
+    await db.from('board_favorites').insert({user_id:currentUser.id,board_id:boardId});
+    window._favBoards.add(boardId);
+    btn.textContent='⭐';
+  }
+  // 즐겨찾기 게시판 상단 정렬 갱신
+  if(window._allBoards)renderBoardGrid(window._allBoards);
+}
+
 function filterBoards(q){
   const items=document.querySelectorAll('#boardList .board-item');
   items.forEach(el=>{
@@ -1711,6 +1873,9 @@ function renderBoardGrid(boards){
   const grid=document.getElementById('boardGrid');if(!grid)return;
   grid.innerHTML='';
   if(!boards.length){grid.innerHTML='<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);font-size:14px">검색 결과가 없어요</div>';return;}
+  // 즐겨찾기 게시판 상단 정렬
+  const favIds=window._favBoards||new Set();
+  boards=boards.slice().sort((a,b)=>{const fa=favIds.has(a.id),fb=favIds.has(b.id);return fb-fa;});
 
   // 카테고리별 그룹핑
   const groups={};
@@ -1750,6 +1915,22 @@ function renderBoardGrid(boards){
   });
 }
 
+
+async function toggleFavBoard(boardId, btn){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  if(!window._favBoards)window._favBoards=new Set();
+  if(window._favBoards.has(boardId)){
+    await db.from('board_favorites').delete().eq('user_id',currentUser.id).eq('board_id',boardId);
+    window._favBoards.delete(boardId);
+    btn.textContent='☆';
+  } else {
+    await db.from('board_favorites').insert({user_id:currentUser.id,board_id:boardId});
+    window._favBoards.add(boardId);
+    btn.textContent='⭐';
+  }
+  // 즐겨찾기 게시판 상단 정렬 갱신
+  if(window._allBoards)renderBoardGrid(window._allBoards);
+}
 
 function filterBoards(q){
   if(!window._allBoards)return;
@@ -2105,7 +2286,19 @@ function openPostDetail(p){
   likeBtn.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent-l)':'none')+';color:'+(liked?'var(--accent)':'var(--muted)')+';font-family:inherit;font-size:14px;font-weight:700;cursor:'+(liked?'default':'pointer')+';margin-bottom:4px;';
   likeBtn.textContent='❤️ '+(p.likes||0);
   if(!liked)likeBtn.onclick=()=>likePost(p.id,likeBtn);
-  detail.appendChild(likeBtn);
+  // 관심 버튼
+  const bmBtn=document.createElement('button');
+  bmBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);margin-left:8px;';
+  if(currentUser){
+    db.from('post_bookmarks').select('id').eq('user_id',currentUser.id).eq('post_id',p.id).maybeSingle().then(({data})=>{
+      if(data){bmBtn.textContent='❤️ 관심';bmBtn.style.color='var(--accent)';}
+      else{bmBtn.textContent='🤍 관심';}
+    });
+  } else {bmBtn.textContent='🤍 관심';}
+  bmBtn.onclick=()=>toggleBookmark(p.id,bmBtn);
+  const btnWrap=document.createElement('div');btnWrap.style.cssText='display:flex;align-items:center;margin-bottom:4px;';
+  btnWrap.appendChild(likeBtn);btnWrap.appendChild(bmBtn);
+  detail.appendChild(btnWrap);
 
   // 댓글
   const cs=document.createElement('div');cs.className='comment-section';
