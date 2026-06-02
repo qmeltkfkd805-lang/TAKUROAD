@@ -451,6 +451,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;">
     <button class="tab-btn active" id="routeTabMake" onclick="switchRouteTab('make')">루트 만들기</button>
     <button class="tab-btn" id="routeTabList" onclick="switchRouteTab('list')">공유된 루트</button>
+    <button class="tab-btn" id="routeTabMine" onclick="switchRouteTab('mine')">내 루트</button>
   </div>
   <!-- 루트 만들기 탭 -->
   <div id="routeMakeTab" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
@@ -2608,9 +2609,48 @@ function closeRoutePanel(){
 function switchRouteTab(tab){
   document.getElementById('routeTabMake').classList.toggle('active',tab==='make');
   document.getElementById('routeTabList').classList.toggle('active',tab==='list');
+  document.getElementById('routeTabMine').classList.toggle('active',tab==='mine');
   document.getElementById('routeMakeTab').style.display=tab==='make'?'flex':'none';
   document.getElementById('routeListTab').style.display=tab==='list'?'flex':'none';
+  document.getElementById('routeMineTab').style.display=tab==='mine'?'flex':'none';
   if(tab==='list')loadSavedRoutes();
+  if(tab==='mine')loadMyRoutes();
+}
+
+async function loadMyRoutes(){
+  if(!currentUser){
+    document.getElementById('myRouteList').innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">로그인 후 확인할 수 있어요</div>';
+    return;
+  }
+  const list=document.getElementById('myRouteList');
+  list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">불러오는 중…</div>';
+  const{data:routes}=await db.from('routes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  list.innerHTML='';
+  if(!routes||!routes.length){list.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">아직 공유한 루트가 없어요</div>';return;}
+  routes.forEach(r=>{
+    const shops=r.shop_ids||[];
+    const card=document.createElement('div');card.className='route-saved-item';
+    const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;';
+    const titleEl=document.createElement('div');titleEl.className='route-saved-title';titleEl.textContent=r.title;
+    const shareBtn=document.createElement('button');
+    shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;';
+    shareBtn.textContent='📢 공유';shareBtn.onclick=()=>openShareRoute(r);
+    const editBtn=document.createElement('button');
+    editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
+    editBtn.textContent='✏️ 수정';editBtn.onclick=()=>openEditRoute(r);
+    const delBtn=document.createElement('button');
+    delBtn.style.cssText='background:var(--red-l);border:1px solid var(--red);border-radius:10px;font-size:11px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 8px;';
+    delBtn.textContent='🗑️ 삭제';delBtn.onclick=()=>deleteRoute(r.id,card);
+    titleRow.appendChild(titleEl);titleRow.appendChild(shareBtn);titleRow.appendChild(editBtn);titleRow.appendChild(delBtn);
+    const metaEl=document.createElement('div');metaEl.className='route-saved-meta';metaEl.textContent=shops.length+'개 샵'+(r.description?' · '+r.description:'');
+    const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
+    shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
+    const viewBtn=document.createElement('button');
+    viewBtn.style.cssText='width:100%;margin-top:8px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
+    card.appendChild(titleRow);card.appendChild(metaEl);card.appendChild(tagsDiv);card.appendChild(viewBtn);
+    list.appendChild(card);
+  });
 }
 
 function addToRoute(shopId){
@@ -2735,21 +2775,25 @@ async function loadSavedRoutes(){
     viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
     // 하단 버튼 행
-    // 하트 옆에 버튼들 추가
+    // 제목 옆에 버튼들 추가
+    const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap;';
+    const titleEl2=infoDiv.querySelector('.route-saved-title');
+    infoDiv.removeChild(titleEl2);
+    titleRow.appendChild(titleEl2);
     const shareBtn=document.createElement('button');
-    shareBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;padding:2px 6px;';
+    shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;white-space:nowrap;';
     shareBtn.textContent='📢 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
-    topRow.querySelector('div:last-child').before(shareBtn);
+    titleRow.appendChild(shareBtn);
     if(currentUser&&r.user_id===currentUser.id){
       const editBtn=document.createElement('button');
-      editBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 4px;';
-      editBtn.textContent='✏️';editBtn.onclick=(e)=>{e.stopPropagation();openEditRoute(r);};
+      editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
+      editBtn.textContent='✏️ 수정';editBtn.onclick=(e)=>{e.stopPropagation();openEditRoute(r);};
       const delBtn=document.createElement('button');
-      delBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 4px;';
-      delBtn.textContent='🗑️';delBtn.onclick=(e)=>{e.stopPropagation();deleteRoute(r.id,card);};
-      topRow.querySelector('div:last-child').before(editBtn);
-      topRow.querySelector('div:last-child').before(delBtn);
+      delBtn.style.cssText='background:var(--red-l);border:1px solid var(--red);border-radius:10px;font-size:11px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 8px;';
+      delBtn.textContent='🗑️ 삭제';delBtn.onclick=(e)=>{e.stopPropagation();deleteRoute(r.id,card);};
+      titleRow.appendChild(editBtn);titleRow.appendChild(delBtn);
     }
+    infoDiv.insertBefore(titleRow,infoDiv.firstChild);
     const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
     btnRow.appendChild(viewBtn);
     card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(btnRow);
