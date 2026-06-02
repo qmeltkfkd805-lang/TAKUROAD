@@ -672,6 +672,12 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="form-group" id="priceGroup" style="display:none;"><label>가격 (원)</label><input type="number" id="bwPrice" placeholder="예) 5000"/></div>
     <div class="form-group"><label>내용 *</label><textarea id="bwContent" rows="6" placeholder="자유롭게 작성해주세요 :)"></textarea></div>
     <div class="form-group" id="linkGroup" style="display:none;"><label>링크 첨부</label><input type="url" id="bwLink" placeholder="https://..."/></div>
+    <div class="form-group" id="bwRouteGroup">
+      <label>성지순례 루트 첨부 <span style="font-size:11px;color:var(--muted);font-weight:400;">선택</span></label>
+      <select id="bwRouteSelect" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;">
+        <option value="">루트 선택 안함</option>
+      </select>
+    </div>
     <div class="form-group">
       <label>이미지 첨부 (최대 5장)</label>
       <div id="bwImgPreview" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
@@ -679,6 +685,36 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <input type="file" id="bwImgInput" accept="image/*" multiple style="display:none" onchange="handleBwImg(event)"/>
     </div>
     <button class="btn-submit" onclick="submitBoardPost()">게시하기</button>
+  </div>
+</div>
+
+<!-- 루트 수정 -->
+<div class="overlay center" id="editRouteOverlay" onclick="handleOverlay(event,'editRouteOverlay')">
+  <div class="panel-base panel-center" style="max-width:400px;">
+    <h2>루트 수정 <button class="icon-close" onclick="closeOverlay('editRouteOverlay')">✕</button></h2>
+    <div class="form-group"><label>루트 이름 *</label><input type="text" id="editRouteTitle"/></div>
+    <div class="form-group"><label>소개</label><textarea id="editRouteDesc" rows="2"></textarea></div>
+    <button class="btn-submit" onclick="submitEditRoute()">수정 완료</button>
+  </div>
+</div>
+
+<!-- 루트 게시판 공유 -->
+<div class="overlay center" id="shareRouteOverlay" onclick="handleOverlay(event,'shareRouteOverlay')">
+  <div class="panel-base panel-center" style="max-width:420px;">
+    <h2>게시판에 공유하기 <button class="icon-close" onclick="closeOverlay('shareRouteOverlay')">✕</button></h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">루트를 게시글로 공유할 게시판과 세부게시판을 선택해주세요.</p>
+    <div class="form-group"><label>게시판 선택</label>
+      <select id="shareRouteBoardSel" onchange="loadShareSubBoards(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;">
+        <option value="">게시판 선택</option>
+      </select>
+    </div>
+    <div class="form-group"><label>세부게시판 선택</label>
+      <select id="shareRouteSubSel" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;">
+        <option value="">세부게시판 선택</option>
+      </select>
+    </div>
+    <div class="form-group"><label>추가 내용</label><textarea id="shareRouteContent" rows="3" placeholder="루트에 대한 추가 설명을 작성해주세요"></textarea></div>
+    <button class="btn-submit" onclick="submitShareRoute()">게시판에 올리기</button>
   </div>
 </div>
 
@@ -2014,6 +2050,25 @@ function openPostDetail(p){
     detail.appendChild(imgs);
   }
 
+  // 루트 데이터 있으면 표시
+  if(p.route_data&&p.route_data.length){
+    const routeBox=document.createElement('div');
+    routeBox.style.cssText='background:var(--purple-l);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;';
+    const rtitle=document.createElement('div');rtitle.style.cssText='font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;';rtitle.textContent='📍 성지순례 루트';
+    const rlist=document.createElement('div');
+    p.route_data.forEach((s,i)=>{
+      const row=document.createElement('div');row.style.cssText='font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:6px;';
+      const num=document.createElement('span');num.style.cssText='width:20px;height:20px;border-radius:50%;background:'+ROUTE_COLORS[i%ROUTE_COLORS.length]+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;';num.textContent=i+1;
+      const name=document.createElement('span');name.textContent=s.name;
+      row.appendChild(num);row.appendChild(name);rlist.appendChild(row);
+    });
+    const viewRouteBtn=document.createElement('button');
+    viewRouteBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    viewRouteBtn.textContent='🗺️ 지도에서 루트 보기';
+    viewRouteBtn.onclick=()=>viewRoute(p.route_data);
+    routeBox.appendChild(rtitle);routeBox.appendChild(rlist);routeBox.appendChild(viewRouteBtn);
+    detail.appendChild(routeBox);
+  }
   const likeBtn=document.createElement('button');
   likeBtn.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent-l)':'none')+';color:'+(liked?'var(--accent)':'var(--muted)')+';font-family:inherit;font-size:14px;font-weight:700;cursor:'+(liked?'default':'pointer')+';margin-bottom:4px;';
   likeBtn.textContent='❤️ '+(p.likes||0);
@@ -2284,6 +2339,14 @@ async function openBoardWrite(){
     row.appendChild(btn);
   });
 
+  // 내 루트 목록 로드
+  if(currentUser){
+    db.from('routes').select('id,title,shop_ids').eq('user_id',currentUser.id).order('created_at',{ascending:false}).then(({data:myRoutes})=>{
+      const sel=document.getElementById('bwRouteSelect');
+      sel.innerHTML='<option value="">루트 선택 안함</option>';
+      (myRoutes||[]).forEach(r=>{const opt=document.createElement('option');opt.value=r.id;opt.dataset.shops=JSON.stringify(r.shop_ids);opt.textContent=r.title;sel.appendChild(opt);});
+    });
+  }
   document.getElementById('bwOverlay').classList.add('open');
 }
 
@@ -2327,7 +2390,9 @@ async function submitBoardPost(){
   const priceVal=document.getElementById('bwPrice').value;
   const price=priceVal?parseInt(priceVal):null;
   const link=document.getElementById('bwLink').value.trim()||null;
-  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null,price,link});
+  const routeSel=document.getElementById('bwRouteSelect');
+  const routeData=routeSel&&routeSel.value?JSON.parse(routeSel.selectedOptions[0].dataset.shops||'null'):null;
+  const{error}=await db.from('posts').insert({type:'일반',nick,title,content,likes:0,user_id:currentUser.id,board_id:currentBoard.id,sub_board_id:selectedSub.id,images:imageUrls.length?imageUrls:null,price,link,route_data:routeData});
   if(error){window._submitting=false;alert('등록 실패: '+error.message);return;}
   await db.from('boards').update({post_count:(currentBoard.post_count||0)+1}).eq('id',currentBoard.id);
   currentBoard.post_count=(currentBoard.post_count||0)+1;
@@ -2669,7 +2734,25 @@ async function loadSavedRoutes(){
     const viewBtn=document.createElement('button');
     viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
-    card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(viewBtn);
+    // 하단 버튼 행
+    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
+    btnRow.appendChild(viewBtn);
+    // 게시판 공유 버튼
+    const shareBtn=document.createElement('button');
+    shareBtn.style.cssText='flex:1;background:var(--cyan-l);color:var(--cyan);border:1.5px solid var(--cyan);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
+    btnRow.appendChild(shareBtn);
+    // 본인 루트만 수정/삭제
+    if(currentUser&&r.user_id===currentUser.id){
+      const editBtn=document.createElement('button');
+      editBtn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--text);';
+      editBtn.textContent='✏️';editBtn.onclick=()=>openEditRoute(r);
+      const delBtn=document.createElement('button');
+      delBtn.style.cssText='background:var(--red-l);border:1.5px solid var(--red);border-radius:var(--r-sm);padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--red);';
+      delBtn.textContent='🗑️';delBtn.onclick=()=>deleteRoute(r.id,card);
+      btnRow.appendChild(editBtn);btnRow.appendChild(delBtn);
+    }
+    card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(btnRow);
     list.appendChild(card);
   });
 }
@@ -2681,6 +2764,73 @@ async function likeRoute(routeId,btn){
   const{data}=await db.from('routes').select('likes').eq('id',routeId).single();if(!data)return;
   const n=(data.likes||0)+1;await db.from('routes').update({likes:n}).eq('id',routeId);
   btn.textContent='❤️ '+n;btn.style.color='var(--accent)';btn.disabled=true;
+}
+
+function openEditRoute(r){
+  window._editingRoute=r;
+  document.getElementById('editRouteTitle').value=r.title;
+  document.getElementById('editRouteDesc').value=r.description||'';
+  document.getElementById('editRouteOverlay').classList.add('open');
+}
+async function submitEditRoute(){
+  const r=window._editingRoute;if(!r)return;
+  const title=document.getElementById('editRouteTitle').value.trim();
+  if(!title){alert('루트 이름을 입력해주세요');return;}
+  const description=document.getElementById('editRouteDesc').value.trim();
+  await db.from('routes').update({title,description}).eq('id',r.id).eq('user_id',currentUser.id);
+  closeOverlay('editRouteOverlay');
+  loadSavedRoutes();
+}
+async function deleteRoute(routeId,card){
+  if(!confirm('루트를 삭제할까요?'))return;
+  await db.from('routes').delete().eq('id',routeId).eq('user_id',currentUser.id);
+  card.remove();
+}
+
+async function openShareRoute(r){
+  window._sharingRoute=r;
+  document.getElementById('shareRouteContent').value='';
+  // 게시판 목록 로드
+  const{data:boards}=await db.from('boards').select('*').order('created_at',{ascending:true});
+  const sel=document.getElementById('shareRouteBoardSel');
+  sel.innerHTML='<option value="">게시판 선택</option>';
+  (boards||[]).forEach(b=>{const opt=document.createElement('option');opt.value=b.id;opt.textContent=b.name;sel.appendChild(opt);});
+  document.getElementById('shareRouteSubSel').innerHTML='<option value="">세부게시판 선택</option>';
+  document.getElementById('shareRouteOverlay').classList.add('open');
+}
+async function loadShareSubBoards(boardId){
+  if(!boardId)return;
+  const{data:subs}=await db.from('sub_boards').select('*').eq('board_id',boardId).order('order_num',{ascending:true});
+  const sel=document.getElementById('shareRouteSubSel');
+  sel.innerHTML='<option value="">세부게시판 선택</option>';
+  (subs||[]).forEach(s=>{const opt=document.createElement('option');opt.value=s.id;opt.dataset.name=s.name;opt.textContent=s.name;sel.appendChild(opt);});
+}
+async function submitShareRoute(){
+  if(!currentUser||!window._sharingRoute)return;
+  const boardId=document.getElementById('shareRouteBoardSel').value;
+  const subSel=document.getElementById('shareRouteSubSel');
+  const subId=subSel.value;
+  if(!boardId){alert('게시판을 선택해주세요');return;}
+  if(!subId){alert('세부게시판을 선택해주세요');return;}
+  const r=window._sharingRoute;
+  const addContent=document.getElementById('shareRouteContent').value.trim();
+  const shops=r.shop_ids||[];
+  const routeText=shops.map((s,i)=>(i+1)+'. '+s.name+' ('+s.addr+')').join('
+');
+  const content=(addContent?addContent+'
+
+':'')+'📍 성지순례 루트: '+r.title+'
+'+routeText;
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{error}=await db.from('posts').insert({
+    type:'일반',nick,title:'[루트] '+r.title,content,likes:0,
+    user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
+    route_data:r.shop_ids
+  });
+  if(error){alert('공유 실패: '+error.message);return;}
+  closeOverlay('shareRouteOverlay');
+  alert('게시판에 공유됐어요! 🎉');
 }
 
 function viewRoute(shops){
