@@ -1949,6 +1949,8 @@ function renderBoardGrid(boards){
       cardTop.appendChild(cardInfo);cardTop.appendChild(favBtn);
       card.appendChild(cardTop);
       card.onclick=()=>selectBoard(b);
+      row.appendChild(card);
+    });
     section.appendChild(row);
     grid.appendChild(section);
   });
