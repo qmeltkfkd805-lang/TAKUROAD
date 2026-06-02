@@ -2735,23 +2735,23 @@ async function loadSavedRoutes(){
     viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
     // 하단 버튼 행
-    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
-    btnRow.appendChild(viewBtn);
-    // 게시판 공유 버튼
+    // 하트 옆에 버튼들 추가
     const shareBtn=document.createElement('button');
-    shareBtn.style.cssText='flex:1;background:var(--cyan-l);color:var(--cyan);border:1.5px solid var(--cyan);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
-    shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
-    btnRow.appendChild(shareBtn);
-    // 본인 루트만 수정/삭제
+    shareBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;white-space:nowrap;padding:2px 6px;';
+    shareBtn.textContent='📢 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
+    topRow.querySelector('div:last-child').before(shareBtn);
     if(currentUser&&r.user_id===currentUser.id){
       const editBtn=document.createElement('button');
-      editBtn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--text);';
-      editBtn.textContent='✏️';editBtn.onclick=()=>openEditRoute(r);
+      editBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 4px;';
+      editBtn.textContent='✏️';editBtn.onclick=(e)=>{e.stopPropagation();openEditRoute(r);};
       const delBtn=document.createElement('button');
-      delBtn.style.cssText='background:var(--red-l);border:1.5px solid var(--red);border-radius:var(--r-sm);padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--red);';
-      delBtn.textContent='🗑️';delBtn.onclick=()=>deleteRoute(r.id,card);
-      btnRow.appendChild(editBtn);btnRow.appendChild(delBtn);
+      delBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 4px;';
+      delBtn.textContent='🗑️';delBtn.onclick=(e)=>{e.stopPropagation();deleteRoute(r.id,card);};
+      topRow.querySelector('div:last-child').before(editBtn);
+      topRow.querySelector('div:last-child').before(delBtn);
     }
+    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
+    btnRow.appendChild(viewBtn);
     card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(btnRow);
     list.appendChild(card);
   });
