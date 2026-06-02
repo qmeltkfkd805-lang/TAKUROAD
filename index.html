@@ -1431,6 +1431,7 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
+  if(isMap&&map){setTimeout(()=>{map.relayout();},100);}
   const searchInput=document.getElementById('searchInput');
   if(isMap){
     localStorage.setItem('tr_state',JSON.stringify({tab:'map'}));
