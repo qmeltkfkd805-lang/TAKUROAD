@@ -2500,6 +2500,7 @@ function makeSlider(images, containerId){
 let currentRoute=[];
 let routePolyline=null;
 let routeMarkers=[];
+const ROUTE_COLORS=['#e8006f','#ff6600','#ffcc00','#00aa44','#0066cc','#4400aa','#8800cc'];
 
 function openRoutePanel(){
   document.getElementById('routePanel').classList.add('open');
@@ -2577,8 +2578,9 @@ function renderRouteShopList(){
   list.innerHTML='';
   currentRoute.forEach((p,i)=>{
     const div=document.createElement('div');div.className='route-shop-item';
-    const color=CAT_COLOR[p.cat]||'#e8006f';
-    div.innerHTML='<div class="route-shop-num" style="background:'+color+';">'+(i+1)+'</div>'
+    const ROUTE_COLORS3=['#e8006f','#ff6600','#f5c400','#16a34a','#0099cc','#1e3a8a','#7c3aed'];
+    const numColor=ROUTE_COLORS3[i%ROUTE_COLORS3.length];
+    div.innerHTML='<div class="route-shop-num" style="background:'+numColor+';">'+(i+1)+'</div>'
       +'<div class="route-shop-info"><div class="route-shop-name">'+p.name+'</div><div class="route-shop-addr">'+p.addr+'</div></div>'
       +'<button class="route-shop-del" onclick="removeFromRoute('+i+')">✕</button>';
     list.appendChild(div);
@@ -2590,10 +2592,11 @@ function previewRoute(){
   clearRoutePreview();
   closeRoutePanel();
   // 번호 마커
+  const ROUTE_COLORS=['#e8006f','#ff6600','#f5c400','#16a34a','#0099cc','#1e3a8a','#7c3aed'];
   currentRoute.forEach((p,i)=>{
     const el=document.createElement('div');
     el.className='route-num-marker';
-    el.style.background=CAT_COLOR[p.cat]||'#e8006f';
+    el.style.background=ROUTE_COLORS[i%ROUTE_COLORS.length];
     el.textContent=i+1;
     const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(p.lat,p.lng),content:el,yAnchor:1.5});
     overlay.setMap(map);
@@ -2682,9 +2685,10 @@ async function likeRoute(routeId,btn){
 function viewRoute(shops){
   clearRoutePreview();
   closeRoutePanel();
+  const ROUTE_COLORS2=['#e8006f','#ff6600','#f5c400','#16a34a','#0099cc','#1e3a8a','#7c3aed'];
   shops.forEach((s,i)=>{
     const el=document.createElement('div');el.className='route-num-marker';
-    el.style.background=CAT_COLOR[s.cat]||'#e8006f';el.textContent=i+1;
+    el.style.background=ROUTE_COLORS2[i%ROUTE_COLORS2.length];el.textContent=i+1;
     const overlay=new kakao.maps.CustomOverlay({position:new kakao.maps.LatLng(s.lat,s.lng),content:el,yAnchor:1.5});
     overlay.setMap(map);routeMarkers.push(overlay);
   });
