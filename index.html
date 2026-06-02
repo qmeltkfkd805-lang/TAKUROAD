@@ -1926,6 +1926,23 @@ function renderBoardGrid(boards){
   // 즐겨찾기 게시판 상단 정렬
   const favIds=window._favBoards||new Set();
   boards=boards.slice().sort((a,b)=>{const fa=favIds.has(a.id),fb=favIds.has(b.id);return fb-fa;});
+  // 즐겨찾기 섹션 맨 위에 표시
+  const favBoards=boards.filter(b=>favIds.has(b.id));
+  if(favBoards.length){
+    const favSection=document.createElement('div');
+    favSection.style.cssText='grid-column:1/-1;margin-bottom:12px;';
+    const favTitle=document.createElement('div');
+    favTitle.className='board-category-title';
+    favTitle.innerHTML='<span>⭐ 즐겨찾기</span><span style="font-size:11px;font-weight:400">('+favBoards.length+'개)</span>';
+    const favRow=document.createElement('div');
+    favRow.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;';
+    favBoards.forEach(b=>favRow.appendChild(makeBoardCard(b)));
+    const divider=document.createElement('div');
+    divider.style.cssText='border-bottom:2px solid var(--border);margin:8px 0 16px;';
+    favSection.appendChild(favTitle);favSection.appendChild(favRow);favSection.appendChild(divider);
+    grid.appendChild(favSection);
+  }
+
 
   // 카테고리별 그룹핑
   const groups={};
