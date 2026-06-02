@@ -2436,8 +2436,8 @@ function openPostDetail(p){
   body.style.cssText='font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px;';
   body.innerHTML=p.content;detail.appendChild(body);
 
-  if(p.images&&p.images.length){
-    const imgs=document.createElement('div');imgs.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
+  // content에 이미지 없을 때만 별도 표시
+  if(p.images&&p.images.length&&!body.querySelector('img')){
     p.images.forEach((src,i)=>{const img=document.createElement('img');img.className='post-img';img.src=src;img.onclick=()=>openImgFull(src,p.images,i);imgs.appendChild(img);});
     detail.appendChild(imgs);
   }
@@ -3377,6 +3377,53 @@ function viewRoute(shops){
 // ── 풀 에디터 ──
 let _editorSavedRange=null;
 
+async function openEditorForEdit(p){
+  if(!currentUser)return;
+  window._editingPostId=p.id;
+  // 게시판 목록 로드
+  const{data:boards}=await db.from('boards').select('*').order('created_at',{ascending:true});
+  const sel=document.getElementById('editorBoard');
+  sel.innerHTML='<option value="">게시판 선택</option>';
+  (boards||[]).forEach(b=>{const opt=document.createElement('option');opt.value=b.id;opt.dataset.name=b.name;opt.textContent=b.name;sel.appendChild(opt);});
+  sel.value=p.board_id;
+  await loadEditorSubBoards(p.board_id);
+  if(p.sub_board_id)document.getElementById('editorSubBoard').value=p.sub_board_id;
+  updateEditorMeta();
+  document.getElementById('editorTitle').value=p.title;
+  document.getElementById('editorContent').innerHTML=p.content||'';
+  document.getElementById('editorPrice').value=p.price||'';
+  document.getElementById('editorLinkInput').value=p.link||'';
+  document.getElementById('editorOverlay').classList.add('open');
+  // 발행 버튼을 수정 완료로 변경
+  const btn=document.querySelector('.editor-publish-btn');
+  btn.textContent='수정 완료';btn.onclick=updatePost;
+}
+
+async function updatePost(){
+  const p_id=window._editingPostId;if(!p_id)return;
+  const title=document.getElementById('editorTitle').value.trim();
+  const content=document.getElementById('editorContent').innerHTML.trim();
+  if(!title){alert('제목을 입력해주세요');return;}
+  if(!content||content==='<br>'){alert('내용을 입력해주세요');return;}
+  const priceVal=document.getElementById('editorPrice').value;
+  const price=priceVal?parseInt(priceVal):null;
+  const link=document.getElementById('editorLinkInput').value.trim()||null;
+  const imgs=[...document.getElementById('editorContent').querySelectorAll('img')].map(i=>i.src);
+  const{error}=await db.from('posts').update({
+    title,content,price,link,
+    images:imgs.length?imgs:null,
+    updated_at:new Date().toISOString()
+  }).eq('id',p_id).eq('user_id',currentUser.id);
+  if(error){alert('수정 실패: '+error.message);return;}
+  window._editingPostId=null;
+  closeEditor();
+  // 버튼 원래대로
+  const btn=document.querySelector('.editor-publish-btn');
+  btn.textContent='게시하기';btn.onclick=publishPost;
+  loadBoardPosts();
+  alert('수정됐어요! 🎉');
+}
+
 function openEditor(){
   if(!currentUser){alert('로그인 후 글을 쓸 수 있어요!');return;}
   // 게시판 목록 로드
@@ -3393,6 +3440,9 @@ function openEditor(){
   document.getElementById('editorLinkInput').value='';
   document.getElementById('editorPriceGroup').style.display='none';
   document.getElementById('editorLinkGroup').style.display='none';
+  window._editingPostId=null;
+  const btn=document.querySelector('.editor-publish-btn');
+  btn.textContent='게시하기';btn.onclick=publishPost;
   document.getElementById('editorOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('editorTitle').focus(),300);
 }
