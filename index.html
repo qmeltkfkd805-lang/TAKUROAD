@@ -2964,7 +2964,13 @@ async function submitShareRoute(){
 }
 
 function viewRoute(shops){
+function viewRoute(shops){
   clearRoutePreview();
+  closeRoutePanel();
+  // 지도 탭으로 전환
+  if(!document.getElementById('tabMap').classList.contains('active')){
+    switchTab('map');
+  }
   closeRoutePanel();
   const ROUTE_COLORS2=['#e8006f','#ff6600','#f5c400','#16a34a','#0099cc','#1e3a8a','#7c3aed'];
   shops.forEach((s,i)=>{
