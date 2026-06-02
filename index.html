@@ -2421,7 +2421,7 @@ function openPostDetail(p){
     editBtn.textContent='수정';
     editBtn.onmouseover=()=>{editBtn.style.color='var(--accent)';};
     editBtn.onmouseout=()=>{editBtn.style.color='var(--muted)';};
-    editBtn.onclick=()=>openEditPost(p);
+    editBtn.onclick=()=>openEditorForEdit(p);
     meta.appendChild(editBtn);
     delBtn.style.cssText='background:none;border:none;font-size:12px;color:var(--muted);cursor:pointer;font-family:inherit;';
     delBtn.textContent='삭제';
