@@ -2566,6 +2566,7 @@ function addSavedToRoute(){
 function removeFromRoute(idx){
   currentRoute.splice(idx,1);
   renderRouteShopList();
+  renderSavedShopsForRoute();
   clearRoutePreview();
 }
 
