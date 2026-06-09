@@ -311,7 +311,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .board-category-title span{color:var(--text);}
     .board-grid-card .board-grid-cnt{font-size:11px;color:var(--muted);margin-top:2px;}
 .comm-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.comm-board-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2);}
+.comm-board-head{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg2);flex-wrap:nowrap;overflow:hidden;}
 .comm-board-name{font-size:15px;font-weight:900;}
 .comm-board-meta{font-size:11px;color:var(--muted);margin-top:2px;}
 .comm-board-meta span{color:var(--accent);font-weight:700;}
@@ -2525,7 +2525,7 @@ async function selectBoard(board){
   head.style.cssText='border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0;background:var(--bg2);';
   const headInfo=document.createElement('div');headInfo.style.cssText='display:flex;align-items:center;gap:8px;';
   const headText=document.createElement('div');
-  headText.innerHTML='<div class="comm-board-name">'+board.name+'</div><div class="comm-board-meta">매니저: <span>'+(board.manager_nickname||'알수없음')+'</span></div>';
+  headText.innerHTML='<div class="comm-board-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">'+board.name+'</div><div class="comm-board-meta" style="white-space:nowrap;">'+(board.manager_nickname||'알수없음')+'</div>';
   const headFavBtn=document.createElement('button');
   headFavBtn.className='fav-btn';headFavBtn.style.cssText='font-size:20px;margin-top:2px;';
   headFavBtn.textContent=window._favBoards&&window._favBoards.has(board.id)?'⭐':'☆';
@@ -2533,14 +2533,14 @@ async function selectBoard(board){
   headFavBtn.onclick=()=>toggleFavBoard(board.id,headFavBtn);
   headInfo.appendChild(headText);headInfo.appendChild(headFavBtn);
   const headBtns=document.createElement('div');
-  headBtns.style.cssText='display:flex;gap:8px;align-items:center;';
+  headBtns.style.cssText='display:flex;gap:4px;align-items:center;flex-shrink:0;';
   if(isMgr){
-    const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent='👑 매니저 양도';tBtn.onclick=openTransfer;headBtns.appendChild(tBtn);
+    const tBtn=document.createElement('button');tBtn.className='transfer-btn';tBtn.textContent=window.innerWidth<=600?'👑 양도':'👑 매니저 양도';tBtn.onclick=openTransfer;headBtns.appendChild(tBtn);
     const dBtn=document.createElement('button');
     dBtn.style.cssText='background:var(--red-l);color:var(--red);border:1px solid var(--red);border-radius:14px;padding:5px 12px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;';
-    dBtn.textContent='🗑️ 게시판 삭제';dBtn.onclick=openDeleteBoard;headBtns.appendChild(dBtn);
+    dBtn.textContent=window.innerWidth<=600?'🗑️ 삭제':'🗑️ 게시판 삭제';dBtn.onclick=openDeleteBoard;headBtns.appendChild(dBtn);
   }
-  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent='✏️ 글쓰기';wBtn.onclick=openEditor;headBtns.appendChild(wBtn);
+  const wBtn=document.createElement('button');wBtn.className='btn-write-post';wBtn.textContent=window.innerWidth<=600?'✏️':'✏️ 글쓰기';wBtn.onclick=openEditor;headBtns.appendChild(wBtn);
   head.appendChild(headInfo);head.appendChild(headBtns);
   // 브라우저 히스토리에 추가
   localStorage.setItem('tr_state',JSON.stringify({tab:'comm',boardId:board.id,boardName:board.name}));
