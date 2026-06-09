@@ -432,6 +432,57 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .chat-btn{background:var(--cyan-l);color:var(--cyan);border:1.5px solid var(--cyan);border-radius:16px;padding:6px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:12px;display:inline-block;}
     .chat-fab{position:fixed;bottom:80px;right:16px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--sh-lg);z-index:400;align-items:center;justify-content:center;}
     .chat-badge{position:absolute;top:-4px;right:-4px;background:#ff3b30;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+    /* ── 유저 팝업 & 신고 ── */
+    .user-popup{position:fixed;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-lg);z-index:1200;padding:8px;min-width:160px;display:none;}
+    .user-popup.open{display:block;}
+    .user-popup-header{display:flex;align-items:center;gap:10px;padding:8px 10px 12px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+    .user-popup-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+    .user-popup-avatar img{width:100%;height:100%;object-fit:cover;}
+    .user-popup-nick{font-size:13px;font-weight:700;}
+    .user-popup-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);border:none;background:none;font-family:inherit;width:100%;text-align:left;}
+    .user-popup-btn:hover{background:var(--surface2);}
+    .user-popup-btn.danger{color:var(--red);}
+    .comment-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;overflow:hidden;cursor:pointer;}
+    .comment-avatar img{width:100%;height:100%;object-fit:cover;}
+    .report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1300;display:none;align-items:center;justify-content:center;}
+    .report-overlay.open{display:flex;}
+    .report-box{background:var(--surface);border-radius:var(--r);padding:20px;width:320px;max-width:90vw;}
+    .report-box h3{font-size:15px;font-weight:900;margin-bottom:14px;}
+    .report-reason{width:100%;padding:10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;resize:none;margin-bottom:12px;}
+    .report-btns{display:flex;gap:8px;}
+    .report-submit{flex:1;background:var(--red);color:#fff;border:none;border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;}
+    .report-cancel{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--text);}
+    /* ── 채팅 ── */
+    .chat-overlay{position:fixed;inset:0;background:var(--bg);z-index:1100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+    .chat-overlay.open{transform:translateX(0);}
+    .chat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+    .chat-back{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+    .chat-title{font-size:15px;font-weight:900;flex:1;}
+    .chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
+    .chat-msg{max-width:70%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;}
+    .chat-msg.mine{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+    .chat-msg.theirs{background:var(--surface2);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+    .chat-msg-wrap{display:flex;flex-direction:column;}
+    .chat-msg-wrap.mine{align-items:flex-end;}
+    .chat-msg-wrap.theirs{align-items:flex-start;}
+    .chat-msg-time{font-size:10px;color:var(--muted);margin-top:3px;padding:0 4px;}
+    .chat-input-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+    .chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:14px;font-family:inherit;background:var(--surface2);color:var(--text);outline:none;resize:none;max-height:100px;}
+    .chat-input:focus{border-color:var(--accent);}
+    .chat-send-btn{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:10px 16px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;}
+    .chat-list-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;}
+    .chat-list-item:hover{background:var(--surface2);}
+    .chat-list-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;}
+    .chat-list-avatar img{width:100%;height:100%;object-fit:cover;}
+    .chat-list-info{flex:1;min-width:0;}
+    .chat-list-name{font-size:13px;font-weight:700;}
+    .chat-list-last{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .chat-list-time{font-size:11px;color:var(--muted);white-space:nowrap;}
+    .chat-unread{background:var(--accent);color:#fff;border-radius:50%;min-width:18px;height:18px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+    .chat-post-ref{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted);margin:8px 16px 0;flex-shrink:0;}
+    .chat-btn{background:var(--cyan-l);color:var(--cyan);border:1.5px solid var(--cyan);border-radius:16px;padding:6px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:12px;display:inline-block;}
+    .chat-fab{position:fixed;bottom:80px;right:16px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--sh-lg);z-index:400;align-items:center;justify-content:center;}
+    .chat-badge{position:absolute;top:-4px;right:-4px;background:#ff3b30;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;}
 </style>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
 </head>
@@ -937,6 +988,29 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <button class="chat-fab" id="chatFab" onclick="openChatList()" style="position:fixed;bottom:80px;right:16px;">
   💬<span class="chat-badge" id="chatBadge" style="display:none;">0</span>
 </button>
+
+
+<!-- 유저 팝업 -->
+<div class="user-popup" id="userPopup">
+  <div class="user-popup-header">
+    <div class="user-popup-avatar" id="popupAvatar">👤</div>
+    <div class="user-popup-nick" id="popupNick"></div>
+  </div>
+  <button class="user-popup-btn" id="popupChatBtn" onclick="popupChat()">💬 1:1 채팅하기</button>
+  <button class="user-popup-btn danger" onclick="popupReport()">🚨 신고하기</button>
+</div>
+
+<!-- 신고 모달 -->
+<div class="report-overlay" id="reportOverlay">
+  <div class="report-box">
+    <h3>🚨 신고하기</h3>
+    <textarea class="report-reason" id="reportReason" rows="4" placeholder="신고 사유를 입력해주세요"></textarea>
+    <div class="report-btns">
+      <button class="report-cancel" onclick="closeReport()">취소</button>
+      <button class="report-submit" onclick="submitReport()">신고</button>
+    </div>
+  </div>
+</div>
 
 <!-- 게시판 삭제 -->
 <div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
@@ -3685,6 +3759,63 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.color-picker-wrap'))document.getElementById('colorSwatches')?.classList.remove('open');
 });
 
+
+
+// ── 유저 팝업 ──
+let _popupTargetUserId=null;
+let _popupTargetType=null;
+let _popupTargetId=null;
+
+async function showUserPopup(e,userId,nick,avatarUrl){
+  e.stopPropagation();
+  if(!currentUser||userId===currentUser.id)return;
+  _popupTargetUserId=userId;
+  const popup=document.getElementById('userPopup');
+  // 아바타
+  const avatarEl=document.getElementById('popupAvatar');
+  if(avatarUrl){avatarEl.innerHTML='<img src="'+avatarUrl+'"/>';}
+  else{avatarEl.innerHTML='👤';}
+  document.getElementById('popupNick').textContent=nick;
+  // 위치 조정
+  const x=Math.min(e.clientX,window.innerWidth-180);
+  const y=Math.min(e.clientY,window.innerHeight-150);
+  popup.style.left=x+'px';popup.style.top=y+'px';
+  popup.classList.add('open');
+}
+
+function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');}
+
+function popupChat(){
+  closeUserPopup();
+  if(_popupTargetUserId)openChatWithUser(_popupTargetUserId,null,'');
+}
+
+function popupReport(){
+  closeUserPopup();
+  document.getElementById('reportReason').value='';
+  document.getElementById('reportOverlay').classList.add('open');
+}
+
+function closeReport(){document.getElementById('reportOverlay').classList.remove('open');}
+
+async function submitReport(){
+  if(!currentUser)return;
+  const reason=document.getElementById('reportReason').value.trim();
+  if(!reason){alert('신고 사유를 입력해주세요');return;}
+  await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_popupTargetUserId,reason});
+  closeReport();
+  alert('신고가 접수됐어요. 검토 후 조치할게요.');
+}
+
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#userPopup'))closeUserPopup();
+});
+
+// 프로필 아바타 HTML 생성 헬퍼
+async function getUserAvatar(userId){
+  const{data}=await db.from('profiles').select('avatar_url').eq('id',userId).single();
+  return data?.avatar_url||null;
+}
 
 // ── 1:1 채팅 ──
 let _currentChatId=null;
