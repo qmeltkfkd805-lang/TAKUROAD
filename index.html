@@ -1090,6 +1090,15 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+<!-- 모바일 글 전체화면 -->
+<div class="mobile-post-view" id="mobilePostView">
+  <div class="mobile-post-header">
+    <button class="mobile-post-back" onclick="closeMobilePostView()">←</button>
+    <div class="mobile-post-title-head" id="mobilePostTitleHead"></div>
+  </div>
+  <div class="mobile-post-body" id="mobilePostBody"></div>
+</div>
+
 <!-- 게시판 삭제 -->
 <div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
@@ -2785,8 +2794,15 @@ async function loadBoardPosts(){
 }
 
 // 하단 바 닫기
+function closeMobilePostView(){
+  document.getElementById('mobilePostView').classList.remove('open');
+  document.getElementById('mobilePostBody').innerHTML='';
+  removePostBottomBar();
+}
+
 function goBackToList(){
   removePostBottomBar();
+  closeMobilePostView();
   const pa=document.getElementById('postArea');
   if(pa){pa.innerHTML='<div class="post-table" id="postTable"></div>';pa.style.paddingBottom='';}
   if(currentSub)selectSub(currentSub);
