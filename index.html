@@ -2546,7 +2546,7 @@ function applyMobileLayout(){
   const sidebar=document.getElementById('subSidebar');
   if(!sidebar)return;
   // cat-bar 스타일 그대로
-  sidebar.setAttribute('style','background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;width:100%;box-sizing:border-box;');
+  sidebar.setAttribute('style','background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;width:100%;box-sizing:border-box;-webkit-overflow-scrolling:touch;');
   const title=sidebar.querySelector('.sub-sidebar-title');
   if(title)title.style.display='none';
   sidebar.querySelectorAll('.sub-item').forEach(el=>{
