@@ -604,7 +604,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div id="boardDetailView" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
     <div class="comm-board-head" id="boardDetailHead"></div>
     <div class="comm-layout" style="display:flex;flex:1;overflow:hidden;">
-      <div class="sub-sidebar">
+      <div class="sub-sidebar" id="subSidebar">
         <div class="sub-sidebar-title">세부게시판</div>
         <div id="subBoardList"></div>
       </div>
@@ -2543,24 +2543,20 @@ function filterBoards(q){
 
 function applyMobileLayout(){
   if(window.innerWidth>600)return;
+  // 레이아웃 세로로
   const layout=document.querySelector('.comm-layout');
-  if(layout){layout.style.flexDirection='column';}
-  const sidebar=document.querySelector('.sub-sidebar');
+  if(layout)layout.setAttribute('style','flex-direction:column!important;display:flex;flex:1;overflow:hidden;');
+  // 사이드바 가로 스크롤
+  const sidebar=document.getElementById('subSidebar');
   if(sidebar){
-    sidebar.style.width='100%';
-    sidebar.style.flexDirection='row';
-    sidebar.style.overflowX='auto';
-    sidebar.style.overflowY='hidden';
-    sidebar.style.borderRight='none';
-    sidebar.style.borderBottom='1px solid var(--border)';
-    sidebar.style.padding='8px 10px';
-    sidebar.style.gap='6px';
-    sidebar.style.flexShrink='0';
-    sidebar.style.background='var(--bg2)';
-    sidebar.style.scrollbarWidth='none';
-    // 세부게시판 타이틀 숨기기
+    sidebar.setAttribute('style','width:100%;display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden;border-right:none;border-bottom:1px solid #eee;padding:8px 10px;gap:6px;flex-shrink:0;background:var(--bg2);-webkit-overflow-scrolling:touch;');
     const title=sidebar.querySelector('.sub-sidebar-title');
     if(title)title.style.display='none';
+    // 모든 sub-item에 pill 스타일 강제 적용
+    sidebar.querySelectorAll('.sub-item').forEach(el=>{
+      const isActive=el.classList.contains('active');
+      el.setAttribute('style','white-space:nowrap!important;padding:5px 13px!important;font-size:12px!important;border-radius:20px!important;display:inline-flex!important;align-items:center!important;flex-shrink:0!important;cursor:pointer!important;border:1px solid '+(isActive?'transparent':'#ddd')+'!important;background:'+(isActive?'var(--accent)':'var(--surface)')+'!important;color:'+(isActive?'#fff':'var(--muted)')+'!important;font-weight:700!important;');
+    });
   }
 }
 
@@ -2717,6 +2713,7 @@ function selectSubAll(pushHistory){
   localStorage.setItem('tr_state',JSON.stringify(st));
   const pa=document.getElementById('postArea');
   if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
+  if(window.innerWidth<=600)setTimeout(applyMobileLayout,10);
   if(pushHistory)history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
   loadBoardPosts();
 }
@@ -2760,6 +2757,7 @@ function selectSub(sub){
     pa.innerHTML=notice+'<div id="subDescBox"></div><div class="post-table" id="postTable"></div>';
   }
   renderSubDesc(sub);
+  if(window.innerWidth<=600)setTimeout(applyMobileLayout,10);
   history.pushState({view:'sub',subId:sub.id,subName:sub.name},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:'')+'&sub='+encodeURIComponent(sub.name));
   loadBoardPosts();
 }
