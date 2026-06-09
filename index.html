@@ -2282,7 +2282,11 @@ async function doCommSearch(){
       const row=document.createElement('div');row.className='post-row';
       const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
       const imgTxt=p.images&&p.images.length?' 🖼️'+p.images.length:'';
-      row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div>';
+      row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div><div class="post-row-comment"><span class="post-row-comment-num">0</span><span class="post-row-comment-label">댓글</span></div>';
+      // 댓글수 로드
+      db.from('comments').select('*',{count:'exact',head:true}).eq('post_id',p.id).then(({count})=>{
+        const el=row.querySelector('.post-row-comment-num');if(el)el.textContent=count||0;
+      });
       row.onclick=()=>openPostDetail(p);
       table.appendChild(row);
     });
@@ -2692,17 +2696,36 @@ async function loadBoardPosts(){
       const row=document.createElement('div');row.className='post-row';
       const imgTxt=p.images&&p.images.length?' 🖼️'+p.images.length:'';
       const date=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-      row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div>';
+      row.innerHTML='<div class="post-row-title"><div class="post-row-name">'+p.title+(imgTxt?'<span style="font-size:11px;color:var(--muted);margin-left:4px">'+imgTxt+'</span>':'')+'</div><div class="post-row-sub">'+p.nick+' · '+date+'</div></div><div class="post-row-likes">❤️ '+(p.likes||0)+'</div><div class="post-row-comment"><span class="post-row-comment-num">0</span><span class="post-row-comment-label">댓글</span></div>';
+      // 댓글수 로드
+      db.from('comments').select('*',{count:'exact',head:true}).eq('post_id',p.id).then(({count})=>{
+        const el=row.querySelector('.post-row-comment-num');if(el)el.textContent=count||0;
+      });
       row.onclick=()=>openPostDetail(p);
       table.appendChild(row);
     });
   }
 }
 
+// 하단 바 닫기
+function goBackToList(){
+  removePostBottomBar();
+  const pa=document.getElementById('postArea');
+  if(pa){pa.innerHTML='<div class="post-table" id="postTable"></div>';pa.style.paddingBottom='';}
+  if(currentSub)selectSub(currentSub);
+  else selectSubAll();
+}
+
+function removePostBottomBar(){
+  const bar=document.getElementById('postBottomBar');
+  if(bar)bar.remove();
+}
+
 function openPostDetail(p){
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   postArea.innerHTML='';
+  removePostBottomBar();
   postArea.innerHTML='';
   const isMine=currentUser&&p.user_id===currentUser.id;
   const liked=window._likedPosts&&window._likedPosts.has(p.id);
