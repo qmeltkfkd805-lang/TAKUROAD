@@ -2956,7 +2956,16 @@ function openPostDetail(p){
   likeBtn.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent-l)':'none')+';color:'+(liked?'var(--accent)':'var(--muted)')+';font-family:inherit;font-size:14px;font-weight:700;cursor:'+(liked?'default':'pointer')+';margin-bottom:4px;';
   likeBtn.textContent='❤️ '+(p.likes||0);
   if(!liked)likeBtn.onclick=()=>likePost(p.id,likeBtn);
-  // 관심 버튼
+  // 관심 글 등록 버튼
+  const bmBtn=document.createElement('button');
+  bmBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);';
+  if(currentUser){
+    db.from('post_bookmarks').select('id').eq('user_id',currentUser.id).eq('post_id',p.id).maybeSingle().then(({data})=>{
+      if(data){bmBtn.textContent='🔖 관심 글 등록됨';bmBtn.style.color='var(--accent)';}
+      else{bmBtn.textContent='🔖 관심 글 등록';}
+    });
+  } else {bmBtn.textContent='🔖 관심 글 등록';}
+  bmBtn.onclick=()=>toggleBookmark(p.id,bmBtn);
 
   const btnWrap=document.createElement('div');btnWrap.style.cssText='display:flex;align-items:center;margin-bottom:4px;';
   btnWrap.appendChild(likeBtn);btnWrap.appendChild(bmBtn);
