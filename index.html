@@ -707,6 +707,14 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       </div>
     </div>
     <div class="form-group" id="addrGroup"><label>주소 *</label><input type="text" id="f-addr" placeholder="예) 서울 마포구 홍익로 22"/></div>
+    <div class="form-group">
+      <label>주차 여부 *</label>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="cat-sel-btn" id="parkingYes" onclick="selectParking('yes')" style="flex:1;">🅿️ 주차 가능</button>
+        <button type="button" class="cat-sel-btn" id="parkingNo" onclick="selectParking('no')" style="flex:1;">🚫 주차 불가</button>
+        <button type="button" class="cat-sel-btn" id="parkingUnknown" onclick="selectParking('unknown')" style="flex:1;">❓ 모름</button>
+      </div>
+    </div>
     <div class="form-group" id="shopLinkGroup" style="display:none;"><label>샵 링크 * <span style="font-size:11px;color:var(--muted);font-weight:400;">온라인샵 URL 필수</span></label><input type="url" id="f-shop-link" placeholder="https://..."/></div>
     <div class="form-group"><label>위치 선택</label><div class="map-pick-box" id="mapPickBox" onclick="startPickMode()">📍 지도에서 위치 직접 선택하기</div></div>
     <div class="form-group"><label>한 줄 소개</label><textarea id="f-desc" rows="3" placeholder="어떤 굿즈를 파는지, 특징을 적어주세요"></textarea></div>
@@ -986,10 +994,6 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
-<!-- 채팅 FAB -->
-<button class="chat-fab" id="chatFab" onclick="openChatList()" style="position:fixed;bottom:80px;right:16px;">
-  💬<span class="chat-badge" id="chatBadgeFab" style="display:none;">0</span>
-</button>
 
 
 <!-- 유저 팝업 -->
@@ -1391,6 +1395,7 @@ async function showDetail(p){
       html+='</div>';
       return html==='<div class="popup-info-box"></div>'?'':html;
     })()
+    +(p.parking?'<div style="font-size:12px;margin-bottom:8px;">'+(p.parking==='yes'?'🅿️ 주차 가능':p.parking==='no'?'🚫 주차 불가':'❓ 주차 여부 모름')+'</div>':'')
     +'<div class="detail-tags">'+(p.cats||[p.cat]).map(function(c){return '<span class="tag" style="background:'+CAT_BG[c]+';color:'+CAT_COLOR[c]+'">'+c+'</span>';}).join('')+'</div>'
     +(p.images&&p.images.length?'<div id="shopImgSlider"></div>':'')
     +'<div class="review-section"><h3>💬 리뷰</h3>'
@@ -1452,6 +1457,15 @@ async function showDetail(p){
       }
     }
   }catch(e){const ce=document.getElementById('detailCnt');if(ce)ce.textContent='리뷰를 불러올 수 없어요';}
+}
+
+let _selectedParking=null;
+function selectParking(val){
+  _selectedParking=val;
+  ['parkingYes','parkingNo','parkingUnknown'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn)btn.classList.toggle('active',id==='parking'+val.charAt(0).toUpperCase()+val.slice(1));
+  });
 }
 
 function esSelCat(btn){
@@ -1999,6 +2013,8 @@ function resetAddForm(){
   document.getElementById('f-shop-link').value='';
   document.getElementById('shopLinkGroup').style.display='none';
   document.getElementById('addrGroup').style.display='';
+  _selectedParking=null;
+  ['parkingYes','parkingNo','parkingUnknown'].forEach(id=>{const b=document.getElementById(id);if(b)b.classList.remove('active');});
   document.getElementById('f-start').value='';
   document.getElementById('f-end').value='';
   document.getElementById('f-hours').value='';
@@ -2035,6 +2051,7 @@ function selCat(btn){
   selectedCats=[...activeBtns].map(b=>b.dataset.c);
   selectedCat=selectedCats[0]||null;
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  if(!_selectedParking){alert('주차 여부를 선택해주세요');return;}
   const hasPopup=selectedCats.includes('팝업/카페');
   const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
@@ -2063,6 +2080,7 @@ async function submitPlace(){
   if(!name){alert('샵 이름을 입력해주세요');return;}
   if(!selectedCat){alert('카테고리를 선택해주세요');return;}
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
+  if(!_selectedParking){alert('주차 여부를 선택해주세요');return;}
   const hasPopup=selectedCats.includes('팝업/카페');
   const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
@@ -2086,7 +2104,7 @@ async function submitPlace(){
     const endDate=document.getElementById('f-end').value||null;
     const hours=document.getElementById('f-hours').value.trim()||null;
     const eventInfo=document.getElementById('f-event').value.trim()||null;
-    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null,startDate,endDate,hours,eventInfo,addedBy:currentUser?currentUser.id:null};
+    const np={id:Date.now(),name,cat:selectedCat,cats,addr:finalAddr,lat,lng,desc,tags:[...modalTags],images:imageUrls,shopLink:shopLink||null,startDate,endDate,hours,eventInfo,addedBy:currentUser?currentUser.id:null,parking:_selectedParking};
     places.push(np);savePlaces();closeOverlay('addOverlay');
     currentCat='전체';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector('.cat-btn[data-cat="전체"]').classList.add('active');
