@@ -2165,10 +2165,10 @@ async function toggleBookmark(postId, btn){
   const{data:existing}=await db.from('post_bookmarks').select('id').eq('user_id',currentUser.id).eq('post_id',postId).maybeSingle();
   if(existing){
     await db.from('post_bookmarks').delete().eq('id',existing.id);
-    if(btn){btn.textContent='🤍 관심';btn.style.color='var(--muted)';}
+    if(btn){btn.textContent='🔖 관심 글 등록';btn.style.color='var(--muted)';}
   } else {
     await db.from('post_bookmarks').insert({user_id:currentUser.id,post_id:postId});
-    if(btn){btn.textContent='❤️ 관심';btn.style.color='var(--accent)';}
+    if(btn){btn.textContent='🔖 관심 글 등록됨';btn.style.color='var(--accent)';}
   }
 }
 
@@ -2911,15 +2911,7 @@ function openPostDetail(p){
   likeBtn.textContent='❤️ '+(p.likes||0);
   if(!liked)likeBtn.onclick=()=>likePost(p.id,likeBtn);
   // 관심 버튼
-  const bmBtn=document.createElement('button');
-  bmBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);margin-left:8px;';
-  if(currentUser){
-    db.from('post_bookmarks').select('id').eq('user_id',currentUser.id).eq('post_id',p.id).maybeSingle().then(({data})=>{
-      if(data){bmBtn.textContent='❤️ 관심';bmBtn.style.color='var(--accent)';}
-      else{bmBtn.textContent='🤍 관심';}
-    });
-  } else {bmBtn.textContent='🤍 관심';}
-  bmBtn.onclick=()=>toggleBookmark(p.id,bmBtn);
+
   const btnWrap=document.createElement('div');btnWrap.style.cssText='display:flex;align-items:center;margin-bottom:4px;';
   btnWrap.appendChild(likeBtn);btnWrap.appendChild(bmBtn);
   detail.appendChild(btnWrap);
