@@ -319,6 +319,13 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .btn-write-post:hover{background:var(--accent-d);}
 .comm-content{flex:1;display:flex;overflow:hidden;}
 .sub-sidebar{width:100px;border-right:1px solid var(--border);padding:6px;flex-shrink:0;overflow-y:auto;background:var(--bg2);}
+@media(max-width:600px){
+  .sub-sidebar{width:100%!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:none!important;border-bottom:1px solid var(--border)!important;padding:8px 12px!important;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;flex-shrink:0!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;box-sizing:border-box!important;}
+  .sub-sidebar::-webkit-scrollbar{display:none!important;}
+  .sub-sidebar-title{display:none!important;}
+  .sub-item{display:inline-flex!important;align-items:center!important;padding:5px 13px!important;border-radius:20px!important;border:1px solid var(--border)!important;background:var(--surface)!important;font-size:12px!important;cursor:pointer!important;white-space:nowrap!important;color:var(--muted)!important;font-weight:700!important;flex-shrink:0!important;}
+  .sub-item.active{background:var(--accent)!important;color:#fff!important;border-color:transparent!important;}
+}
 .sub-sidebar-title{display:none;}
 .sub-item{padding:7px 8px;border-radius:var(--r-sm);font-size:12px;cursor:pointer;color:var(--muted);font-weight:500;}
 .sub-item:hover{background:var(--surface2);color:var(--text);}
@@ -2542,18 +2549,7 @@ function filterBoards(q){
 }
 
 function applyMobileLayout(){
-  if(window.innerWidth>600)return;
-  const sidebar=document.getElementById('subSidebar');
-  if(!sidebar)return;
-  // cat-bar 스타일 그대로
-  sidebar.setAttribute('style','background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;flex-wrap:nowrap;gap:7px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;width:100%;box-sizing:border-box;-webkit-overflow-scrolling:touch;');
-  const title=sidebar.querySelector('.sub-sidebar-title');
-  if(title)title.style.display='none';
-  sidebar.querySelectorAll('.sub-item').forEach(el=>{
-    const isActive=el.classList.contains('active');
-    // cat-btn 스타일 그대로
-    el.setAttribute('style','display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;border:1px solid '+(isActive?'transparent':' var(--border)')+';background:'+(isActive?'var(--accent)':'var(--surface)')+';font-size:12px;cursor:pointer;white-space:nowrap;color:'+(isActive?'#fff':'var(--muted)')+';font-weight:700;flex-shrink:0;');
-  });
+  // CSS로 처리하므로 여기선 아무것도 안함
 }
 
 function updateMobileSubItem(el,isActive){
