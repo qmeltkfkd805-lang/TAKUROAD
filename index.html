@@ -1766,6 +1766,8 @@ async function setUser(user){
       document.getElementById('nickSetOverlay').classList.add('open');
     }
   });
+  // 실시간 채팅 알림 구독
+  subscribeToNewMessages(user.id);
 }
 function clearUser(){
   currentUser=null;
@@ -3892,6 +3894,22 @@ function showChatFab(){
     document.getElementById('chatFab').style.display='flex';
     loadUnreadCount();
   }
+}
+
+function subscribeToNewMessages(userId){
+  // 내 채팅방에 새 메시지 오면 배지 업데이트
+  db.channel('new-messages-'+userId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},async payload=>{
+      if(payload.new.user_id===userId)return; // 내가 보낸 메시지는 제외
+      // 내 채팅방 메시지인지 확인
+      const{data:chat}=await db.from('chats').select('id').eq('id',payload.new.chat_id)
+        .or('user1_id.eq.'+userId+',user2_id.eq.'+userId).maybeSingle();
+      if(!chat)return;
+      // 현재 열린 채팅방이 아닐 때만 배지 업데이트
+      if(_currentChatId!==payload.new.chat_id){
+        loadUnreadCount();
+      }
+    }).subscribe();
 }
 
 async function loadUnreadCount(){
