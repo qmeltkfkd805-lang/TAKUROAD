@@ -3878,7 +3878,7 @@ async function openChatWithUser(targetUserId,postId,postTitle){
     chatId=newChat.id;
   }
   // 상대방 닉네임
-  const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',targetUserId).single();
+  const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',targetUserId).maybeSingle();
   const nick=profile?.nickname||'사용자';
   openChatRoom(chatId,nick,postTitle);
 }
@@ -3893,7 +3893,7 @@ async function openChatList(){
   if(!chats||!chats.length){body.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">채팅 내역이 없어요</div>';return;}
   for(const chat of chats){
     const otherId=chat.user1_id===currentUser.id?chat.user2_id:chat.user1_id;
-    const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',otherId).single();
+    const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',otherId).maybeSingle();
     const nick=profile?.nickname||'사용자';
     const msgs=chat.chat_messages||[];
     const lastMsg=msgs.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
