@@ -878,6 +878,35 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 
 </div>
 
+
+<!-- 채팅 목록 -->
+<div class="chat-overlay" id="chatListOverlay">
+  <div class="chat-header">
+    <button class="chat-back" onclick="closeChatList()">←</button>
+    <div class="chat-title">💬 채팅</div>
+  </div>
+  <div id="chatListBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+
+<!-- 채팅방 -->
+<div class="chat-overlay" id="chatRoomOverlay">
+  <div class="chat-header">
+    <button class="chat-back" onclick="closeChatRoom()">←</button>
+    <div class="chat-title" id="chatRoomTitle">채팅</div>
+  </div>
+  <div id="chatPostRef" class="chat-post-ref" style="display:none;margin:8px 16px 0;"></div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" placeholder="메시지를 입력하세요" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+    <button class="chat-send-btn" onclick="sendMessage()">전송</button>
+  </div>
+</div>
+
+<!-- 채팅 FAB -->
+<button class="chat-fab" id="chatFab" onclick="openChatList()" style="position:fixed;bottom:80px;right:16px;">
+  💬<span class="chat-badge" id="chatBadge" style="display:none;">0</span>
+</button>
+
 <!-- 게시판 삭제 -->
 <div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
@@ -1606,6 +1635,8 @@ async function setUser(user){
   btn.onclick=openProfile;
   document.getElementById('notifBtn').style.display='flex';
   loadNotifications();
+  document.getElementById('chatFab').style.display='flex';
+  loadUnreadCount();
 }
 function clearUser(){
   currentUser=null;
@@ -1614,6 +1645,7 @@ function clearUser(){
   btn.className='btn-login';btn.textContent='로그인';btn.onclick=openAuth;
   document.getElementById('notifBtn').style.display='none';
   document.getElementById('notifBadge').classList.remove('on');
+  document.getElementById('chatFab').style.display='none';
 }
 async function loginWithGoogle(){
   const{error}=await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://takuroad.jonjonnni.com'}});
@@ -2484,6 +2516,13 @@ function openPostDetail(p){
   btnWrap.appendChild(likeBtn);btnWrap.appendChild(bmBtn);
   detail.appendChild(btnWrap);
 
+  // 채팅하기 버튼 (본인 글 아닐 때만)
+  if(currentUser&&!isMine&&p.user_id){
+    const chatBtn=document.createElement('button');chatBtn.className='chat-btn';
+    chatBtn.innerHTML='💬 판매자에게 채팅하기';
+    chatBtn.onclick=()=>openChatWithUser(p.user_id,p.id,p.title);
+    detail.appendChild(chatBtn);
+  }
   // 공유 버튼
   const shareWrap=document.createElement('div');
   shareWrap.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;';
@@ -3614,6 +3653,138 @@ async function publishPost(){
 document.addEventListener('click',e=>{
   if(!e.target.closest('.color-picker-wrap'))document.getElementById('colorSwatches')?.classList.remove('open');
 });
+
+
+// ── 1:1 채팅 ──
+let _currentChatId=null;
+let _chatSubscription=null;
+
+// setUser에서 FAB 표시
+function showChatFab(){
+  if(currentUser){
+    document.getElementById('chatFab').style.display='flex';
+    loadUnreadCount();
+  }
+}
+
+async function loadUnreadCount(){
+  if(!currentUser)return;
+  const{data:chats}=await db.from('chats').select('id').or('user1_id.eq.'+currentUser.id+',user2_id.eq.'+currentUser.id);
+  if(!chats||!chats.length)return;
+  const ids=chats.map(c=>c.id);
+  const{count}=await db.from('chat_messages').select('*',{count:'exact',head:true}).in('chat_id',ids).eq('is_read',false).neq('user_id',currentUser.id);
+  const badge=document.getElementById('chatBadge');
+  if(count>0){badge.textContent=count>9?'9+':count;badge.style.display='flex';}
+  else{badge.style.display='none';}
+}
+
+async function openChatWithUser(targetUserId,postId,postTitle){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  if(targetUserId===currentUser.id){alert('본인과는 채팅할 수 없어요');return;}
+  // 기존 채팅방 찾기
+  const{data:existing}=await db.from('chats').select('*')
+    .or('and(user1_id.eq.'+currentUser.id+',user2_id.eq.'+targetUserId+'),and(user1_id.eq.'+targetUserId+',user2_id.eq.'+currentUser.id+')')
+    .eq('post_id',postId).maybeSingle();
+  let chatId;
+  if(existing){
+    chatId=existing.id;
+  } else {
+    const{data:newChat}=await db.from('chats').insert({user1_id:currentUser.id,user2_id:targetUserId,post_id:postId}).select().single();
+    chatId=newChat.id;
+  }
+  // 상대방 닉네임
+  const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',targetUserId).single();
+  const nick=profile?.nickname||'상대방';
+  openChatRoom(chatId,nick,postTitle);
+}
+
+async function openChatList(){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  document.getElementById('chatListOverlay').classList.add('open');
+  const body=document.getElementById('chatListBody');
+  body.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">불러오는 중…</div>';
+  const{data:chats}=await db.from('chats').select('*,chat_messages(content,created_at,is_read,user_id)').or('user1_id.eq.'+currentUser.id+',user2_id.eq.'+currentUser.id).order('created_at',{ascending:false});
+  body.innerHTML='';
+  if(!chats||!chats.length){body.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">채팅 내역이 없어요</div>';return;}
+  for(const chat of chats){
+    const otherId=chat.user1_id===currentUser.id?chat.user2_id:chat.user1_id;
+    const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',otherId).single();
+    const nick=profile?.nickname||'알수없음';
+    const msgs=chat.chat_messages||[];
+    const lastMsg=msgs.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+    const unread=msgs.filter(m=>!m.is_read&&m.user_id!==currentUser.id).length;
+    const item=document.createElement('div');item.className='chat-list-item';
+    const avatar=document.createElement('div');avatar.className='chat-list-avatar';
+    if(profile?.avatar_url){const img=document.createElement('img');img.src=profile.avatar_url;avatar.appendChild(img);}
+    else{avatar.textContent='👤';}
+    const info=document.createElement('div');info.className='chat-list-info';
+    const time=lastMsg?new Date(lastMsg.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'}):'';
+    info.innerHTML='<div class="chat-list-name">'+nick+'</div><div class="chat-list-last">'+(lastMsg?lastMsg.content:'채팅을 시작해보세요')+'</div>';
+    const right=document.createElement('div');right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;gap:4px;';
+    right.innerHTML='<div class="chat-list-time">'+time+'</div>';
+    if(unread>0){const badge=document.createElement('div');badge.className='chat-unread';badge.textContent=unread;right.appendChild(badge);}
+    item.appendChild(avatar);item.appendChild(info);item.appendChild(right);
+    item.onclick=()=>openChatRoom(chat.id,nick,'');
+    body.appendChild(item);
+  }
+}
+
+function closeChatList(){document.getElementById('chatListOverlay').classList.remove('open');}
+
+async function openChatRoom(chatId,partnerNick,postTitle){
+  _currentChatId=chatId;
+  document.getElementById('chatRoomTitle').textContent=partnerNick;
+  const postRef=document.getElementById('chatPostRef');
+  if(postTitle){postRef.textContent='📦 '+postTitle;postRef.style.display='block';}
+  else{postRef.style.display='none';}
+  document.getElementById('chatRoomOverlay').classList.add('open');
+  await loadMessages(chatId);
+  // 실시간 구독
+  if(_chatSubscription)_chatSubscription.unsubscribe();
+  _chatSubscription=db.channel('chat:'+chatId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'chat_id=eq.'+chatId},payload=>{
+      appendMessage(payload.new);
+      if(payload.new.user_id!==currentUser.id)db.from('chat_messages').update({is_read:true}).eq('id',payload.new.id);
+    }).subscribe();
+}
+
+function closeChatRoom(){
+  document.getElementById('chatRoomOverlay').classList.remove('open');
+  if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}
+  loadUnreadCount();
+}
+
+async function loadMessages(chatId){
+  const body=document.getElementById('chatBody');
+  body.innerHTML='';
+  const{data:msgs}=await db.from('chat_messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true});
+  (msgs||[]).forEach(m=>appendMessage(m));
+  // 읽음 처리
+  db.from('chat_messages').update({is_read:true}).eq('chat_id',chatId).neq('user_id',currentUser.id);
+  body.scrollTop=body.scrollHeight;
+}
+
+function appendMessage(msg){
+  const body=document.getElementById('chatBody');
+  const isMine=msg.user_id===currentUser.id;
+  const wrap=document.createElement('div');wrap.className='chat-msg-wrap '+(isMine?'mine':'theirs');
+  const bubble=document.createElement('div');bubble.className='chat-msg '+(isMine?'mine':'theirs');
+  bubble.textContent=msg.content;
+  const time=document.createElement('div');time.className='chat-msg-time';
+  time.textContent=new Date(msg.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  wrap.appendChild(bubble);wrap.appendChild(time);
+  body.appendChild(wrap);
+  body.scrollTop=body.scrollHeight;
+}
+
+async function sendMessage(){
+  if(!currentUser||!_currentChatId)return;
+  const input=document.getElementById('chatInput');
+  const content=input.value.trim();
+  if(!content)return;
+  input.value='';
+  await db.from('chat_messages').insert({chat_id:_currentChatId,user_id:currentUser.id,content});
+}
 
 function openImgFull(src,images,startIdx){
   const imgs=images&&images.length?images:[src];
