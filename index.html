@@ -320,6 +320,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 .comm-content{flex:1;display:flex;overflow:hidden;}
 .sub-sidebar{width:100px;border-right:1px solid var(--border);padding:6px;flex-shrink:0;overflow-y:auto;background:var(--bg2);}
 @media(max-width:600px){
+  .comm-layout{overflow:visible!important;flex-direction:column!important;}
   .sub-sidebar{width:100%!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:none!important;border-bottom:1px solid var(--border)!important;padding:8px 12px!important;display:flex!important;flex-wrap:nowrap!important;gap:6px!important;flex-shrink:0!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;box-sizing:border-box!important;}
   .sub-sidebar::-webkit-scrollbar{display:none!important;}
   .sub-sidebar-title{display:none!important;}
