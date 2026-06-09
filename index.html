@@ -3997,8 +3997,9 @@ async function loadMessages(chatId){
   body.innerHTML='';
   const{data:msgs}=await db.from('chat_messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true});
   (msgs||[]).forEach(m=>appendMessage(m));
-  // 읽음 처리
-  db.from('chat_messages').update({is_read:true}).eq('chat_id',chatId).neq('user_id',currentUser.id);
+  // 즉시 읽음 처리
+  await db.from('chat_messages').update({is_read:true}).eq('chat_id',chatId).neq('user_id',currentUser.id);
+  loadUnreadCount();
   body.scrollTop=body.scrollHeight;
 }
 
