@@ -539,6 +539,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .share-popup-btn{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:none;background:none;font-family:inherit;}
     .share-popup-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
     .share-popup-label{font-size:11px;color:var(--muted);font-weight:700;}
+    @media(max-width:600px){.back-btn{display:none!important;}}
 </style>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -1118,7 +1119,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div class="mobile-post-header">
     <button class="mobile-post-back" onclick="closeMobilePostView()">←</button>
     <span id="mobilePostSubName" style="font-size:13px;color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap;"></span>
-    <div class="mobile-post-title-head" id="mobilePostTitleHead" style="font-size:13px;color:var(--muted);"></div>
+    
   </div>
   <div class="mobile-post-body" id="mobilePostBody"></div>
 </div>
@@ -3029,7 +3030,7 @@ function openPostDetail(p){
   postArea.innerHTML='';
   // 모바일이면 전체화면으로
   if(window.innerWidth<=600){
-    document.getElementById('mobilePostTitleHead').textContent=p.title;
+  
     // 세부게시판 이름 표시
     const mobileSubName=document.getElementById('mobilePostSubName');
     if(mobileSubName){
@@ -3190,22 +3191,49 @@ async function loadComments(postId){
         nickSpan.style.cursor='pointer';nickSpan.onclick=openPopup;
       }
     } else {avatar.textContent='👤';}
-    if(isMine){
-      const delBtn=document.createElement('button');delBtn.className='comment-del';delBtn.textContent='삭제';delBtn.onclick=()=>deleteComment(c.id,postId);
-      top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);top.appendChild(delBtn);
-    } else {
-      top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);
-    }
+    // 텍스트
     const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;
     div.appendChild(top);div.appendChild(textDiv);
-    div.appendChild(top);div.appendChild(textDiv);
+    // 하단 액션 행
+    const actionRow=document.createElement('div');
+    actionRow.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-top:6px;';
     const likeBtn=document.createElement('button');
-    likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;flex-shrink:0;';
-    likeBtn.disabled=liked;
-    if(!liked)likeBtn.onclick=()=>likeComment(c.id,postId,likeBtn);
-    top.appendChild(likeBtn);
-    list.appendChild(div);
+    likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:pointer;font-family:inherit;padding:2px 0;';
+    likeBtn.textContent='❤️ '+(c.likes||0);
+    likeBtn.onclick=()=>toggleCommentLike(c.id,postId,likeBtn,liked);
+    actionRow.appendChild(likeBtn);
+    if(isMine){
+      const delBtn=document.createElement('button');
+      delBtn.style.cssText='background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;';
+      delBtn.textContent='삭제';
+      delBtn.onclick=()=>deleteComment(c.id,postId);
+      actionRow.appendChild(delBtn);
+    }
+    div.appendChild(actionRow);
   });
+}
+
+async function toggleCommentLike(commentId, postId, btn, wasLiked){
+  if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
+  if(wasLiked){
+    // 취소
+    await db.from('comment_likes').delete().eq('comment_id',commentId).eq('user_id',currentUser.id);
+    const{data}=await db.from('comments').select('likes').eq('id',commentId).single();
+    const newLikes=Math.max(0,(data?.likes||1)-1);
+    await db.from('comments').update({likes:newLikes}).eq('id',commentId);
+    btn.textContent='❤️ '+newLikes;
+    btn.style.color='var(--muted)';
+    btn.onclick=()=>toggleCommentLike(commentId,postId,btn,false);
+  } else {
+    // 추가
+    await db.from('comment_likes').insert({comment_id:commentId,user_id:currentUser.id});
+    const{data}=await db.from('comments').select('likes').eq('id',commentId).single();
+    const newLikes=(data?.likes||0)+1;
+    await db.from('comments').update({likes:newLikes}).eq('id',commentId);
+    btn.textContent='❤️ '+newLikes;
+    btn.style.color='var(--accent)';
+    btn.onclick=()=>toggleCommentLike(commentId,postId,btn,true);
+  }
 }
 
 async function likeComment(commentId, postId, btn){
