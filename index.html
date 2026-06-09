@@ -2553,9 +2553,27 @@ function applyMobileLayout(){
     sidebar.style.overflowY='hidden';
     sidebar.style.borderRight='none';
     sidebar.style.borderBottom='1px solid var(--border)';
-    sidebar.style.padding='6px 8px';
-    sidebar.style.gap='4px';
+    sidebar.style.padding='8px 10px';
+    sidebar.style.gap='6px';
     sidebar.style.flexShrink='0';
+    sidebar.style.background='var(--bg2)';
+    sidebar.style.scrollbarWidth='none';
+    // 세부게시판 타이틀 숨기기
+    const title=sidebar.querySelector('.sub-sidebar-title');
+    if(title)title.style.display='none';
+  }
+}
+
+function updateMobileSubItem(el,isActive){
+  if(window.innerWidth>600)return;
+  if(isActive){
+    el.style.background='var(--accent)';
+    el.style.color='#fff';
+    el.style.borderColor='transparent';
+  } else {
+    el.style.background='var(--surface)';
+    el.style.color='var(--muted)';
+    el.style.borderColor='var(--border)';
   }
 }
 
@@ -2615,7 +2633,7 @@ async function selectBoard(board){
   (subs||[]).forEach(s=>{
     const el=document.createElement('div');
     el.className='sub-item';el.id='sub-'+s.id;el.textContent=s.name;
-    if(window.innerWidth<=600){el.style.cssText='white-space:nowrap;padding:5px 12px;font-size:12px;border-radius:16px;display:inline-block;flex-shrink:0;cursor:pointer;';}
+    if(window.innerWidth<=600){el.style.cssText='white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-weight:700;';}
     el.onclick=()=>selectSub(s);subList.appendChild(el);
   });
 
@@ -2688,8 +2706,8 @@ async function saveDesc(){
 
 function selectSubAll(pushHistory){
   currentSub=null;window._popularMode=false;
-  document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById('sub-all');if(el)el.classList.add('active');
+  document.querySelectorAll('.sub-item').forEach(el=>{el.classList.remove('active');updateMobileSubItem(el,false);});
+  const el=document.getElementById('sub-all');if(el){el.classList.add('active');updateMobileSubItem(el,true);}
   const sd=document.getElementById('subDescBox');if(sd)sd.innerHTML='';
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   st.subId=null;st.subName=null;st.postId=null;
@@ -2728,8 +2746,8 @@ async function selectSubPopular(){
 
 function selectSub(sub){
   currentSub=sub;window._popularMode=false;
-  document.querySelectorAll('.sub-item').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById('sub-'+sub.id);if(el)el.classList.add('active');
+  document.querySelectorAll('.sub-item').forEach(el=>{el.classList.remove('active');updateMobileSubItem(el,false);});
+  const el=document.getElementById('sub-'+sub.id);if(el){el.classList.add('active');updateMobileSubItem(el,true);}
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   st.subId=sub.id;st.subName=sub.name;st.postId=null;
   localStorage.setItem('tr_state',JSON.stringify(st));
