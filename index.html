@@ -3088,6 +3088,8 @@ async function loadComments(postId){
     const top=document.createElement('div');top.className='comment-top';top.style.cssText='display:flex;align-items:center;gap:8px;';
     const avatar=document.createElement('div');avatar.className='comment-avatar';
     const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;
+    // 최신 닉네임 반영
+    if(c.user_id)db.from('profiles').select('nickname').eq('id',c.user_id).maybeSingle().then(({data})=>{if(data?.nickname)nickSpan.textContent=data.nickname;});
     const dateSpan=document.createElement('span');dateSpan.className='comment-date';dateSpan.textContent=date;
     if(c.user_id){
       db.from('profiles').select('avatar_url').eq('id',c.user_id).single().then(({data})=>{
