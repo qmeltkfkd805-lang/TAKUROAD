@@ -2386,7 +2386,6 @@ async function loadBoardPosts(){
 
 function openPostDetail(p){
   const postArea=document.getElementById('postArea');
-  const postArea=document.getElementById('postArea');
   if(!postArea)return;
   postArea.innerHTML='';
   const isMgr=currentUser&&currentBoard&&currentUser.id===currentBoard.manager_id;
