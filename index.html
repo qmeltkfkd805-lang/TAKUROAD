@@ -2545,12 +2545,14 @@ function applyMobileLayout(){
   if(window.innerWidth>600)return;
   const sidebar=document.getElementById('subSidebar');
   if(!sidebar)return;
-  sidebar.setAttribute('style','width:100%;display:flex;flex-direction:row;overflow-x:scroll;overflow-y:hidden;border-right:none;border-bottom:1px solid #ddd;padding:8px 10px;gap:6px;flex-shrink:0;background:var(--bg2);-webkit-overflow-scrolling:touch;');
+  // cat-bar 스타일 그대로
+  sidebar.setAttribute('style','background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;width:100%;box-sizing:border-box;');
   const title=sidebar.querySelector('.sub-sidebar-title');
   if(title)title.style.display='none';
   sidebar.querySelectorAll('.sub-item').forEach(el=>{
     const isActive=el.classList.contains('active');
-    el.setAttribute('style','white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid '+(isActive?'transparent':'#ddd')+';background:'+(isActive?'var(--accent)':'var(--surface)')+';color:'+(isActive?'#fff':'#999')+';font-weight:700;');
+    // cat-btn 스타일 그대로
+    el.setAttribute('style','display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:20px;border:1px solid '+(isActive?'transparent':' var(--border)')+';background:'+(isActive?'var(--accent)':'var(--surface)')+';font-size:12px;cursor:pointer;white-space:nowrap;color:'+(isActive?'#fff':'var(--muted)')+';font-weight:700;flex-shrink:0;');
   });
 }
 
