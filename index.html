@@ -2491,6 +2491,24 @@ function filterBoards(q){
   renderBoardGrid(filtered);
 }
 
+function applyMobileLayout(){
+  if(window.innerWidth>600)return;
+  const layout=document.querySelector('.comm-layout');
+  if(layout){layout.style.flexDirection='column';}
+  const sidebar=document.querySelector('.sub-sidebar');
+  if(sidebar){
+    sidebar.style.width='100%';
+    sidebar.style.flexDirection='row';
+    sidebar.style.overflowX='auto';
+    sidebar.style.overflowY='hidden';
+    sidebar.style.borderRight='none';
+    sidebar.style.borderBottom='1px solid var(--border)';
+    sidebar.style.padding='6px 8px';
+    sidebar.style.gap='4px';
+    sidebar.style.flexShrink='0';
+  }
+}
+
 async function selectBoard(board){
   currentBoard=board;currentSub=null;
 
@@ -2547,6 +2565,7 @@ async function selectBoard(board){
   (subs||[]).forEach(s=>{
     const el=document.createElement('div');
     el.className='sub-item';el.id='sub-'+s.id;el.textContent=s.name;
+    if(window.innerWidth<=600){el.style.cssText='white-space:nowrap;padding:5px 12px;font-size:12px;border-radius:16px;display:inline-block;flex-shrink:0;cursor:pointer;';}
     el.onclick=()=>selectSub(s);subList.appendChild(el);
   });
 
