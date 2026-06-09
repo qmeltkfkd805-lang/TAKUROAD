@@ -3790,7 +3790,8 @@ let _popupTargetId=null;
 
 async function showUserPopup(e,userId,nick,avatarUrl){
   e.stopPropagation();
-  if(!currentUser||userId===currentUser.id)return;
+  e.stopPropagation();
+  if(userId===currentUser?.id)return;
   _popupTargetUserId=userId;
   const popup=document.getElementById('userPopup');
   // 아바타
