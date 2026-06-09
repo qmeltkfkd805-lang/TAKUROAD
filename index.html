@@ -2622,6 +2622,7 @@ async function selectBoard(board){
   // 전체게시판 추가
   const allEl=document.createElement('div');
   allEl.className='sub-item active';allEl.id='sub-all';allEl.textContent='전체게시판';
+  if(window.innerWidth<=600){allEl.style.cssText='white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;background:var(--accent);color:#fff;border:1px solid transparent;font-weight:700;transition:all .18s;';}
   allEl.onclick=()=>selectSubAll(true);subList.appendChild(allEl);
 
   // 인기글 추가
@@ -2633,6 +2634,7 @@ async function selectBoard(board){
   (subs||[]).forEach(s=>{
     const el=document.createElement('div');
     el.className='sub-item';el.id='sub-'+s.id;el.textContent=s.name;
+    if(window.innerWidth<=600){el.style.cssText='white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-weight:700;transition:all .18s;';}
     if(window.innerWidth<=600){el.style.cssText='white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-weight:700;';}
     el.onclick=()=>selectSub(s);subList.appendChild(el);
   });
