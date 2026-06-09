@@ -2804,8 +2804,30 @@ async function loadComments(postId){
     const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
     const isMine=currentUser&&c.user_id===currentUser.id;
     const liked=likedComments.has(c.id);
-    div.innerHTML='<div class="comment-top" style="display:flex;align-items:center;gap:8px;"><span class="comment-nick">'+c.nick+'</span><span class="comment-date">'+date+'</span></div><div class="comment-text">'+c.content+'</div>'+(isMine?'<div style="text-align:right;margin-top:4px;"><button class="comment-del" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')" >삭제</button></div>':'');
-    const likeBtn=document.createElement('button');
+    // 아바타 + 닉네임 클릭 팝업
+    const top=document.createElement('div');top.className='comment-top';top.style.cssText='display:flex;align-items:center;gap:8px;';
+    const avatar=document.createElement('div');avatar.className='comment-avatar';
+    const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;
+    const dateSpan=document.createElement('span');dateSpan.className='comment-date';dateSpan.textContent=date;
+    if(c.user_id){
+      db.from('profiles').select('avatar_url').eq('id',c.user_id).single().then(({data})=>{
+        if(data?.avatar_url){avatar.innerHTML='<img src="'+data.avatar_url+'"/>';}
+        else{avatar.textContent='👤';}
+      });
+      if(!isMine){
+        const openPopup=(e)=>{e.stopPropagation();db.from('profiles').select('nickname,avatar_url').eq('id',c.user_id).single().then(({data})=>{showUserPopup(e,c.user_id,data?.nickname||c.nick,data?.avatar_url);});};
+        avatar.onclick=openPopup;
+        nickSpan.style.cursor='pointer';nickSpan.onclick=openPopup;
+      }
+    } else {avatar.textContent='👤';}
+    if(isMine){
+      const delBtn=document.createElement('button');delBtn.className='comment-del';delBtn.textContent='삭제';delBtn.onclick=()=>deleteComment(c.id,postId);
+      top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);top.appendChild(delBtn);
+    } else {
+      top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);
+    }
+    const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;
+    div.appendChild(top);div.appendChild(textDiv);
     likeBtn.textContent='❤️ '+(c.likes||0);
     likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;flex-shrink:0;';
     likeBtn.disabled=liked;
