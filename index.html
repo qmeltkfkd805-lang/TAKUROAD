@@ -1443,13 +1443,7 @@ async function showDetail(p){
     naverBtn.target='_blank';naverBtn.style.textDecoration='none';
     naverBtn.textContent='🗺️ 네이버지도';
     actionsEl.appendChild(naverBtn);
-    // 루트 추가 버튼
-    const routeAddBtn=document.createElement('button');
-    routeAddBtn.className='da-btn';
-    routeAddBtn.style.cssText='background:var(--purple-l);color:var(--purple);border-color:var(--purple);';
-    routeAddBtn.textContent='📍 루트에 추가';
-    routeAddBtn.onclick=()=>addToRoute(p.id);
-    actionsEl.appendChild(routeAddBtn);
+
     if(p.shopLink){
       const shopLinkBtn=document.createElement('a');
       shopLinkBtn.className='da-btn';shopLinkBtn.href=p.shopLink;shopLinkBtn.target='_blank';
