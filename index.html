@@ -3089,7 +3089,8 @@ async function loadComments(postId){
     }
     const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;
     div.appendChild(top);div.appendChild(textDiv);
-    likeBtn.textContent='❤️ '+(c.likes||0);
+    div.appendChild(top);div.appendChild(textDiv);
+    const likeBtn=document.createElement('button');
     likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;flex-shrink:0;';
     likeBtn.disabled=liked;
     if(!liked)likeBtn.onclick=()=>likeComment(c.id,postId,likeBtn);
@@ -4062,7 +4063,6 @@ let _popupTargetId=null;
 async function showUserPopup(e,userId,nick,avatarUrl){
   e.stopPropagation();
   e.stopPropagation();
-  if(userId===currentUser?.id)return;
   _popupTargetUserId=userId;
   const popup=document.getElementById('userPopup');
   // 아바타
@@ -4123,7 +4123,7 @@ async function submitReport(){
 }
 
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#userPopup'))closeUserPopup();
+  if(!e.target.closest('#userPopup')&&!e.target.closest('.comment-avatar')&&!e.target.closest('.comment-nick')&&!e.target.closest('.user-popup-btn'))closeUserPopup();
 });
 
 // 프로필 아바타 HTML 생성 헬퍼
@@ -4144,7 +4144,9 @@ function showChatFab(){
   }
 }
 
+let _msgSubscription=null;
 function subscribeToNewMessages(userId){
+  if(_msgSubscription){_msgSubscription.unsubscribe();_msgSubscription=null;}
   // 내 채팅방에 새 메시지 오면 배지 업데이트
   db.channel('new-messages-'+userId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'chat_id=neq.null'},async payload=>{
