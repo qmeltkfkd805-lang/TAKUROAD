@@ -1012,6 +1012,21 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
 </div>
 
+<!-- 닉네임 설정 -->
+<div class="overlay center" id="nickSetOverlay" style="z-index:1400;">
+  <div class="panel-base panel-center" style="max-width:380px;">
+    <h2 style="text-align:center;margin-bottom:8px;">👋 타쿠로드에 오신 걸 환영해요!</h2>
+    <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;">닉네임을 설정해야 서비스를 이용할 수 있어요.</p>
+    <div class="form-group">
+      <label>닉네임 *</label>
+      <input type="text" id="nickSetInput" placeholder="사용할 닉네임을 입력하세요" maxlength="15" style="width:100%;"/>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">2~15자, 특수문자 제외</div>
+    </div>
+    <div id="nickSetError" style="font-size:12px;color:var(--red);margin-bottom:8px;"></div>
+    <button class="btn-submit" onclick="submitNickname()">닉네임 설정하기</button>
+  </div>
+</div>
+
 <!-- 게시판 삭제 -->
 <div class="overlay center" id="deleteBoardOverlay" onclick="handleOverlay(event,'deleteBoardOverlay')">
   <div class="panel-base panel-center" style="max-width:380px;">
@@ -1742,6 +1757,14 @@ async function setUser(user){
   loadNotifications();
   document.getElementById('chatFab').style.display='flex';
   loadUnreadCount();
+  // 닉네임 없으면 설정 창 표시
+  db.from('profiles').select('nickname').eq('id',user.id).maybeSingle().then(({data})=>{
+    if(!data||!data.nickname){
+      document.getElementById('nickSetInput').value='';
+      document.getElementById('nickSetError').textContent='';
+      document.getElementById('nickSetOverlay').classList.add('open');
+    }
+  });
 }
 function clearUser(){
   currentUser=null;
@@ -1940,6 +1963,24 @@ async function toggleBookmark(postId, btn){
     await db.from('post_bookmarks').insert({user_id:currentUser.id,post_id:postId});
     if(btn){btn.textContent='❤️ 관심';btn.style.color='var(--accent)';}
   }
+}
+
+async function submitNickname(){
+  const nick=document.getElementById('nickSetInput').value.trim();
+  const errEl=document.getElementById('nickSetError');
+  if(!nick||nick.length<2){errEl.textContent='닉네임은 2자 이상이어야 해요';return;}
+  if(nick.length>15){errEl.textContent='닉네임은 15자 이하여야 해요';return;}
+  if(/[!@#$%^&*()+=\[\]{};':"\|,.<>\/?]/.test(nick)){errEl.textContent='특수문자는 사용할 수 없어요';return;}
+  // 중복 확인
+  const{data:existing}=await db.from('profiles').select('id').eq('nickname',nick).maybeSingle();
+  if(existing){errEl.textContent='이미 사용 중인 닉네임이에요';return;}
+  // 저장
+  const{error}=await db.from('profiles').upsert({id:currentUser.id,nickname:nick}).eq('id',currentUser.id);
+  if(error){errEl.textContent='설정 실패: '+error.message;return;}
+  document.getElementById('nickSetOverlay').classList.remove('open');
+  // 헤더 닉네임 업데이트
+  const btn=document.getElementById('loginBtn');
+  if(btn){btn.textContent=nick;}
 }
 
 async function logout(){await db.auth.signOut();closeOverlay('profileOverlay');}
