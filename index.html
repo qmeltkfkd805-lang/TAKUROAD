@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>타쿠로드 — 덕후들의 성지순례 지도</title>
 <link href="https://fonts.googleapis.com/css2?family=Cute+Font&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
-}
 <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=42255d70b37fcf98f7f82cbffcc71771&libraries=services"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -2221,7 +2220,7 @@ async function submitNickname(){
   const errEl=document.getElementById('nickSetError');
   if(!nick||nick.length<2){errEl.textContent='닉네임은 2자 이상이어야 해요';return;}
   if(nick.length>15){errEl.textContent='닉네임은 15자 이하여야 해요';return;}
-  if(/[!@#$%^&*()+=\[\]{};':"\|,.<>\/?]/.test(nick)){errEl.textContent='특수문자는 사용할 수 없어요';return;}
+  if(/[!@#$%^&*()+=\[\];':"\|,.<>\/?]/.test(nick)){errEl.textContent='특수문자는 사용할 수 없어요';return;}
   // 중복 확인
   const{data:existing}=await db.from('profiles').select('id').eq('nickname',nick).maybeSingle();
   if(existing){errEl.textContent='이미 사용 중인 닉네임이에요';return;}
@@ -3137,7 +3136,6 @@ async function deletePost(postId){
 }
 
 async function loadComments(postId){
-async function loadComments(postId){
   const list=document.getElementById('commentList');if(!list)return;
   const[{data:cs},{data:cl}]=await Promise.all([
     db.from('comments').select('*').eq('post_id',postId).order('created_at',{ascending:true}),
@@ -3148,7 +3146,6 @@ async function loadComments(postId){
   list2.innerHTML='';
   const arr=cs||[];
   const likedComments=new Set((cl||[]).map(x=>x.comment_id));
-  if(!arr.length){list2.innerHTML='<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 댓글을 남겨보세요!</p>';return;}
   if(!arr.length){list2.innerHTML='<p style="font-size:12px;color:var(--muted);padding:4px 0">첫 댓글을 남겨보세요!</p>';return;}
   arr.forEach(c=>{
     const date=new Date(c.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
