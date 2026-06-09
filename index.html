@@ -402,6 +402,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .color-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;}
     .color-swatch:hover{border-color:var(--text);}
 </style>
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <header>
@@ -973,6 +974,8 @@ async function loadShops(){
 }
 
 window.onload=function(){
+  // 카카오 SDK 초기화
+  if(window.Kakao&&!Kakao.isInitialized())Kakao.init('42255d70b37fcf98f7f82cbffcc71771');
   // 상태 복원
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
   if(st.tab==='comm'){
