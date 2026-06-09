@@ -389,6 +389,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .editor-content{min-height:400px;outline:none;font-size:16px;line-height:1.8;color:var(--text);}
     .editor-content:empty:before{content:attr(data-placeholder);color:var(--muted);pointer-events:none;white-space:pre-line;line-height:1.8;}
     .editor-content img{max-width:100%;border-radius:8px;margin:8px 0;display:block;}
+    .post-detail img{max-width:100%!important;height:auto!important;border-radius:8px;display:block;}
     .editor-content blockquote{border-left:4px solid var(--accent);padding:8px 16px;margin:12px 0;background:var(--accent-l);border-radius:0 8px 8px 0;color:var(--muted);}
     .editor-content hr{border:none;border-top:2px solid var(--border);margin:20px 0;}
     .editor-content a{color:var(--cyan);text-decoration:underline;}
@@ -2620,7 +2621,9 @@ function openPostDetail(p){
 
   const body=document.createElement('div');
   body.style.cssText='font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px;';
-  body.innerHTML=p.content;detail.appendChild(body);
+  body.innerHTML=p.content;
+  body.querySelectorAll('img').forEach(img=>{img.style.maxWidth='100%';img.style.height='auto';img.style.borderRadius='8px';});
+  detail.appendChild(body);
 
   // content에 이미지 없을 때만 별도 표시
   if(p.images&&p.images.length&&!body.querySelector('img')){
