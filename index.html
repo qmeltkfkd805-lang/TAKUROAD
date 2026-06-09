@@ -489,6 +489,33 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .chat-btn{background:var(--cyan-l);color:var(--cyan);border:1.5px solid var(--cyan);border-radius:16px;padding:6px 14px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:12px;display:inline-block;}
     .chat-fab{position:fixed;bottom:80px;right:16px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--sh-lg);z-index:400;align-items:center;justify-content:center;}
     .chat-badge{position:absolute;top:-4px;right:-4px;background:#ff3b30;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+    @media(max-width:600px){
+      .comm-layout{flex-direction:column!important;}
+      .sub-board-list{width:100%!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;border-right:none!important;border-bottom:1px solid var(--border)!important;padding:6px 8px!important;gap:4px!important;flex-shrink:0!important;scrollbar-width:none!important;}
+      .sub-board-list::-webkit-scrollbar{display:none;}
+      .sub-item{white-space:nowrap!important;padding:5px 12px!important;font-size:12px!important;border-radius:16px!important;}
+      .sub-item.active{background:var(--accent)!important;color:#fff!important;}
+      .board-main{flex:1!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;}
+      .post-area{flex:1!important;overflow-y:auto!important;}
+      .post-row{display:flex!important;align-items:center!important;padding:12px 14px!important;gap:10px!important;border-bottom:1px solid var(--border)!important;}
+      .post-row-title{flex:1!important;}
+      .post-row-name{font-size:14px!important;font-weight:700!important;margin-bottom:4px!important;}
+      .post-row-sub{font-size:11px!important;color:var(--muted)!important;}
+      .post-row-likes{display:none!important;}
+      .post-row-comment{min-width:44px!important;height:44px!important;background:var(--surface2)!important;border-radius:8px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;font-size:13px!important;font-weight:700!important;flex-shrink:0!important;}
+      .post-row-comment-label{font-size:10px!important;color:var(--muted)!important;}
+      .post-detail{padding:14px!important;}
+      .post-bottom-bar{display:flex!important;}
+    }
+    @media(min-width:601px){
+      .post-row-comment{display:none;}
+      .post-bottom-bar{display:none!important;}
+    }
+    .post-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:none;align-items:center;padding:8px 0;z-index:200;}
+    .pbb-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;}
+    .pbb-btn.active{color:var(--accent);}
+    .pbb-icon{font-size:20px;line-height:1;}
 </style>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
