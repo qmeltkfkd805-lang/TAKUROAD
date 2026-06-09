@@ -2051,7 +2051,7 @@ function selCat(btn){
   selectedCats=[...activeBtns].map(b=>b.dataset.c);
   selectedCat=selectedCats[0]||null;
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
-  if(!_selectedParking){alert('주차 여부를 선택해주세요');return;}
+
   const hasPopup=selectedCats.includes('팝업/카페');
   const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
@@ -2080,7 +2080,7 @@ async function submitPlace(){
   if(!name){alert('샵 이름을 입력해주세요');return;}
   if(!selectedCat){alert('카테고리를 선택해주세요');return;}
   const onlineOnly=selectedCats.length===1&&selectedCats[0]==='온라인샵';
-  if(!_selectedParking){alert('주차 여부를 선택해주세요');return;}
+
   const hasPopup=selectedCats.includes('팝업/카페');
   const pf=document.getElementById('popupFields');if(pf)pf.style.display=hasPopup?'block':'none';
   const hasOnline=selectedCats.includes('온라인샵');
