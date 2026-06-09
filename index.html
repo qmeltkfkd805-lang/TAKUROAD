@@ -691,6 +691,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('comments',this)">댓글 단 글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('bookmarks',this)">관심 글</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('favboards',this)">⭐즐겨찾기</button>
+      <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('subscriptions',this)">구독</button>
       <button class="profile-tab" onclick="event.stopPropagation();switchProfileTab('notifications',this)">알림내역</button>
     </div>
     <div id="profileTabContent" style="flex:1;overflow-y:auto;">
@@ -715,6 +716,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
     <div id="profileBookmarksTab" style="display:none;" class="profile-content"></div>
     <div id="profileFavBoardsTab" style="display:none;" class="profile-content"></div>
+    <div id="profileSubscriptionsTab" style="display:none;" class="profile-content"></div>
     <div id="profileNotiTab" style="display:none;" class="profile-content"></div>
     </div><!-- profileTabContent end -->
   </div>
@@ -1041,6 +1043,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="user-popup-avatar" id="popupAvatar">👤</div>
     <div class="user-popup-nick" id="popupNick"></div>
   </div>
+  <button class="user-popup-btn" id="popupSubscribeBtn" onclick="popupSubscribe()">🔔 구독하기</button>
   <button class="user-popup-btn" id="popupChatBtn" onclick="popupChat()">💬 1:1 채팅하기</button>
   <button class="user-popup-btn danger" onclick="popupReport()">🚨 신고하기</button>
 </div>
@@ -1980,15 +1983,16 @@ async function saveProfile(){
 async function switchProfileTab(tab, btn){
   document.querySelectorAll('.profile-tab').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  const tabs=['Info','Posts','Comments','Bookmarks','FavBoards','Noti'];
+  const tabs=['Info','Posts','Comments','Bookmarks','FavBoards','Subscriptions','Noti'];
   tabs.forEach(t=>{ const el=document.getElementById('profile'+t+'Tab'); if(el)el.style.display='none'; });
-  const map={info:'Info',posts:'Posts',comments:'Comments',bookmarks:'Bookmarks',favboards:'FavBoards',notifications:'Noti'};
+  const map={info:'Info',posts:'Posts',comments:'Comments',bookmarks:'Bookmarks',favboards:'FavBoards',subscriptions:'Subscriptions',notifications:'Noti'};
   const el=document.getElementById('profile'+map[tab]+'Tab');
   if(el)el.style.display='';
   if(tab==='posts')loadMyPosts();
   if(tab==='comments')loadMyComments();
   if(tab==='bookmarks')loadMyBookmarks();
   if(tab==='favboards')loadMyFavBoards();
+  if(tab==='subscriptions')loadMySubscriptions();
   if(tab==='notifications')loadMyNotifications();
 }
 
@@ -2094,6 +2098,33 @@ async function loadMyFavBoards(){
     const cnt=document.createElement('span');cnt.style.cssText='font-size:11px;color:var(--muted);';cnt.textContent='글 '+(b.post_count||0)+'개';
     div.appendChild(name);div.appendChild(cnt);el.appendChild(div);
   });
+}
+
+async function loadMySubscriptions(){
+  const el=document.getElementById('profileSubscriptionsTab');
+  el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px;">불러오는 중…</div>';
+  if(!currentUser)return;
+  const{data:subs}=await db.from('subscriptions').select('following_id').eq('follower_id',currentUser.id);
+  el.innerHTML='';
+  if(!subs||!subs.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">구독 중인 사람이 없어요</div>';return;}
+  for(const s of subs){
+    const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',s.following_id).maybeSingle();
+    const div=document.createElement('div');div.className='fav-board-item';
+    const left=document.createElement('div');left.style.cssText='display:flex;align-items:center;gap:10px;';
+    const avatar=document.createElement('div');avatar.className='comment-avatar';
+    if(profile?.avatar_url){avatar.innerHTML='<img src="'+profile.avatar_url+'"/>';}else{avatar.textContent='👤';}
+    const nick=document.createElement('span');nick.style.cssText='font-size:13px;font-weight:700;';nick.textContent=profile?.nickname||'알수없음';
+    const unsubBtn=document.createElement('button');
+    unsubBtn.style.cssText='background:none;border:1px solid var(--border);border-radius:12px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;';
+    unsubBtn.textContent='구독취소';
+    unsubBtn.onclick=async()=>{
+      await db.from('subscriptions').delete().eq('follower_id',currentUser.id).eq('following_id',s.following_id);
+      div.remove();
+    };
+    left.appendChild(avatar);left.appendChild(nick);
+    div.appendChild(left);div.appendChild(unsubBtn);
+    el.appendChild(div);
+  }
 }
 
 async function loadMyNotifications(){
@@ -3995,14 +4026,24 @@ async function publishPost(){
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   // 이미지 URL 추출
   const imgs=[...document.getElementById('editorContent').querySelectorAll('img')].map(i=>i.src);
-  const{error}=await db.from('posts').insert({
+  const{data:data2,error}=await db.from('posts').insert({
     type:'일반',nick,title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,
     sub_board_id:subId||null,
     images:imgs.length?imgs:null,price,link
-  });
+  }).select().single();
   if(error){alert('게시 실패: '+error.message);return;}
   closeEditor();
+  // 구독자에게 알림
+  if(data2){
+    const{data:subs}=await db.from('subscriptions').select('follower_id').eq('following_id',currentUser.id);
+    if(subs&&subs.length){
+      const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+      const nick=profile?.nickname||'누군가';
+      const notifRows=subs.map(s=>({user_id:s.follower_id,type:'subscription',message:nick+'님이 새 글을 올렸어요: '+title,post_id:data2.id}));
+      await db.from('notifications').insert(notifRows);
+    }
+  }
   if(currentBoard&&currentBoard.id===boardId)loadBoardPosts();
   alert('게시됐어요! 🎉');
 }
@@ -4034,9 +4075,30 @@ async function showUserPopup(e,userId,nick,avatarUrl){
   const y=Math.min(e.clientY,window.innerHeight-150);
   popup.style.left=x+'px';popup.style.top=y+'px';
   popup.classList.add('open');
+  // 구독 상태 확인
+  const subBtn=document.getElementById('popupSubscribeBtn');
+  if(subBtn&&currentUser){
+    db.from('subscriptions').select('id').eq('follower_id',currentUser.id).eq('following_id',userId).maybeSingle().then(({data})=>{
+      subBtn.textContent=data?'🔔 구독중':'🔔 구독하기';
+      subBtn.style.color=data?'var(--accent)':'var(--text)';
+      subBtn._subscribed=!!data;
+    });
+  }
 }
 
 function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');}
+
+async function popupSubscribe(){
+  if(!currentUser){alert('로그인이 필요해요');return;}
+  const btn=document.getElementById('popupSubscribeBtn');
+  if(btn._subscribed){
+    await db.from('subscriptions').delete().eq('follower_id',currentUser.id).eq('following_id',_popupTargetUserId);
+    btn.textContent='🔔 구독하기';btn.style.color='var(--text)';btn._subscribed=false;
+  } else {
+    await db.from('subscriptions').insert({follower_id:currentUser.id,following_id:_popupTargetUserId});
+    btn.textContent='🔔 구독중';btn.style.color='var(--accent)';btn._subscribed=true;
+  }
+}
 
 function popupChat(){
   closeUserPopup();
