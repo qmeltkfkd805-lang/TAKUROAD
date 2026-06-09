@@ -2832,7 +2832,7 @@ async function loadComments(postId){
     likeBtn.style.cssText='background:none;border:none;font-size:12px;color:'+(liked?'var(--accent)':'var(--muted)')+';cursor:'+(liked?'default':'pointer')+';font-family:inherit;padding:0;margin-left:auto;flex-shrink:0;';
     likeBtn.disabled=liked;
     if(!liked)likeBtn.onclick=()=>likeComment(c.id,postId,likeBtn);
-    div.querySelector('.comment-top').appendChild(likeBtn);
+    top.appendChild(likeBtn);
     list.appendChild(div);
   });
 }
@@ -3879,7 +3879,7 @@ async function openChatWithUser(targetUserId,postId,postTitle){
   }
   // 상대방 닉네임
   const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',targetUserId).single();
-  const nick=profile?.nickname||'상대방';
+  const nick=profile?.nickname||'사용자';
   openChatRoom(chatId,nick,postTitle);
 }
 
@@ -3894,7 +3894,7 @@ async function openChatList(){
   for(const chat of chats){
     const otherId=chat.user1_id===currentUser.id?chat.user2_id:chat.user1_id;
     const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',otherId).single();
-    const nick=profile?.nickname||'알수없음';
+    const nick=profile?.nickname||'사용자';
     const msgs=chat.chat_messages||[];
     const lastMsg=msgs.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
     const unread=msgs.filter(m=>!m.is_read&&m.user_id!==currentUser.id).length;
@@ -3928,8 +3928,11 @@ async function openChatRoom(chatId,partnerNick,postTitle){
   if(_chatSubscription)_chatSubscription.unsubscribe();
   _chatSubscription=db.channel('chat:'+chatId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages',filter:'chat_id=eq.'+chatId},payload=>{
-      appendMessage(payload.new);
-      if(payload.new.user_id!==currentUser.id)db.from('chat_messages').update({is_read:true}).eq('id',payload.new.id);
+      // 본인 메시지는 sendMessage에서 직접 추가하므로 중복 방지
+      if(payload.new.user_id!==currentUser.id){
+        appendMessage(payload.new);
+        db.from('chat_messages').update({is_read:true}).eq('id',payload.new.id);
+      }
     }).subscribe();
 }
 
@@ -3968,7 +3971,8 @@ async function sendMessage(){
   const content=input.value.trim();
   if(!content)return;
   input.value='';
-  await db.from('chat_messages').insert({chat_id:_currentChatId,user_id:currentUser.id,content});
+  const{data,error}=await db.from('chat_messages').insert({chat_id:_currentChatId,user_id:currentUser.id,content}).select().single();
+  if(!error&&data)appendMessage(data);
 }
 
 function openImgFull(src,images,startIdx){
