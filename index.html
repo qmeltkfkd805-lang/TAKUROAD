@@ -2543,21 +2543,25 @@ function filterBoards(q){
 
 function applyMobileLayout(){
   if(window.innerWidth>600)return;
-  // 레이아웃 세로로
-  const layout=document.querySelector('.comm-layout');
-  if(layout)layout.setAttribute('style','flex-direction:column!important;display:flex;flex:1;overflow:hidden;');
-  // 사이드바 가로 스크롤
+  // 부모 레이아웃 세로로
   const sidebar=document.getElementById('subSidebar');
-  if(sidebar){
-    sidebar.setAttribute('style','width:100%;display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden;border-right:none;border-bottom:1px solid #eee;padding:8px 10px;gap:6px;flex-shrink:0;background:var(--bg2);-webkit-overflow-scrolling:touch;');
-    const title=sidebar.querySelector('.sub-sidebar-title');
-    if(title)title.style.display='none';
-    // 모든 sub-item에 pill 스타일 강제 적용
-    sidebar.querySelectorAll('.sub-item').forEach(el=>{
-      const isActive=el.classList.contains('active');
-      el.setAttribute('style','white-space:nowrap!important;padding:5px 13px!important;font-size:12px!important;border-radius:20px!important;display:inline-flex!important;align-items:center!important;flex-shrink:0!important;cursor:pointer!important;border:1px solid '+(isActive?'transparent':'#ddd')+'!important;background:'+(isActive?'var(--accent)':'var(--surface)')+'!important;color:'+(isActive?'#fff':'var(--muted)')+'!important;font-weight:700!important;');
-    });
+  if(!sidebar)return;
+  // 부모들 수정
+  let el=sidebar.parentElement;
+  while(el&&!el.classList.contains('board-grid-view')){
+    if(el.style.display==='flex'||el.style.display===''){
+      el.style.flexDirection='column';
+    }
+    el=el.parentElement;
   }
+  // 사이드바 가로 스크롤
+  sidebar.setAttribute('style','width:100%;display:flex;flex-direction:row;overflow-x:scroll;overflow-y:hidden;border-right:none;border-bottom:1px solid #ddd;padding:8px 10px;gap:6px;flex-shrink:0;background:var(--bg2);-webkit-overflow-scrolling:touch;');
+  const title=sidebar.querySelector('.sub-sidebar-title');
+  if(title)title.style.display='none';
+  sidebar.querySelectorAll('.sub-item').forEach(el=>{
+    const isActive=el.classList.contains('active');
+    el.setAttribute('style','white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid '+(isActive?'transparent':'#ddd')+';background:'+(isActive?'var(--accent)':'var(--surface)')+';color:'+(isActive?'#fff':'#999')+';font-weight:700;');
+  });
 }
 
 function updateMobileSubItem(el,isActive){
