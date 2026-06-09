@@ -523,6 +523,14 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     .mobile-post-back{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text);padding:2px;}
     .mobile-post-title-head{flex:1;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .mobile-post-body{flex:1;overflow-y:auto;padding:16px;padding-bottom:70px;}
+    .share-popup{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1500;display:none;align-items:flex-end;justify-content:center;}
+    .share-popup.open{display:flex;}
+    .share-popup-box{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:20px 16px 32px;}
+    .share-popup-title{font-size:15px;font-weight:900;text-align:center;margin-bottom:20px;}
+    .share-popup-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+    .share-popup-btn{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:none;background:none;font-family:inherit;}
+    .share-popup-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;}
+    .share-popup-label{font-size:11px;color:var(--muted);font-weight:700;}
 </style>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.6.0/kakao.min.js" crossorigin="anonymous"></script>
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -1101,9 +1109,35 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 <div class="mobile-post-view" id="mobilePostView">
   <div class="mobile-post-header">
     <button class="mobile-post-back" onclick="closeMobilePostView()">←</button>
-    <div class="mobile-post-title-head" id="mobilePostTitleHead"></div>
+    <span id="mobilePostSubName" style="font-size:13px;color:var(--accent);font-weight:700;cursor:pointer;white-space:nowrap;"></span>
+    <div class="mobile-post-title-head" id="mobilePostTitleHead" style="font-size:13px;color:var(--muted);"></div>
   </div>
   <div class="mobile-post-body" id="mobilePostBody"></div>
+</div>
+
+<!-- 공유 팝업 -->
+<div class="share-popup" id="sharePopup" onclick="if(event.target===this)closeSharePopup()">
+  <div class="share-popup-box">
+    <div class="share-popup-title">공유하기</div>
+    <div class="share-popup-btns">
+      <button class="share-popup-btn" onclick="doShare('x')">
+        <div class="share-popup-icon" style="background:#000;color:#fff;">𝕏</div>
+        <span class="share-popup-label">X(트위터)</span>
+      </button>
+      <button class="share-popup-btn" onclick="doShare('fb')">
+        <div class="share-popup-icon" style="background:#1877f2;color:#fff;">f</div>
+        <span class="share-popup-label">페이스북</span>
+      </button>
+      <button class="share-popup-btn" onclick="doShare('kakao')">
+        <div class="share-popup-icon" style="background:#fee500;color:#000;">💬</div>
+        <span class="share-popup-label">카카오톡</span>
+      </button>
+      <button class="share-popup-btn" onclick="doShare('copy')">
+        <div class="share-popup-icon" style="background:var(--surface2);color:var(--text);">🔗</div>
+        <span class="share-popup-label" id="copyShareLabel">링크 복사</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- 게시판 삭제 -->
@@ -2975,6 +3009,13 @@ function openPostDetail(p){
   // 모바일이면 전체화면으로
   if(window.innerWidth<=600){
     document.getElementById('mobilePostTitleHead').textContent=p.title;
+    // 세부게시판 이름 표시
+    const mobileSubName=document.getElementById('mobilePostSubName');
+    if(mobileSubName){
+      const subName=currentSub?currentSub.name:'전체게시판';
+      mobileSubName.textContent=subName;
+      mobileSubName.onclick=()=>closeMobilePostView();
+    }
     const body=document.getElementById('mobilePostBody');
     body.innerHTML='';
     body.appendChild(detail);
@@ -4338,6 +4379,40 @@ async function sendMessage(){
   input.value='';
   const{data,error}=await db.from('chat_messages').insert({chat_id:_currentChatId,user_id:currentUser.id,content}).select().single();
   if(!error&&data)appendMessage(data);
+}
+
+
+let _shareUrl='';
+let _sharePost=null;
+
+function openSharePopup(){
+  _shareUrl=window._currentShareUrl||location.href;
+  _sharePost=window._currentSharePost;
+  document.getElementById('copyShareLabel').textContent='링크 복사';
+  document.getElementById('sharePopup').classList.add('open');
+}
+
+function closeSharePopup(){
+  document.getElementById('sharePopup').classList.remove('open');
+}
+
+function doShare(type){
+  const url=_shareUrl;
+  const title=_sharePost?_sharePost.title:'타쿠로드';
+  const text=encodeURIComponent(title+' - 타쿠로드');
+  if(type==='x'){window.open('https://twitter.com/intent/tweet?text='+text+'&url='+encodeURIComponent(url),'_blank','width=600,height=400');}
+  else if(type==='fb'){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),'_blank','width=600,height=400');}
+  else if(type==='kakao'){
+    if(!window.Kakao||!Kakao.isInitialized()){alert('카카오 SDK 로딩 중이에요.');return;}
+    Kakao.Share.sendDefault({objectType:'feed',content:{title,description:_sharePost?.content?_sharePost.content.replace(/<[^>]+>/g,'').slice(0,100):'',imageUrl:_sharePost?.images?.[0]||'',link:{mobileWebUrl:url,webUrl:url}},buttons:[{title:'타쿠로드에서 보기',link:{mobileWebUrl:url,webUrl:url}}]});
+  }
+  else if(type==='copy'){
+    navigator.clipboard.writeText(url).then(()=>{
+      document.getElementById('copyShareLabel').textContent='복사됐어요!';
+      setTimeout(()=>{document.getElementById('copyShareLabel').textContent='링크 복사';},2000);
+    });
+  }
+  if(type!=='copy')closeSharePopup();
 }
 
 function openImgFull(src,images,startIdx){
