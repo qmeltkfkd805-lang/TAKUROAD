@@ -2543,18 +2543,8 @@ function filterBoards(q){
 
 function applyMobileLayout(){
   if(window.innerWidth>600)return;
-  // 부모 레이아웃 세로로
   const sidebar=document.getElementById('subSidebar');
   if(!sidebar)return;
-  // 부모들 수정
-  let el=sidebar.parentElement;
-  while(el&&!el.classList.contains('board-grid-view')){
-    if(el.style.display==='flex'||el.style.display===''){
-      el.style.flexDirection='column';
-    }
-    el=el.parentElement;
-  }
-  // 사이드바 가로 스크롤
   sidebar.setAttribute('style','width:100%;display:flex;flex-direction:row;overflow-x:scroll;overflow-y:hidden;border-right:none;border-bottom:1px solid #ddd;padding:8px 10px;gap:6px;flex-shrink:0;background:var(--bg2);-webkit-overflow-scrolling:touch;');
   const title=sidebar.querySelector('.sub-sidebar-title');
   if(title)title.style.display='none';
