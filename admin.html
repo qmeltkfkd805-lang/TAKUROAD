@@ -265,24 +265,13 @@ function renderUserList(users){
 }
 
 async function loadUsers(){
+async function loadUsers(){
   const el=document.getElementById('userList');
   el.innerHTML='<div class="loading">불러오는 중…</div>';
   const{data:users}=await db.from('profiles').select('*').order('created_at',{ascending:false});
   if(!users||!users.length){el.innerHTML='<div class="empty">회원이 없어요</div>';return;}
-  el.innerHTML='';
-  const table=document.createElement('div');
-  users.forEach(u=>{
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);';
-    const avatar=document.createElement('div');
-    avatar.style.cssText='width:32px;height:32px;border-radius:8px;background:var(--accent-l);flex-shrink:0;overflow:hidden;';
-    if(u.avatar_url){avatar.style.backgroundImage='url('+u.avatar_url+')';avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';}else{avatar.textContent='👤';}
-    const info=document.createElement('div');info.style.flex='1';
-    info.innerHTML='<div style="font-weight:700;font-size:13px;">'+u.nickname+'</div><div style="font-size:11px;color:var(--muted);">'+new Date(u.created_at||'').toLocaleDateString('ko-KR')+'</div>';
-    row.appendChild(avatar);row.appendChild(info);
-    table.appendChild(row);
-  });
-  el.appendChild(table);
+  _allUsers=users;
+  renderUserList(users);
 }
 
 async function loadPosts(){
