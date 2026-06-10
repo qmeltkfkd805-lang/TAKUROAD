@@ -2995,7 +2995,8 @@ async function openPostDetail(p){
   postArea.innerHTML='';
   removePostBottomBar();
   postArea.innerHTML='';
-  const isMine=currentUser&&(p.user_id===currentUser.id||isAdmin);
+  const isMine=currentUser&&p.user_id===currentUser.id;
+  const canEdit=currentUser&&(p.user_id===currentUser.id||isAdmin);
   // DB에서 직접 좋아요 여부 확인
   let liked=window._likedPosts&&window._likedPosts.has(p.id);
   if(currentUser&&!liked){
