@@ -3909,7 +3909,7 @@ async function saveRoute(){
     const{error:upErr}=await db.storage.from('post-images').upload(path,file,{upsert:true});
     if(!upErr){const{data:u}=db.storage.from('post-images').getPublicUrl(path);imageUrls.push(u.publicUrl);}
   }
-  const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0,images:imageUrls.length?imageUrls:null});
+  const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0,images:imageUrls.length?imageUrls:null,is_shared:false});
   if(error){alert('저장 실패: '+error.message);return;}
   alert('루트가 공유됐어요! 🎉');
   currentRoute=[];_routeImgFiles=[];
