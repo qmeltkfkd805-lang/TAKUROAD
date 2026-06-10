@@ -741,6 +741,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="form-group"><label>자기소개</label><textarea id="editBio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
     <button class="btn-submit" onclick="saveProfile()">저장하기</button>
     <button class="btn-logout" onclick="logout()">로그아웃</button>
+    <button id="adminPanelBtn" onclick="location.href='/admin.html'" style="display:none;width:100%;margin-top:6px;background:var(--accent-l);border:1.5px solid var(--accent);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--accent);">🔐 관리자 패널</button>
     <button onclick="confirmDeleteAccount()" style="width:100%;margin-top:6px;background:none;border:none;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;padding:6px;text-decoration:underline;">회원탈퇴</button>
     </div><!-- profileInfoTab end -->
     <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
@@ -1985,6 +1986,8 @@ db.auth.onAuthStateChange((e,session)=>{if(session)setUser(session.user);else cl
 
 async function setUser(user){
   isAdmin=user?.email==='ham60111@gmail.com';
+  const adminBtn=document.getElementById('adminPanelBtn');
+  if(adminBtn)adminBtn.style.display=isAdmin?'block':'none';
   currentUser=user;
   const{data:profile}=await db.from('profiles').select('*').eq('id',user.id).single();
   const nick=profile&&profile.nickname?profile.nickname:user.email.split('@')[0];
