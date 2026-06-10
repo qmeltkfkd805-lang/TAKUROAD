@@ -4562,7 +4562,11 @@ function showChatFab(){
 }
 
 let _msgSubscription=null;
+let _msgSubUserId=null;
 function subscribeToNewMessages(userId){
+  if(_msgSubUserId===userId)return;  // 이미 같은 유저로 구독 중
+  _msgSubUserId=userId;
+  if(_msgSubscription){try{_msgSubscription.unsubscribe();}catch(e){}  _msgSubscription=null;}
   if(_msgSubscription){_msgSubscription.unsubscribe();_msgSubscription=null;}
   // 내 채팅방에 새 메시지 오면 배지 업데이트
   db.channel('new-messages-'+userId)
