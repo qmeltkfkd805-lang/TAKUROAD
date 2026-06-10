@@ -1758,6 +1758,8 @@ async function assignShopManager(shopId){
   if(results.length===1){
     if(!confirm(results[0].nickname+'님을 이 샵의 매니저로 임명할까요?'))return;
     await db.from('shops').update({manager_id:results[0].id}).eq('id',shopId);
+    const{data:shopData}=await db.from('shops').select('name').eq('id',shopId).single();
+    await db.from('notifications').insert({user_id:results[0].id,type:'shop_manager',message:'🏪 ['+shopData?.name+'] 샵의 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
     alert('매니저 임명 완료! 🎉');
     return;
   }
@@ -1766,6 +1768,8 @@ async function assignShopManager(shopId){
   if(isNaN(idx)||!results[idx])return;
   if(!confirm(results[idx].nickname+'님을 매니저로 임명할까요?'))return;
   await db.from('shops').update({manager_id:results[idx].id}).eq('id',shopId);
+  const{data:shopData2}=await db.from('shops').select('name').eq('id',shopId).single();
+  await db.from('notifications').insert({user_id:results[idx].id,type:'shop_manager',message:'🏪 ['+shopData2?.name+'] 샵의 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
   alert('매니저 임명 완료! 🎉');
 }
 
@@ -3731,6 +3735,7 @@ async function acceptTransfer(reqId,boardId,fromUserId,fromNick){
   await db.from('boards').update({manager_id:currentUser.id,manager_nickname:myNick}).eq('id',boardId);
   await db.from('transfer_requests').update({status:'accepted'}).eq('id',reqId);
   await db.from('notifications').insert({user_id:fromUserId,type:'transfer_accepted',message:myNick+'님이 매니저 양도를 수락했어요! 🎉'});
+  await db.from('notifications').insert({user_id:currentUser.id,type:'board_manager',message:'🎉 ['+currentBoard.name+'] 게시판 매니저로 임명됐어요! 게시판을 관리할 수 있어요.',post_id:null});
   alert('매니저 양도를 수락했어요!');
   toggleNotifPanel();
   loadNotifications();
