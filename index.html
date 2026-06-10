@@ -2587,7 +2587,7 @@ function updateMobileSubItem(el,isActive){
   }
 }
 
-async function selectBoard(board){
+async function selectBoard(board, fromPopstate=false){
   currentBoard=board;currentSub=null;
 
   // 그리드 숨기고 상세 표시
@@ -2646,7 +2646,7 @@ async function selectBoard(board){
   localStorage.setItem('tr_state',JSON.stringify({tab:'comm',boardId:board.id,boardName:board.name}));
   window._boardCache=window._boardCache||{};
   window._boardCache[board.id]=board;
-  history.pushState({view:'board',boardId:board.id},'',location.pathname+'?board='+encodeURIComponent(board.name));
+  if(!fromPopstate)history.pushState({view:'board',boardId:board.id},'',location.pathname+'?board='+encodeURIComponent(board.name));
   // 세부게시판
   const subList=document.getElementById('subBoardList');
   subList.innerHTML='';
@@ -2693,16 +2693,16 @@ window.addEventListener('popstate', function(e){
     const pa=document.getElementById('postArea');
     if(pa){pa.innerHTML='<div class="post-table" id="postTable"></div>';}
     removePostBottomBar();
-    if(currentSub)selectSub(currentSub,false);
-    else selectSubAll(false);
+    if(currentSub)selectSub(currentSub,false,true);
+    else selectSubAll(false, true);
   } else if(state.view==='sub'||state.view==='subAll'){
     // 세부게시판에서 뒤로가기 = 게시판 상세
     if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
-      selectBoard(window._boardCache[state.boardId]);
+      selectBoard(window._boardCache[state.boardId], true);
     }
   } else if(state.view==='board'){
     if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
-      selectBoard(window._boardCache[state.boardId]);
+      selectBoard(window._boardCache[state.boardId], true);
     }
   } else if(state.view==='list'||!state.view){
     backToBoards(true);
@@ -2766,7 +2766,7 @@ function selectSubAll(pushHistory){
   const pa=document.getElementById('postArea');
   if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
   if(window.innerWidth<=600)setTimeout(applyMobileLayout,10);
-  if(pushHistory)history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
+  if(pushHistory&&!fromPopstate)history.pushState({view:'subAll'},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:''));
   loadBoardPosts();
 }
 
@@ -2810,7 +2810,7 @@ function selectSub(sub){
   }
   renderSubDesc(sub);
   if(window.innerWidth<=600)setTimeout(applyMobileLayout,10);
-  history.pushState({view:'sub',subId:sub.id,subName:sub.name},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:'')+'&sub='+encodeURIComponent(sub.name));
+  if(!fromPopstate)history.pushState({view:'sub',subId:sub.id,subName:sub.name},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:'')+'&sub='+encodeURIComponent(sub.name));
   loadBoardPosts();
 }
 
