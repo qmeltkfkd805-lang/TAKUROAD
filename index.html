@@ -2875,7 +2875,7 @@ function removePostBottomBar(){
   if(bar)bar.remove();
 }
 
-function openPostDetail(p){
+async function openPostDetail(p){
   const postArea=document.getElementById('postArea');
   if(!postArea)return;
   postArea.innerHTML='';
