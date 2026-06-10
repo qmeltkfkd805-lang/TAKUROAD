@@ -2424,13 +2424,19 @@ async function toggleFavBoard(boardId, btn){
   if(window._favBoards.has(boardId)){
     await db.from('board_favorites').delete().eq('user_id',currentUser.id).eq('board_id',boardId);
     window._favBoards.delete(boardId);
-    btn.textContent='☆';
+    // 게시판 카드 안의 별이면 텍스트만
+    if(btn.innerHTML.includes('즐겨찾기')){
+      btn.style.background='var(--surface2)';btn.style.borderColor='var(--border)';btn.style.color='var(--muted)';
+      btn.innerHTML='✩ 즐겨찾기';
+    } else {btn.textContent='☆';}
   } else {
     await db.from('board_favorites').insert({user_id:currentUser.id,board_id:boardId});
     window._favBoards.add(boardId);
-    btn.textContent='⭐';
+    if(btn.innerHTML.includes('즐겨찾기')){
+      btn.style.background='var(--accent-l)';btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';
+      btn.innerHTML='🌟 즐겨찾기됨';
+    } else {btn.textContent='⭐';}
   }
-  // 즐겨찾기 게시판 상단 정렬 갱신
   if(window._allBoards)renderBoardGrid(window._allBoards);
 }
 
@@ -2541,13 +2547,19 @@ async function toggleFavBoard(boardId, btn){
   if(window._favBoards.has(boardId)){
     await db.from('board_favorites').delete().eq('user_id',currentUser.id).eq('board_id',boardId);
     window._favBoards.delete(boardId);
-    btn.textContent='☆';
+    // 게시판 카드 안의 별이면 텍스트만
+    if(btn.innerHTML.includes('즐겨찾기')){
+      btn.style.background='var(--surface2)';btn.style.borderColor='var(--border)';btn.style.color='var(--muted)';
+      btn.innerHTML='✩ 즐겨찾기';
+    } else {btn.textContent='☆';}
   } else {
     await db.from('board_favorites').insert({user_id:currentUser.id,board_id:boardId});
     window._favBoards.add(boardId);
-    btn.textContent='⭐';
+    if(btn.innerHTML.includes('즐겨찾기')){
+      btn.style.background='var(--accent-l)';btn.style.borderColor='var(--accent)';btn.style.color='var(--accent)';
+      btn.innerHTML='🌟 즐겨찾기됨';
+    } else {btn.textContent='⭐';}
   }
-  // 즐겨찾기 게시판 상단 정렬 갱신
   if(window._allBoards)renderBoardGrid(window._allBoards);
 }
 
@@ -2614,9 +2626,9 @@ async function selectBoard(board){
   const headText=document.createElement('div');
   headText.innerHTML='<div class="comm-board-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">'+board.name+'</div><div class="comm-board-meta" style="white-space:nowrap;">'+(board.manager_nickname||'알수없음')+'</div>';
   const headFavBtn=document.createElement('button');
-  headFavBtn.className='fav-btn';headFavBtn.style.cssText='font-size:20px;margin-top:2px;';
-  headFavBtn.textContent=window._favBoards&&window._favBoards.has(board.id)?'⭐':'☆';
-  headFavBtn.title='즐겨찾기';
+  const isFaved=window._favBoards&&window._favBoards.has(board.id);
+  headFavBtn.style.cssText='background:'+(isFaved?'var(--accent-l)':'var(--surface2)')+';border:1.5px solid '+(isFaved?'var(--accent)':'var(--border)')+';border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700;color:'+(isFaved?'var(--accent)':'var(--muted)')+';white-space:nowrap;display:flex;align-items:center;gap:3px;flex-shrink:0;';
+  headFavBtn.innerHTML=(isFaved?'🌟':'✩')+' '+(isFaved?'즐겨찾기됨':'즐겨찾기');
   headFavBtn.onclick=()=>toggleFavBoard(board.id,headFavBtn);
   headInfo.appendChild(headText);headInfo.appendChild(headFavBtn);
   const headBtns=document.createElement('div');
