@@ -3190,10 +3190,12 @@ async function openPostDetail(p){
       mobileSubName.textContent=subName;
       mobileSubName.onclick=()=>closeMobilePostView();
     }
+    const mpv=document.getElementById('mobilePostView');
+    if(mpv.parentElement!==document.body)document.body.appendChild(mpv);
     const body=document.getElementById('mobilePostBody');
     body.innerHTML='';
     body.appendChild(detail);
-    document.getElementById('mobilePostView').classList.add('open');
+    mpv.classList.add('open');
   } else {
     postArea.appendChild(detail);
     postArea.style.paddingBottom='60px';
