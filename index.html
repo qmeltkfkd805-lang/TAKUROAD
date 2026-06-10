@@ -4038,7 +4038,6 @@ async function submitShareRoute(){
   if(!boardId){alert('게시판을 선택해주세요');return;}
   if(!subId){alert('세부게시판을 선택해주세요');return;}
   const r=window._sharingRoute;
-  const r=window._sharingRoute;
   const addContent=document.getElementById('shareRouteContent').value.trim();
   const content=addContent||'';
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
