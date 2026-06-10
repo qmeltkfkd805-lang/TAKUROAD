@@ -2581,7 +2581,29 @@ async function selectBoard(board){
   document.getElementById('boardListView').style.display='none';
   const detailView=document.getElementById('boardDetailView');
   detailView.style.display='flex';
-
+  detailView.style.display='flex';
+  // 모바일: 부모 overflow 풀기 + subBoardList flex row
+  if(window.innerWidth<=600){
+    detailView.style.overflow='visible';
+    document.querySelector('.comm-view').style.overflow='visible';
+    document.querySelector('.comm-layout').style.overflow='visible';
+    setTimeout(()=>{
+      const sbl=document.getElementById('subBoardList');
+      if(sbl){
+        sbl.style.cssText='display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;';
+      }
+      const sidebar=document.getElementById('subSidebar');
+      if(sidebar){
+        sidebar.style.cssText='display:flex;flex-direction:row;overflow-x:auto;overflow-y:hidden;width:100%;padding:8px 12px;gap:6px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;-webkit-overflow-scrolling:touch;';
+        const title=sidebar.querySelector('.sub-sidebar-title');
+        if(title)title.style.display='none';
+        sidebar.querySelectorAll('.sub-item').forEach(el=>{
+          const isActive=el.classList.contains('active');
+          el.style.cssText='white-space:nowrap;padding:5px 13px;font-size:12px;border-radius:20px;display:inline-flex;align-items:center;flex-shrink:0;cursor:pointer;border:1px solid '+(isActive?'transparent':'var(--border)')+';background:'+(isActive?'var(--accent)':'var(--surface)')+';color:'+(isActive?'#fff':'var(--muted)')+';font-weight:700;';
+        });
+      }
+    },100);
+  }
   const isMgr=currentUser&&currentUser.id===board.manager_id;
 
   // 헤더
