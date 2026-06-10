@@ -4148,6 +4148,7 @@ async function updatePost(){
   const{error}=await db.from('posts').update({
     title,content,price,link,
     images:imgs.length?imgs:null,
+    route_data:routeData,
     updated_at:new Date().toISOString()
   }).eq('id',p_id).eq('user_id',currentUser.id);
   if(error){alert('수정 실패: '+error.message);return;}
@@ -4330,7 +4331,7 @@ async function publishPost(){
     type:'일반',nick,title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,
     sub_board_id:subId||null,
-    images:imgs.length?imgs:null,price,link
+    images:imgs.length?imgs:null,price,link,route_data:routeData
   }).select().single();
   if(error){alert('게시 실패: '+error.message);return;}
   closeEditor();
