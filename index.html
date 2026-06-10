@@ -1992,7 +1992,18 @@ document.addEventListener('mousedown',()=>{window._dragging=false;});
 document.addEventListener('mousemove',()=>{window._dragging=true;});
 document.addEventListener('mouseup',()=>{setTimeout(()=>{window._dragging=false;},0);});
 function closeOverlay(id){document.getElementById(id).classList.remove('open');}
-function openAuth(){document.getElementById('authOverlay').classList.add('open');}
+function isInAppBrowser(){
+  const ua=navigator.userAgent.toLowerCase();
+  return /kakaotalk|line|naver|instagram|facebook|fbios|fbav|twitter|snapchat|wechat|micromessenger/.test(ua);
+}
+
+function openAuth(){
+  if(isInAppBrowser()){
+    document.getElementById('inAppBrowserAlert').style.display='flex';
+    return;
+  }
+  document.getElementById('authOverlay').classList.add('open');
+}
 function openAddModal(){document.getElementById('addOverlay').classList.add('open');resetAddForm();}
 
 // ── 인증 ──
@@ -4821,5 +4832,13 @@ function openImgFull(src,images,startIdx){
       <a href="/contact.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">문의하기</a>
     </footer>
   </div>
+<div id="inAppBrowserAlert" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--surface);border-radius:var(--r);padding:28px 24px;max-width:320px;width:100%;text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🌐</div>
+    <div style="font-size:17px;font-weight:900;margin-bottom:8px;">외부 브라우저로 열어주세요</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px;">카카오톡 등 앱 내 브라우저에서는<br>Google 로그인이 제한돼요.<br><br>우측 하단 <strong>···</strong> → <strong>다른 브라우저로 열기</strong><br>→ <strong>크롬</strong> 을 선택해주세요!</div>
+    <button onclick="document.getElementById('inAppBrowserAlert').style.display='none'" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);padding:12px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;">확인</button>
+  </div>
+</div>
 </body>
 </html>
