@@ -659,7 +659,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     </div>
     <div style="padding:12px 16px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;">
       <button onclick="previewRoute()" style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">🗺️ 지도에서 미리보기</button>
-      <button onclick="saveRoute()" style="flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">공유하기</button>
+      <button onclick="saveRoute()" style="flex:1;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;">저장하기</button>
     </div>
   </div>
   <!-- 공유된 루트 탭 -->
@@ -3755,6 +3755,13 @@ function switchRouteTab(tab){
   if(tab==='mine')loadMyRoutes();
 }
 
+function shareRouteLink(r){
+  // 루트 공유 팝업
+  window._currentShareUrl=location.origin+location.pathname+'?route='+r.id;
+  window._currentSharePost={title:r.title};
+  openSharePopup();
+}
+
 async function loadMyRoutes(){
   if(!currentUser){
     document.getElementById('myRouteList').innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">로그인 후 확인할 수 있어요</div>';
@@ -3773,6 +3780,11 @@ async function loadMyRoutes(){
     const shareBtn=document.createElement('button');
     shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;';
     shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
+    const shareRouteBtn=document.createElement('button');shareRouteBtn.className='route-action-btn';
+    shareRouteBtn.style.cssText='background:var(--cyan-l);color:var(--cyan);border:1px solid var(--cyan);border-radius:var(--r-sm);padding:5px 10px;font-size:11px;font-family:inherit;cursor:pointer;';
+    shareRouteBtn.textContent='🔗 루트 공유';
+    shareRouteBtn.onclick=()=>shareRouteLink(r);
+    btns.appendChild(shareRouteBtn);
     const editBtn=document.createElement('button');
     editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
     editBtn.textContent='✏️ 수정';editBtn.onclick=()=>openEditRoute(r);
@@ -3896,7 +3908,7 @@ async function saveRoute(){
   document.getElementById('routeDesc').value='';
   renderRouteShopList();renderRouteImgPreview();
   clearRoutePreview();
-  switchRouteTab('list');
+  switchRouteTab('mine');
 }
 
 async function loadSavedRoutes(){
@@ -4066,8 +4078,12 @@ async function submitShareRoute(){
     user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
     route_data:r.shop_ids
   }).select().single();
-  closeOverlay('shareRouteOverlay');
-  closeRoutePanel();
+  }).select().single();
+  if(error){alert('공유 실패: '+error.message);return;}
+  // routes 테이블에 없으면 추가
+  if(!r.id||typeof r.id==='undefined'){
+    await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title:r.title,description:r.description||'',shop_ids:r.shop_ids,likes:0,images:r.images||null});
+  }
   if(newPost){
     const{data:board}=await db.from('boards').select('*').eq('id',boardId).single();
     const{data:sub}=await db.from('sub_boards').select('*').eq('id',subId).single();
