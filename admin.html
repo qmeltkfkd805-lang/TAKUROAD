@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 패널 - 타쿠로드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Cute+Font&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#fdf6ff;--surface:#fff;--surface2:#f5eeff;--border:#e8d5f5;
+  --text:#1a0a2e;--muted:#9b7bb8;--accent:#e8006f;--accent-l:rgba(232,0,111,.1);
+  --purple:#7c3aed;--purple-l:rgba(124,58,237,.1);--red:#dc2626;--red-l:rgba(220,38,38,.1);
+  --green:#059669;--green-l:rgba(5,150,105,.1);--r:12px;--r-sm:7px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+a{color:var(--accent);text-decoration:none;}
+
+header{background:var(--surface);border-bottom:1.5px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.logo{font-family:'Cute Font',cursive;font-size:24px;color:var(--accent);}
+.admin-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.back-btn{margin-left:auto;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--text);}
+
+#authWall{display:flex;align-items:center;justify-content:center;height:80vh;flex-direction:column;gap:16px;}
+#authWall h2{font-size:20px;font-weight:900;color:var(--accent);}
+#authWall p{color:var(--muted);font-size:14px;}
+
+.container{max-width:900px;margin:0 auto;padding:32px 24px 80px;}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:32px;}
+.stat-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 20px;text-align:center;}
+.stat-num{font-size:28px;font-weight:900;color:var(--accent);}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;}
+
+.section{margin-bottom:40px;}
+.section-title{font-size:18px;font-weight:900;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.badge{background:var(--red-l);color:var(--red);font-size:12px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.badge-green{background:var(--green-l);color:var(--green);}
+
+.report-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:12px;}
+.report-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+.report-type{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:var(--accent-l);color:var(--accent);flex-shrink:0;}
+.report-reason{font-size:14px;line-height:1.6;color:var(--text);flex:1;}
+.report-meta{font-size:12px;color:var(--muted);margin-top:8px;}
+.report-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn{padding:6px 14px;border-radius:20px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;border:1.5px solid;}
+.btn-red{background:var(--red-l);color:var(--red);border-color:var(--red);}
+.btn-gray{background:var(--surface2);color:var(--muted);border-color:var(--border);}
+.btn-green{background:var(--green-l);color:var(--green);border-color:var(--green);}
+.resolved{opacity:0.4;pointer-events:none;}
+
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.loading{text-align:center;padding:20px;color:var(--muted);font-size:13px;}
+
+.tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:12px;}
+.tab-btn{padding:8px 16px;border:none;background:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--muted);border-radius:20px;}
+.tab-btn.active{background:var(--accent-l);color:var(--accent);}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">TAKUROAD</span>
+  <span class="admin-badge">🔐 관리자</span>
+  <button class="back-btn" onclick="location.href='/'">← 사이트로</button>
+</header>
+
+<div id="authWall" style="display:none;">
+  <h2>🔒 접근 불가</h2>
+  <p>관리자 계정으로 로그인해주세요.</p>
+  <button onclick="location.href='/'" style="background:var(--accent);color:#fff;border:none;border-radius:20px;padding:10px 24px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;">홈으로</button>
+</div>
+
+<div id="adminPanel" style="display:none;">
+  <div class="container">
+    <!-- 통계 -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num" id="statReports">-</div>
+        <div class="stat-label">미처리 신고</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statPosts">-</div>
+        <div class="stat-label">전체 게시글</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statUsers">-</div>
+        <div class="stat-label">전체 회원</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statShops">-</div>
+        <div class="stat-label">등록된 샵</div>
+      </div>
+    </div>
+
+    <!-- 탭 -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('reports', this)">🚨 신고 목록</button>
+      <button class="tab-btn" onclick="switchTab('users', this)">👥 회원 목록</button>
+      <button class="tab-btn" onclick="switchTab('posts', this)">📝 게시글 목록</button>
+    </div>
+
+    <!-- 신고 목록 -->
+    <div id="tab-reports">
+      <div class="section">
+        <div class="section-title">미처리 신고 <span class="badge" id="reportCount">0</span></div>
+        <div id="reportList" class="loading">불러오는 중…</div>
+      </div>
+      <div class="section">
+        <div class="section-title">처리 완료 <span class="badge badge-green">완료</span></div>
+        <div id="resolvedList" class="loading">불러오는 중…</div>
+      </div>
+    </div>
+
+    <!-- 회원 목록 -->
+    <div id="tab-users" style="display:none;">
+      <div id="userList" class="loading">불러오는 중…</div>
+    </div>
+
+    <!-- 게시글 목록 -->
+    <div id="tab-posts" style="display:none;">
+      <div id="postList" class="loading">불러오는 중…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ouhlwmtwgxewrktgrzkd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91aGx3bXR3Z3hld3JrdGdyemtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzNDM4NjUsImV4cCI6MjA5NDkxOTg2NX0.Y1BGbubuWUM-8E9ydN0sJk3R3j8wiYwhj0Qkk7F2O_M';
+const ADMIN_EMAIL = 'ham60111@gmail.com';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  if(tab==='users')loadUsers();
+  if(tab==='posts')loadPosts();
+}
+
+async function init(){
+  const{data:{user}}=await db.auth.getUser();
+  if(!user||user.email!==ADMIN_EMAIL){
+    document.getElementById('authWall').style.display='flex';
+    return;
+  }
+  currentUser=user;
+  document.getElementById('adminPanel').style.display='block';
+  loadStats();
+  loadReports();
+}
+
+async function loadStats(){
+  const[{count:rCount},{count:pCount},{count:uCount},{count:sCount}]=await Promise.all([
+    db.from('reports').select('*',{count:'exact',head:true}).eq('status','pending'),
+    db.from('posts').select('*',{count:'exact',head:true}),
+    db.from('profiles').select('*',{count:'exact',head:true}),
+    db.from('shops').select('*',{count:'exact',head:true}),
+  ]);
+  document.getElementById('statReports').textContent=rCount||0;
+  document.getElementById('statPosts').textContent=pCount||0;
+  document.getElementById('statUsers').textContent=uCount||0;
+  document.getElementById('statShops').textContent=sCount||0;
+}
+
+async function loadReports(){
+  const{data:reports}=await db.from('reports').select('*').order('created_at',{ascending:false});
+  const pending=(reports||[]).filter(r=>r.status!=='resolved');
+  const resolved=(reports||[]).filter(r=>r.status==='resolved');
+  document.getElementById('reportCount').textContent=pending.length;
+
+  renderReports(pending, 'reportList', false);
+  renderReports(resolved, 'resolvedList', true);
+}
+
+async function renderReports(reports, elId, isResolved){
+  const el=document.getElementById(elId);
+  if(!reports.length){el.innerHTML='<div class="empty">없어요</div>';return;}
+  el.innerHTML='';
+  for(const r of reports){
+    // 신고자, 피신고자 닉네임 가져오기
+    const[{data:reporter},{data:target}]=await Promise.all([
+      db.from('profiles').select('nickname').eq('id',r.reporter_id).maybeSingle(),
+      r.target_user_id?db.from('profiles').select('nickname').eq('id',r.target_user_id).maybeSingle():{data:null}
+    ]);
+    // 신고된 글이면 글 정보도
+    let postInfo='';
+    if(r.target_type==='post'&&r.target_id){
+      const{data:post}=await db.from('posts').select('title').eq('id',r.target_id).maybeSingle();
+      if(post)postInfo='<div style="font-size:12px;color:var(--muted);margin-top:4px;">📝 신고된 글: '+post.title+'</div>';
+    }
+    const card=document.createElement('div');
+    card.className='report-card'+(isResolved?' resolved':'');
+    card.innerHTML=`
+      <div class="report-top">
+        <span class="report-type">${r.target_type==='post'?'📝 게시글':'👤 유저'}</span>
+        <div class="report-reason">${r.reason||'(사유 없음)'}</div>
+      </div>
+      ${postInfo}
+      <div class="report-meta">
+        신고자: <strong>${reporter?.nickname||'(알수없음)'}</strong> →
+        피신고자: <strong>${target?.nickname||'(알수없음)'}</strong> ·
+        ${new Date(r.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+      </div>
+      ${!isResolved?`<div class="report-actions">
+        ${r.target_type==='post'&&r.target_id?`<button class="btn btn-red" onclick="deleteReportedPost('${r.id}','${r.target_id}',this.closest('.report-card'))">🗑️ 게시글 삭제</button>`:''}
+        <button class="btn btn-green" onclick="resolveReport('${r.id}',this.closest('.report-card'))">✅ 처리 완료</button>
+        <button class="btn btn-gray" onclick="dismissReport('${r.id}',this.closest('.report-card'))">무시</button>
+      </div>`:''}
+    `;
+    el.appendChild(card);
+  }
+}
+
+async function resolveReport(reportId, card){
+  await db.from('reports').update({status:'resolved'}).eq('id',reportId);
+  card.classList.add('resolved');
+  setTimeout(()=>loadReports(),500);
+}
+
+async function dismissReport(reportId, card){
+  await db.from('reports').update({status:'dismissed'}).eq('id',reportId);
+  card.classList.add('resolved');
+  setTimeout(()=>loadReports(),500);
+}
+
+async function deleteReportedPost(reportId, postId, card){
+  if(!confirm('이 게시글을 삭제할까요?'))return;
+  await db.from('posts').delete().eq('id',postId);
+  await db.from('reports').update({status:'resolved'}).eq('id',reportId);
+  card.classList.add('resolved');
+  setTimeout(()=>loadReports(),500);
+  loadStats();
+}
+
+async function loadUsers(){
+  const el=document.getElementById('userList');
+  el.innerHTML='<div class="loading">불러오는 중…</div>';
+  const{data:users}=await db.from('profiles').select('*').order('created_at',{ascending:false});
+  if(!users||!users.length){el.innerHTML='<div class="empty">회원이 없어요</div>';return;}
+  el.innerHTML='';
+  const table=document.createElement('div');
+  users.forEach(u=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);';
+    const avatar=document.createElement('div');
+    avatar.style.cssText='width:32px;height:32px;border-radius:8px;background:var(--accent-l);flex-shrink:0;overflow:hidden;';
+    if(u.avatar_url)avatar.style.backgroundImage='url('+u.avatar_url+')';avatar.style.backgroundSize='cover';
+    else avatar.textContent='👤';
+    const info=document.createElement('div');info.style.flex='1';
+    info.innerHTML='<div style="font-weight:700;font-size:13px;">'+u.nickname+'</div><div style="font-size:11px;color:var(--muted);">'+new Date(u.created_at||'').toLocaleDateString('ko-KR')+'</div>';
+    row.appendChild(avatar);row.appendChild(info);
+    table.appendChild(row);
+  });
+  el.appendChild(table);
+}
+
+async function loadPosts(){
+  const el=document.getElementById('postList');
+  el.innerHTML='<div class="loading">불러오는 중…</div>';
+  const{data:posts}=await db.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
+  if(!posts||!posts.length){el.innerHTML='<div class="empty">게시글이 없어요</div>';return;}
+  el.innerHTML='';
+  posts.forEach(p=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);';
+    const d=new Date(p.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+    row.innerHTML=`
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">${p.title}</div>
+        <div style="font-size:11px;color:var(--muted);">${p.nick} · ${d} · ❤️ ${p.likes||0}</div>
+      </div>
+      <button class="btn btn-red" onclick="adminDeletePost('${p.id}',this.closest('div[style]'))">삭제</button>
+    `;
+    el.appendChild(row);
+  });
+}
+
+async function adminDeletePost(postId, row){
+  if(!confirm('이 게시글을 삭제할까요?'))return;
+  await db.from('posts').delete().eq('id',postId);
+  row.remove();
+  loadStats();
+}
+
+init();
+</script>
+</body>
+</html>
