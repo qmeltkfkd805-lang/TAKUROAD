@@ -741,7 +741,8 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <div class="form-group"><label>자기소개</label><textarea id="editBio" rows="3" placeholder="자기소개를 입력하세요"></textarea></div>
     <button class="btn-submit" onclick="saveProfile()">저장하기</button>
     <button class="btn-logout" onclick="logout()">로그아웃</button>
-    </div><!-- profileInfoTab end -->
+    <button class="btn-logout" onclick="logout()">로그아웃</button>
+    <button onclick="confirmDeleteAccount()" style="width:100%;margin-top:6px;background:none;border:none;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;padding:6px;text-decoration:underline;">회원탈퇴</button>
     <div id="profilePostsTab" style="display:none;" class="profile-content"></div>
     <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
     <div id="profileBookmarksTab" style="display:none;" class="profile-content"></div>
@@ -2257,6 +2258,36 @@ async function submitNickname(){
 }
 
 async function logout(){await db.auth.signOut();closeOverlay('profileOverlay');}
+
+async function confirmDeleteAccount(){
+  if(!currentUser)return;
+  const confirmed=confirm('정말 탈퇴하시겠어요?\n작성한 모든 글, 댓글, 루트 데이터가 영구 삭제됩니다.');
+  if(!confirmed)return;
+  const confirmed2=confirm('⚠️ 탈퇴 후 복구가 불가능합니다.\n정말 삭제하시겠어요?');
+  if(!confirmed2)return;
+  const uid=currentUser.id;
+  try{
+    // 데이터 삭제
+    await db.from('comments').delete().eq('user_id',uid);
+    await db.from('post_likes').delete().eq('user_id',uid);
+    await db.from('comment_likes').delete().eq('user_id',uid);
+    await db.from('post_bookmarks').delete().eq('user_id',uid);
+    await db.from('board_favorites').delete().eq('user_id',uid);
+    await db.from('route_likes').delete().eq('user_id',uid);
+    await db.from('subscriptions').delete().eq('follower_id',uid);
+    await db.from('subscriptions').delete().eq('following_id',uid);
+    await db.from('notifications').delete().eq('user_id',uid);
+    await db.from('posts').delete().eq('user_id',uid);
+    await db.from('routes').delete().eq('user_id',uid);
+    await db.from('profiles').delete().eq('id',uid);
+    // 계정 삭제
+    await db.auth.signOut();
+    alert('탈퇴가 완료됐어요. 이용해주셔서 감사합니다 🙏');
+    location.reload();
+  } catch(e){
+    alert('탈퇴 처리 중 오류가 발생했어요: '+e.message);
+  }
+}
 
 // ── 장소 추가 ──
 let selectedCat=null,selectedCats=[],pickedLat=null,pickedLng=null,modalTags=[];
