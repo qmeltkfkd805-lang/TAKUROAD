@@ -4535,7 +4535,7 @@ function popupReport(){
   document.getElementById('reportOverlay').classList.add('open');
 }
 
-function openReport(){closeUserPopup();document.getElementById('reportOverlay').classList.add('open');}
+function openReport(){document.getElementById('reportOverlay').classList.add('open');document.getElementById('reportReason').value='';closeUserPopup();}
 function closeReport(){document.getElementById('reportOverlay').classList.remove('open');}
 
 async function submitReport(){
