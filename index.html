@@ -4044,26 +4044,22 @@ async function submitShareRoute(){
   const content=(addContent?addContent+'\n\n':'')+'📍 성지순례 루트: '+r.title+'\n'+routeText;
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile?.nickname||currentUser.email.split('@')[0];
-  const{error}=await db.from('posts').insert({
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{data:newPost,error}=await db.from('posts').insert({
     type:'일반',nick,title:'[루트] '+r.title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
     route_data:r.shop_ids
-  });
+  }).select().single();
   if(error){alert('공유 실패: '+error.message);return;}
   closeOverlay('shareRouteOverlay');
-  closeOverlay('shareRouteOverlay');
   closeRoutePanel();
-  // 해당 글로 이동
-  const{data:board}=await db.from('boards').select('*').eq('id',boardId).single();
-  const{data:newPost}=await db.from('posts').select('*').eq('user_id',currentUser.id).eq('board_id',boardId).order('created_at',{ascending:false}).limit(1).single();
-  if(board&&newPost){
-    switchTab('comm');
-    await selectBoard(board);
+  if(newPost){
+    const{data:board}=await db.from('boards').select('*').eq('id',boardId).single();
     const{data:sub}=await db.from('sub_boards').select('*').eq('id',subId).single();
+    if(board){switchTab('comm');await selectBoard(board);}
     if(sub)await selectSub(sub);
-    setTimeout(()=>openPostDetail(newPost),300);
+    setTimeout(()=>openPostDetail(newPost),400);
   }
-  clearRoutePreview();
   closeRoutePanel();
   // 지도 탭으로 전환
   if(!document.getElementById('tabMap').classList.contains('active')){
