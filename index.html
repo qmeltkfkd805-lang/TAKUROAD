@@ -1757,7 +1757,7 @@ async function assignShopManager(shopId){
   if(results.length===1){
     if(!confirm(results[0].nickname+'님을 이 샵의 매니저로 임명할까요?'))return;
     await db.from('shops').update({manager_id:results[0].id}).eq('id',shopId);
-    await db.from('notifications').insert({user_id:results[0].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
+    await db.from('notifications').insert({user_id:results[0].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:shopId});
     alert('매니저 임명 완료! 🎉');
     return;
   }
@@ -1766,7 +1766,7 @@ async function assignShopManager(shopId){
   if(isNaN(idx)||!results[idx])return;
   if(!confirm(results[idx].nickname+'님을 매니저로 임명할까요?'))return;
   await db.from('shops').update({manager_id:results[idx].id}).eq('id',shopId);
-  await db.from('notifications').insert({user_id:results[idx].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
+  await db.from('notifications').insert({user_id:results[idx].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:shopId});
   alert('매니저 임명 완료! 🎉');
 }
 
@@ -3685,6 +3685,8 @@ async function submitTransfer(){
   alert(profile.nickname+'님께 양도 요청을 보냈어요! 상대방이 수락하면 양도돼요 😊');
 }
 
+function closeNotifPanel(){document.getElementById('notifPanel').classList.remove('open');}
+
 async function loadNotifications(){
   if(!currentUser)return;
   const{data:notifs}=await db.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
@@ -3719,8 +3721,25 @@ async function loadNotifications(){
         await db.from('notifications').update({is_read:true}).eq('id',item.id);
         div.classList.remove('unread');
         loadNotifications();
+        // 클릭 시 해당 위치로 이동
+        closeNotifPanel();
+        if(item.type==='shop_manager'&&item.post_id){
+          // 샵으로 이동
+          const{data:shop}=await db.from('shops').select('*').eq('id',item.post_id).single();
+          if(shop)openDetail(shop);
+        } else if(item.post_id){
+          // 글로 이동
+          const{data:post}=await db.from('posts').select('*').eq('id',item.post_id).single();
+          if(post){
+            const{data:board}=await db.from('boards').select('*').eq('id',post.board_id).single();
+            if(board){
+              switchTab('comm');
+              await selectBoard(board);
+              setTimeout(()=>openPostDetail(post),300);
+            }
+          }
+        }
       };
-    }
     list.appendChild(div);
   });
 }
