@@ -4535,7 +4535,17 @@ function popupReport(){
   document.getElementById('reportOverlay').classList.add('open');
 }
 
-function openReport(){document.getElementById('reportOverlay').classList.add('open');document.getElementById('reportReason').value='';closeUserPopup();}
+function openReport(){
+  // 스크롤 핸들러 먼저 제거
+  if(_popupScrollHandler){
+    window.removeEventListener('scroll',_popupScrollHandler,true);
+    document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));
+    _popupScrollHandler=null;
+  }
+  document.getElementById('userPopup').classList.remove('open');
+  document.getElementById('reportReason').value='';
+  document.getElementById('reportOverlay').classList.add('open');
+}
 function closeReport(){document.getElementById('reportOverlay').classList.remove('open');}
 
 async function submitReport(){
