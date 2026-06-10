@@ -3100,6 +3100,29 @@ async function submitEditPost(){
   openPostDetail(p);
 }
 
+async function togglePostLike(postId, btn, wasLiked){
+  if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
+  if(wasLiked){
+    if(!window._likedPosts)window._likedPosts=new Set();
+    window._likedPosts.delete(postId);
+    const{data}=await db.from('posts').select('likes').eq('id',postId).single();
+    const newLikes=Math.max(0,(data?.likes||1)-1);
+    await db.from('posts').update({likes:newLikes}).eq('id',postId);
+    btn.style.background='none';btn.style.color='var(--muted)';btn.style.borderColor='var(--border)';
+    btn.textContent='❤️ '+newLikes;
+    btn.onclick=()=>togglePostLike(postId,btn,false);
+  } else {
+    if(!window._likedPosts)window._likedPosts=new Set();
+    window._likedPosts.add(postId);
+    const{data}=await db.from('posts').select('likes').eq('id',postId).single();
+    const newLikes=(data?.likes||0)+1;
+    await db.from('posts').update({likes:newLikes}).eq('id',postId);
+    btn.style.background='var(--accent)';btn.style.color='#fff';btn.style.borderColor='var(--accent)';
+    btn.textContent='❤️ '+newLikes;
+    btn.onclick=()=>togglePostLike(postId,btn,true);
+  }
+}
+
 async function likePost(postId,btn){
   if(!currentUser){alert('로그인 후 좋아요를 누를 수 있어요!');return;}
   if(window._likedPosts&&window._likedPosts.has(postId))return;
@@ -3152,7 +3175,8 @@ async function loadComments(postId){
     const isMine=currentUser&&c.user_id===currentUser.id;
     const liked=likedComments.has(c.id);
     // 아바타 + 닉네임 클릭 팝업
-    const top=document.createElement('div');top.className='comment-top';top.style.cssText='display:flex;align-items:center;gap:8px;';
+    // 아바타 + 닉네임 클릭 팝업
+    const div=document.createElement('div');div.className='comment-item';div.style.cssText='background:var(--surface2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;';
     const avatar=document.createElement('div');avatar.className='comment-avatar';
     const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;
     // 최신 닉네임 반영
