@@ -1916,6 +1916,13 @@ function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
   if(isMap&&map){setTimeout(()=>{map.relayout();},100);}
+  // 커뮤니티로 전환 시 샵 세부창 닫기
+  if(!isMap){
+    const dp=document.getElementById('detailPanel');
+    if(dp)dp.classList.remove('open');
+    const lp=document.getElementById('listPanel');
+    if(lp)lp.classList.remove('open');
+  }
   const searchInput=document.getElementById('searchInput');
   if(isMap){
     localStorage.setItem('tr_state',JSON.stringify({tab:'map'}));
