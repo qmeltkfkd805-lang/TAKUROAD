@@ -3917,7 +3917,17 @@ async function loadSavedRoutes(){
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
     shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
-    // 지도보기 버튼
+    shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=s.name;savedShops.appendChild(tag);});
+    // 이미지 표시
+    if(r.images&&r.images.length){
+      const imgRow=document.createElement('div');imgRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;';
+      r.images.forEach(src=>{
+        const img=document.createElement('img');img.src=src;
+        img.style.cssText='width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border);';
+        img.onclick=()=>openImgFull(src,r.images);imgRow.appendChild(img);
+      });
+      card.appendChild(imgRow);
+    }
     const viewBtn=document.createElement('button');
     viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
