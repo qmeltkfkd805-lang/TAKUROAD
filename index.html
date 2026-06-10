@@ -4059,11 +4059,18 @@ async function submitShareRoute(){
 }
 
 function viewRoute(shops){
+  if(!shops||!shops.length)return;
   clearRoutePreview();
   closeRoutePanel();
   if(!document.getElementById('tabMap').classList.contains('active')){
     switchTab('map');
+    setTimeout(()=>_drawRoute(shops),350);
+    return;
   }
+  _drawRoute(shops);
+}
+
+function _drawRoute(shops){
   const ROUTE_COLORS2=['#e8006f','#ff6600','#f5c400','#16a34a','#0099cc','#1e3a8a','#7c3aed'];
   shops.forEach((s,i)=>{
     const el=document.createElement('div');el.className='route-num-marker';
@@ -4077,6 +4084,8 @@ function viewRoute(shops){
   const bounds=new kakao.maps.LatLngBounds();
   shops.forEach(s=>bounds.extend(new kakao.maps.LatLng(s.lat,s.lng)));
   map.setBounds(bounds);
+  // 첫 번째 샵으로 중심 이동
+  if(shops[0])map.setCenter(new kakao.maps.LatLng(shops[0].lat,shops[0].lng));
 }
 
 
