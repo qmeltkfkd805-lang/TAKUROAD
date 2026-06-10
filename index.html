@@ -3194,6 +3194,8 @@ async function loadComments(postId){
     const top=document.createElement('div');
     top.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px;';
     const avatar=document.createElement('div');avatar.className='comment-avatar';
+    const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;nickSpan.style.cssText='font-size:13px;font-weight:700;';
+    const dateSpan=document.createElement('span');dateSpan.className='comment-date';dateSpan.textContent=date;dateSpan.style.cssText='font-size:11px;color:var(--muted);';
     if(c.user_id){
       db.from('profiles').select('nickname,avatar_url').eq('id',c.user_id).maybeSingle().then(({data})=>{
         if(data?.avatar_url){avatar.innerHTML='<img src="'+data.avatar_url+'"/>';}
@@ -3206,8 +3208,6 @@ async function loadComments(postId){
         nickSpan.onclick=openPopup;nickSpan.style.cursor='pointer';
       }
     } else {avatar.textContent='👤';}
-    const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;nickSpan.style.cssText='font-size:13px;font-weight:700;';
-    const dateSpan=document.createElement('span');dateSpan.className='comment-date';dateSpan.textContent=date;dateSpan.style.cssText='font-size:11px;color:var(--muted);';
     top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);
     // 텍스트
     const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;textDiv.style.cssText='font-size:13px;line-height:1.6;margin-bottom:6px;';
