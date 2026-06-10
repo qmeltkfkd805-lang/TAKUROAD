@@ -625,6 +625,12 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     </div>
   </div>
 </div>
+  <footer style="text-align:center;padding:14px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;background:var(--bg);flex-shrink:0;">
+    <a href="/about.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">소개</a>
+    <a href="/privacy.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">개인정보처리방침</a>
+    <a href="/terms.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">이용약관</a>
+    <a href="/contact.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">문의하기</a>
+  </footer>
 
 <!-- 루트 패널 -->
 <div class="route-panel" id="routePanel">
@@ -4680,5 +4686,14 @@ function openImgFull(src,images,startIdx){
   d.onclick=()=>d.remove();document.body.appendChild(d);
 }
 </script>
+  <!-- 푸터 -->
+  <div style="display:none" id="pageFooter">
+    <footer style="text-align:center;padding:20px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;background:var(--surface);flex-shrink:0;">
+      <a href="/about.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">소개</a>
+      <a href="/privacy.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">개인정보처리방침</a>
+      <a href="/terms.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">이용약관</a>
+      <a href="/contact.html" style="color:var(--muted);margin:0 8px;text-decoration:none;">문의하기</a>
+    </footer>
+  </div>
 </body>
 </html>
