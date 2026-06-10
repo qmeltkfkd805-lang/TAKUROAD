@@ -4558,7 +4558,7 @@ async function submitReport(){
 }
 
 document.addEventListener('click',e=>{
-  if(!e.target.closest('#userPopup')&&!e.target.closest('.comment-avatar')&&!e.target.closest('.comment-nick')&&!e.target.closest('.user-popup-btn'))closeUserPopup();
+  if(!e.target.closest('#userPopup')&&!e.target.closest('.comment-avatar')&&!e.target.closest('.comment-nick')&&!e.target.closest('.user-popup-btn')&&!e.target.closest('#reportOverlay'))closeUserPopup();
 });
 
 // 프로필 아바타 HTML 생성 헬퍼
