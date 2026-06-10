@@ -3968,18 +3968,7 @@ async function loadSavedRoutes(){
     shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
     btnRow.appendChild(shareBtn);
     card.appendChild(viewBtn);card.appendChild(btnRow);
-      const editBtn=document.createElement('button');
-      editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
-      editBtn.textContent='✏️ 수정';editBtn.onclick=(e)=>{e.stopPropagation();openEditRoute(r);};
-      const delBtn=document.createElement('button');
-      delBtn.style.cssText='background:var(--red-l);border:1px solid var(--red);border-radius:10px;font-size:11px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 8px;';
-      delBtn.textContent='🗑️ 삭제';delBtn.onclick=(e)=>{e.stopPropagation();deleteRoute(r.id,card);};
-      titleRow.appendChild(editBtn);titleRow.appendChild(delBtn);
-    }
-    infoDiv.insertBefore(titleRow,infoDiv.firstChild);
-    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
-    btnRow.appendChild(viewBtn);
-    card.appendChild(topRow);card.appendChild(tagsDiv);card.appendChild(btnRow);
+    card.appendChild(viewBtn);card.appendChild(btnRow);
     list.appendChild(card);
   });
 }
