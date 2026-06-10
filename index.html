@@ -4535,6 +4535,7 @@ function popupReport(){
   document.getElementById('reportOverlay').classList.add('open');
 }
 
+function openReport(){closeUserPopup();document.getElementById('reportOverlay').classList.add('open');}
 function closeReport(){document.getElementById('reportOverlay').classList.remove('open');}
 
 async function submitReport(){
