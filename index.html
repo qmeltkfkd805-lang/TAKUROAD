@@ -3183,7 +3183,7 @@ async function loadComments(postId){
     const liked=likedComments.has(c.id);
     // 아바타 + 닉네임 클릭 팝업
     // 아바타 + 닉네임 클릭 팝업
-    const div=document.createElement('div');div.className='comment-item';div.style.cssText='background:var(--surface2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;';
+    const top=document.createElement('div');top.className='comment-top';top.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:6px;';
     const avatar=document.createElement('div');avatar.className='comment-avatar';
     const nickSpan=document.createElement('span');nickSpan.className='comment-nick';nickSpan.textContent=c.nick;
     // 최신 닉네임 반영
@@ -3200,7 +3200,8 @@ async function loadComments(postId){
         nickSpan.style.cursor='pointer';nickSpan.onclick=openPopup;
       }
     } else {avatar.textContent='👤';}
-    // 텍스트
+    } else {avatar.textContent='👤';}
+    top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);
     const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;
     div.appendChild(top);div.appendChild(textDiv);
     // 하단 액션 행
