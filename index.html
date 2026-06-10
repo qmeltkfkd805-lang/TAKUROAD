@@ -2935,7 +2935,7 @@ async function openPostDetail(p){
   detail.appendChild(meta);
 
   const body=document.createElement('div');
-  body.style.cssText='font-size:14px;line-height:1.8;background:var(--surface2);border-radius:var(--r-sm);padding:14px;border:1px solid var(--border);margin-bottom:14px;';
+  body.style.cssText='font-size:14px;line-height:1.8;background:none;border:none;margin-bottom:14px;';
   body.innerHTML=p.content;
   body.querySelectorAll('img').forEach(img=>{img.style.maxWidth='100%';img.style.height='auto';img.style.borderRadius='8px';});
   detail.appendChild(body);
