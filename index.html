@@ -2973,7 +2973,7 @@ function openPostDetail(p){
   detail.appendChild(btnWrap);
 
   // 채팅하기 버튼 (본인 글 아닐 때만)
-  if(currentUser&&!isMine&&p.user_id){
+  if(currentUser&&!isMine&&p.user_id&&currentSub&&currentSub.name==='중고거래'){
     const chatBtn=document.createElement('button');chatBtn.className='chat-btn';
     chatBtn.innerHTML='💬 판매자에게 채팅하기';
     chatBtn.onclick=()=>openChatWithUser(p.user_id,p.id,p.title);
