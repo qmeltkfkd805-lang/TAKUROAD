@@ -1269,34 +1269,15 @@ async function loadShops(){
 }
 
 window.onload=function(){
-  // 카카오 SDK 초기화
   if(window.Kakao&&!Kakao.isInitialized())Kakao.init('42255d70b37fcf98f7f82cbffcc71771');
-  // 상태 복원
   const st=JSON.parse(localStorage.getItem('tr_state')||'{}');
-  if(st.tab==='comm'){
+  const params=new URLSearchParams(location.search);
+  const boardName=params.get('board');
+  const subName=params.get('sub');
+  if(st.tab==='comm'||boardName){
     (async()=>{
       switchTab('comm');
-      if(st.boardId){
-        const{data:board}=await db.from('boards').select('*').eq('id',st.boardId).single();
-        if(board){
-          await selectBoard(board);
-          if(st.subId){
-            const{data:sub}=await db.from('sub_boards').select('*').eq('id',st.subId).single();
-            if(sub){
-              selectSub(sub);
-            }
-          }
-        }
-      }
-    })();
-  } else {
-    // URL 파라미터로 복원
-    const params=new URLSearchParams(location.search);
-    const boardName=params.get('board');
-    const subName=params.get('sub');
-    if(boardName){
-      (async()=>{
-        switchTab('comm');
+      if(boardName){
         const{data:board}=await db.from('boards').select('*').eq('name',boardName).single();
         if(board){
           await selectBoard(board);
@@ -1305,10 +1286,20 @@ window.onload=function(){
             if(sub)selectSub(sub);
           }
         }
-      })();
-    }
+      } else if(st.boardId){
+        const{data:board}=await db.from('boards').select('*').eq('id',st.boardId).single();
+        if(board){
+          await selectBoard(board);
+          if(st.subId){
+            const{data:sub}=await db.from('sub_boards').select('*').eq('id',st.subId).single();
+            if(sub)selectSub(sub);
+          }
+        }
+      }
+    })();
   }
-    map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0005),level:8});
+  kakao.maps.load(()=>{
+    map=new kakao.maps.Map(document.getElementById('map'),{center:new kakao.maps.LatLng(37.5519,127.0738),level:8});
     kakao.maps.event.addListener(map,'click',function(){closeDetail();});
     geocodeDummy().then(()=>loadShops());
   });
