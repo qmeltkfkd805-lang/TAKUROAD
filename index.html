@@ -1085,7 +1085,8 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   </div>
   <button class="user-popup-btn" id="popupSubscribeBtn" onclick="popupSubscribe()">🔔 구독하기</button>
   <button class="user-popup-btn" id="popupChatBtn" onclick="popupChat()">💬 1:1 채팅하기</button>
-  <button class="user-popup-btn danger" onclick="popupReport()">🚨 신고하기</button>
+  <button class="user-popup-btn" id="popupChatBtn" onclick="popupChat()">💬 1:1 채팅하기</button>
+  <button class="user-popup-btn" onclick="openUserPosts()">📝 작성한 글 보기</button>
 </div>
 
 <!-- 신고 모달 -->
@@ -4451,6 +4452,53 @@ async function showUserPopup(e,userId,nick,avatarUrl){
       subBtn._subscribed=!!data;
     });
   }
+}
+
+async function openUserPosts(){
+  const userId=_popupTargetUserId;
+  if(!userId)return;
+  closeUserPopup();
+  // 유저 정보 가져오기
+  const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',userId).single();
+  const nick=profile?.nickname||'유저';
+  // 오버레이로 표시
+  let overlay=document.getElementById('userPostsOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='userPostsOverlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:flex;align-items:flex-end;justify-content:center;';
+    overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML='';
+  const panel=document.createElement('div');
+  panel.style.cssText='background:var(--bg);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:80dvh;display:flex;flex-direction:column;';
+  // 헤더
+  const head=document.createElement('div');
+  head.style.cssText='padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;';
+  head.innerHTML='<span style="font-weight:900;font-size:16px;">'+nick+'님의 글</span><button onclick="document.getElementById('userPostsOverlay').remove()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>';
+  panel.appendChild(head);
+  // 글 목록
+  const list=document.createElement('div');list.style.cssText='flex:1;overflow-y:auto;padding:12px;';
+  list.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">불러오는 중…</div>';
+  panel.appendChild(list);
+  overlay.appendChild(panel);
+  // 글 로드
+  const{data:posts}=await db.from('posts').select('*').eq('user_id',userId).order('created_at',{ascending:false}).limit(30);
+  if(!posts||!posts.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">작성한 글이 없어요</div>';return;}
+  list.innerHTML='';
+  posts.forEach(p=>{
+    const row=document.createElement('div');
+    row.style.cssText='padding:12px;border-bottom:1px solid var(--border);cursor:pointer;';
+    row.innerHTML='<div style="font-size:14px;font-weight:700;margin-bottom:4px;">'+p.title+'</div><div style="font-size:12px;color:var(--muted);">'+new Date(p.created_at).toLocaleDateString('ko-KR')+'  ❤️ '+(p.likes||0)+'</div>';
+    row.onmouseenter=()=>row.style.background='var(--surface2)';
+    row.onmouseleave=()=>row.style.background='';
+    row.onclick=()=>{
+      overlay.remove();
+      openPostDetail(p);
+    };
+    list.appendChild(row);
+  });
 }
 
 function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){window.removeEventListener('scroll',_popupScrollHandler,true);document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));_popupScrollHandler=null;}_popupTargetEl=null;}
