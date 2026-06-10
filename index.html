@@ -3784,8 +3784,8 @@ async function loadMyRoutes(){
     shareRouteBtn.style.cssText='background:var(--cyan-l);color:var(--cyan);border:1px solid var(--cyan);border-radius:var(--r-sm);padding:5px 10px;font-size:11px;font-family:inherit;cursor:pointer;';
     shareRouteBtn.textContent='🔗 루트 공유';
     shareRouteBtn.onclick=()=>shareRouteLink(r);
-    btns.appendChild(shareRouteBtn);
-    const editBtn=document.createElement('button');
+    shareRouteBtn.onclick=()=>shareRouteLink(r);
+    titleRow.appendChild(shareRouteBtn);
     editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
     editBtn.textContent='✏️ 수정';editBtn.onclick=()=>openEditRoute(r);
     const delBtn=document.createElement('button');
@@ -3938,7 +3938,6 @@ async function loadSavedRoutes(){
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
     shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
-    shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=s.name;savedShops.appendChild(tag);});
     // 이미지 표시
     if(r.images&&r.images.length){
       const imgRow=document.createElement('div');imgRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;';
