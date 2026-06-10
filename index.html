@@ -3940,7 +3940,8 @@ async function loadSavedRoutes(){
     const likeBtn=document.createElement('button');
     likeBtn.style.cssText='background:none;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);';
     likeBtn.textContent='❤️ '+(r.likes||0);
-    topRow.appendChild(infoDiv);topRow.appendChild(likeBtn);
+    likeBtn.textContent='❤️ '+(r.likes||0);
+    likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
     shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
