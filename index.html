@@ -1515,7 +1515,7 @@ async function showDetail(p){
     let existMgr=document.getElementById('detailMgrBtn');if(existMgr)existMgr.remove();
     const mgrBtn=document.createElement('button');
     mgrBtn.id='detailMgrBtn';mgrBtn.className='da-btn';
-    mgrBtn.style.cssText='position:absolute;top:80px;right:14px;font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border-color:var(--purple);';
+    mgrBtn.style.cssText='position:absolute;top:48px;right:70px;font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border:1px solid var(--purple);border-radius:var(--r-sm);cursor:pointer;font-family:inherit;';
     mgrBtn.textContent='👑 매니저';
     mgrBtn.onclick=()=>assignShopManager(p.id);
     document.getElementById('detailPanel').appendChild(mgrBtn);
@@ -1748,6 +1748,25 @@ async function deleteShop(id){
   places=places.filter(p=>p.id!==id);
   closeDetail();
   renderAll();
+}
+
+async function assignShopManager(shopId){
+  const nick=prompt('매니저로 임명할 사용자의 닉네임을 입력하세요:');
+  if(!nick)return;
+  const{data:results}=await db.from('profiles').select('id,nickname').ilike('nickname','%'+nick+'%').limit(5);
+  if(!results||!results.length){alert('해당 닉네임을 찾을 수 없어요.');return;}
+  if(results.length===1){
+    if(!confirm(results[0].nickname+'님을 이 샵의 매니저로 임명할까요?'))return;
+    await db.from('shops').update({manager_id:results[0].id}).eq('id',shopId);
+    alert('매니저 임명 완료! 🎉');
+    return;
+  }
+  const names=results.map((u,i)=>i+'. '+u.nickname).join('\n');
+  const idx=parseInt(prompt('여러 명이 검색됐어요. 번호를 입력하세요:\n'+names));
+  if(isNaN(idx)||!results[idx])return;
+  if(!confirm(results[idx].nickname+'님을 매니저로 임명할까요?'))return;
+  await db.from('shops').update({manager_id:results[idx].id}).eq('id',shopId);
+  alert('매니저 임명 완료! 🎉');
 }
 
 function openEditShop(id){
