@@ -3931,20 +3931,23 @@ async function loadSavedRoutes(){
     const liked=likedRoutes.has(r.id);
     const card=document.createElement('div');card.className='route-saved-item';
     // 상단 행
-    const topRow=document.createElement('div');topRow.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;';
-    const infoDiv=document.createElement('div');
+    // 상단 행
+    const topRow=document.createElement('div');topRow.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;';
+    const infoDiv=document.createElement('div');infoDiv.style.flex='1';
     const titleEl=document.createElement('div');titleEl.className='route-saved-title';titleEl.textContent=r.title;
-    const metaEl=document.createElement('div');metaEl.className='route-saved-meta';metaEl.textContent=r.nickname+' · '+shops.length+'개 샵';
+    const metaEl=document.createElement('div');metaEl.className='route-saved-meta';metaEl.textContent=r.nickname+' · '+(r.likes||0)+' ❤️';
     infoDiv.appendChild(titleEl);infoDiv.appendChild(metaEl);
     if(r.description){const descEl=document.createElement('div');descEl.style.cssText='font-size:12px;color:var(--muted);margin-top:4px;';descEl.textContent=r.description;infoDiv.appendChild(descEl);}
     const likeBtn=document.createElement('button');
-    likeBtn.style.cssText='background:none;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);';
-    likeBtn.textContent='❤️ '+(r.likes||0);
+    likeBtn.style.cssText='background:none;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);flex-shrink:0;';
     likeBtn.textContent='❤️ '+(r.likes||0);
     likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
+    topRow.appendChild(infoDiv);topRow.appendChild(likeBtn);
+    card.appendChild(topRow);
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
     shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
+    card.appendChild(tagsDiv);
     // 이미지 표시
     if(r.images&&r.images.length){
       const imgRow=document.createElement('div');imgRow.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;';
@@ -3956,19 +3959,15 @@ async function loadSavedRoutes(){
       card.appendChild(imgRow);
     }
     const viewBtn=document.createElement('button');
-    viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
+    viewBtn.style.cssText='width:100%;margin-top:10px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:8px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;';
     viewBtn.textContent='🗺️ 지도에서 보기';viewBtn.onclick=()=>viewRoute(shops);
-    // 하단 버튼 행
-    // 제목 옆에 버튼들 추가
-    const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap;';
-    const titleEl2=infoDiv.querySelector('.route-saved-title');
-    infoDiv.removeChild(titleEl2);
-    titleRow.appendChild(titleEl2);
+    // 버튼 행
+    const btnRow=document.createElement('div');btnRow.style.cssText='display:flex;gap:6px;margin-top:8px;';
     const shareBtn=document.createElement('button');
-    shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;white-space:nowrap;';
+    shareBtn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:700;padding:5px 10px;';
     shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=(e)=>{e.stopPropagation();openShareRoute(r);};
-    titleRow.appendChild(shareBtn);
-    if(currentUser&&r.user_id===currentUser.id){
+    btnRow.appendChild(shareBtn);
+    card.appendChild(viewBtn);card.appendChild(btnRow);
       const editBtn=document.createElement('button');
       editBtn.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;padding:2px 8px;';
       editBtn.textContent='✏️ 수정';editBtn.onclick=(e)=>{e.stopPropagation();openEditRoute(r);};
