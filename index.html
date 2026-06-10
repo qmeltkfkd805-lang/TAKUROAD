@@ -4078,7 +4078,6 @@ async function submitShareRoute(){
     user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
     route_data:r.shop_ids
   }).select().single();
-  }).select().single();
   if(error){alert('공유 실패: '+error.message);return;}
   // routes 테이블에 없으면 추가
   if(!r.id||typeof r.id==='undefined'){
