@@ -4040,9 +4040,9 @@ async function submitShareRoute(){
   const r=window._sharingRoute;
   const addContent=document.getElementById('shareRouteContent').value.trim();
   const content=addContent||'';
-  const content=addContent||'';
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
-  const{data:newPost,error}=await db.from('posts').insert({
+  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
+  const nick=profile?.nickname||currentUser.email.split('@')[0];
     type:'일반',nick,title:'[루트] '+r.title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
     route_data:r.shop_ids
