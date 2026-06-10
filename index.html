@@ -4542,7 +4542,7 @@ async function submitReport(){
   if(!currentUser)return;
   const reason=document.getElementById('reportReason').value.trim();
   if(!reason){alert('신고 사유를 입력해주세요');return;}
-  await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_popupTargetUserId,reason});
+  await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_popupTargetUserId,reason,status:'pending',target_type:'user'});
   closeReport();
   alert('신고가 접수됐어요. 검토 후 조치할게요.');
 }
