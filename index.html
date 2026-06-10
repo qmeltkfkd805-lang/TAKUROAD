@@ -4039,9 +4039,6 @@ async function submitShareRoute(){
   if(!subId){alert('세부게시판을 선택해주세요');return;}
   const r=window._sharingRoute;
   const addContent=document.getElementById('shareRouteContent').value.trim();
-  const shops=r.shop_ids||[];
-  const routeText=shops.map((s,i)=>(i+1)+'. '+s.name+' ('+s.addr+')').join('\n');
-  const addContent=document.getElementById('shareRouteContent').value.trim();
   const content=addContent||'';
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   const{data:newPost,error}=await db.from('posts').insert({
