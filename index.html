@@ -3923,7 +3923,7 @@ async function saveRoute(){
 async function loadSavedRoutes(){
   const list=document.getElementById('savedRouteList');
   list.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">불러오는 중…</div>';
-  const{data:routes}=await db.from('routes').select('*').order('created_at',{ascending:false});
+  const{data:routes}=await db.from('routes').select('*').eq('is_shared',true).order('created_at',{ascending:false});
   list.innerHTML='';
   if(!routes||!routes.length){list.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted);font-size:13px;">아직 공유된 루트가 없어요</div>';return;}
   const likedRoutes=new Set();
