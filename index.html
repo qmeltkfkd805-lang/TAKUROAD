@@ -2965,8 +2965,33 @@ async function openPostDetail(p){
   }
 
   const meta=document.createElement('div');
-  meta.style.cssText='font-size:12px;color:var(--muted);margin-bottom:16px;display:flex;gap:12px;align-items:center;';
-  meta.innerHTML='<span style="color:var(--cyan);font-weight:700">'+p.nick+'</span><span>'+date+'</span>';
+  meta.style.cssText='font-size:12px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px;';
+  // 아바타
+  const authorAvatar=document.createElement('div');authorAvatar.className='comment-avatar';
+  authorAvatar.style.cssText='width:36px;height:36px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;overflow:hidden;cursor:'+(isMine?'default':'pointer')+';';
+  // 닉네임+날짜
+  const authorInfo=document.createElement('div');
+  const authorNick=document.createElement('span');
+  authorNick.style.cssText='font-weight:700;color:var(--text);font-size:13px;display:block;cursor:'+(isMine?'default':'pointer')+';';
+  authorNick.textContent=p.nick;
+  const authorDate=document.createElement('span');
+  authorDate.style.cssText='font-size:11px;color:var(--muted);display:block;';
+  authorDate.textContent=date;
+  authorInfo.appendChild(authorNick);authorInfo.appendChild(authorDate);
+  // 프로필 조회
+  if(p.user_id){
+    db.from('profiles').select('nickname,avatar_url').eq('id',p.user_id).maybeSingle().then(({data})=>{
+      if(data?.avatar_url){authorAvatar.innerHTML='<img src="'+data.avatar_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>';}
+      else{authorAvatar.textContent='👤';}
+      if(data?.nickname)authorNick.textContent=data.nickname;
+    });
+    if(!isMine){
+      const openPopup=(e)=>{e.stopPropagation();db.from('profiles').select('nickname,avatar_url').eq('id',p.user_id).maybeSingle().then(({data})=>{showUserPopup(e,p.user_id,data?.nickname||p.nick,data?.avatar_url);});};
+      authorAvatar.onclick=openPopup;
+      authorNick.onclick=openPopup;
+    }
+  } else {authorAvatar.textContent='👤';}
+  meta.appendChild(authorAvatar);meta.appendChild(authorInfo);
   if(isMine){
     const delBtn=document.createElement('button');
     const editBtn=document.createElement('button');
