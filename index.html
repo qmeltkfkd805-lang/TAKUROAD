@@ -4038,16 +4038,16 @@ async function submitShareRoute(){
   if(!boardId){alert('게시판을 선택해주세요');return;}
   if(!subId){alert('세부게시판을 선택해주세요');return;}
   const r=window._sharingRoute;
+  const r=window._sharingRoute;
   const addContent=document.getElementById('shareRouteContent').value.trim();
   const content=addContent||'';
   const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
-  const{data:profile}=await db.from('profiles').select('nickname').eq('id',currentUser.id).single();
   const nick=profile?.nickname||currentUser.email.split('@')[0];
+  const{data:newPost,error}=await db.from('posts').insert({
     type:'일반',nick,title:'[루트] '+r.title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,sub_board_id:subId,
     route_data:r.shop_ids
   }).select().single();
-  if(error){alert('공유 실패: '+error.message);return;}
   closeOverlay('shareRouteOverlay');
   closeRoutePanel();
   if(newPost){
