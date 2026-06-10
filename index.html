@@ -3938,9 +3938,9 @@ async function loadSavedRoutes(){
     infoDiv.appendChild(titleEl);infoDiv.appendChild(metaEl);
     if(r.description){const descEl=document.createElement('div');descEl.style.cssText='font-size:12px;color:var(--muted);margin-top:4px;';descEl.textContent=r.description;infoDiv.appendChild(descEl);}
     const likeBtn=document.createElement('button');
-    likeBtn.style.cssText='background:none;border:none;font-size:13px;cursor:'+(liked?'default':'pointer')+';color:'+(liked?'var(--accent)':'var(--muted)');
-    likeBtn.textContent='❤️ '+(r.likes||0);likeBtn.disabled=liked;
-    likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
+    const likeBtn=document.createElement('button');
+    likeBtn.style.cssText='background:none;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);';
+    likeBtn.textContent='❤️ '+(r.likes||0);
     topRow.appendChild(infoDiv);topRow.appendChild(likeBtn);
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
