@@ -713,7 +713,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
 
 <!-- 프로필 -->
 <div class="overlay center" id="profileOverlay" onclick="handleOverlay(event,'profileOverlay')" style="align-items:center;">
-  <div class="panel-base panel-center" style="max-width:400px;">
+  <div class="panel-base panel-center" style="max-width:400px;width:400px;height:80dvh;display:flex;flex-direction:column;overflow:hidden;">
     <h2>내 프로필 <button class="icon-close" onclick="closeOverlay('profileOverlay')">✕</button></h2>
     <div class="profile-tab-bar">
       <button class="profile-tab active" onclick="event.stopPropagation();switchProfileTab('info',this)">프로필</button>
