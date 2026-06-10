@@ -1016,7 +1016,15 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       <button class="tb-btn" onclick="insertLink()" title="링크">🔗</button>
       <button class="tb-btn" onclick="document.getElementById('editorImgInput').click()" title="이미지">🖼️</button>
       <input type="file" id="editorImgInput" accept="image/*" multiple style="display:none" onchange="insertImages(event)"/>
+      <button class="tb-btn" onclick="toggleEditorRouteSelect()" title="루트 첨부" id="tbRouteBtn">🗺️</button>
     </div>
+  </div>
+  <div id="editorRouteBar" style="display:none;padding:8px 24px;background:var(--surface2);border-bottom:1px solid var(--border);align-items:center;gap:8px;font-size:13px;">
+    <span style="font-weight:700;">🗺️ 루트 선택</span>
+    <select id="editorRouteSelect" style="flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;">
+      <option value="">루트 없음</option>
+    </select>
+    <button onclick="toggleEditorRouteSelect()" style="background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted);">✕</button>
   </div>
   <div style="padding:12px 24px;max-width:800px;margin:0 auto;width:100%;box-sizing:border-box;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
     <input type="text" id="editorTitle" class="editor-title-input" placeholder="제목을 입력하세요" style="flex:1;min-width:160px;"/>
@@ -4134,6 +4142,8 @@ async function updatePost(){
   const price=priceVal?parseInt(priceVal):null;
   const link=document.getElementById('editorLinkInput').value.trim()||null;
   const imgs=[...document.getElementById('editorContent').querySelectorAll('img')].map(i=>i.src);
+  const routeSel=document.getElementById('editorRouteSelect');
+  const routeData=routeSel&&routeSel.value?JSON.parse(routeSel.selectedOptions[0].dataset.shops||'null'):null;
   const{error}=await db.from('posts').update({
     title,content,price,link,
     images:imgs.length?imgs:null,
@@ -4149,6 +4159,11 @@ async function updatePost(){
   const{data:updatedPost}=await db.from('posts').select('*').eq('id',p_id).single();
   if(updatedPost)openPostDetail(updatedPost);
   loadBoardPosts();
+}
+
+function toggleEditorRouteSelect(){
+  const bar=document.getElementById('editorRouteBar');
+  bar.style.display=bar.style.display==='none'?'flex':'none';
 }
 
 function openEditor(){
@@ -4170,6 +4185,18 @@ function openEditor(){
   window._editingPostId=null;
   const btn=document.querySelector('.editor-publish-btn');
   btn.textContent='게시하기';btn.onclick=publishPost;
+  // 내 루트 목록 로드
+  const routeSel=document.getElementById('editorRouteSelect');
+  if(routeSel&&currentUser){
+    routeSel.innerHTML='<option value="">루트 없음</option>';
+    db.from('routes').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).then(({data})=>{
+      (data||[]).forEach(r=>{
+        const opt=document.createElement('option');opt.value=r.id;
+        opt.dataset.shops=JSON.stringify(r.shop_ids);opt.textContent=r.title;
+        routeSel.appendChild(opt);
+      });
+    });
+  }
   document.getElementById('editorOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('editorTitle').focus(),300);
 }
@@ -4284,6 +4311,8 @@ async function publishPost(){
   const nick=profile?.nickname||currentUser.email.split('@')[0];
   // 이미지 URL 추출
   const imgs=[...document.getElementById('editorContent').querySelectorAll('img')].map(i=>i.src);
+  const routeSel=document.getElementById('editorRouteSelect');
+  const routeData=routeSel&&routeSel.value?JSON.parse(routeSel.selectedOptions[0].dataset.shops||'null'):null;
   const{data:data2,error}=await db.from('posts').insert({
     type:'일반',nick,title,content,likes:0,
     user_id:currentUser.id,board_id:boardId,
