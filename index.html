@@ -2200,7 +2200,8 @@ async function loadMySubscriptions(){
     nick.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
     avatar.style.cursor='pointer';avatar.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
     const unsubBtn=document.createElement('button');
-    unsubBtn.textContent='구독취소';
+    const unsubBtn=document.createElement('button');
+    unsubBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);flex-shrink:0;';
     unsubBtn.onclick=async()=>{
       await db.from('subscriptions').delete().eq('follower_id',currentUser.id).eq('following_id',s.following_id);
       div.remove();
