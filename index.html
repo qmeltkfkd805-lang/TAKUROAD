@@ -2961,7 +2961,7 @@ function openPostDetail(p){
     detail.appendChild(routeBox);
   }
   const likeBtn=document.createElement('button');
-  likeBtn.style.cssText='border-radius:20px;padding:8px 20px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent)':'none')+';color:'+(liked?'#fff':'var(--muted)')+';';
+  likeBtn.style.cssText='border-radius:20px;padding:8px 20px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:none;color:var(--text);';
   likeBtn.textContent='❤️ '+(p.likes||0);
   likeBtn.onclick=()=>togglePostLike(p.id,likeBtn,liked);
   // 관심 글 등록 버튼
@@ -3115,7 +3115,7 @@ async function togglePostLike(postId, btn, wasLiked){
     const{data}=await db.from('posts').select('likes').eq('id',postId).single();
     const newLikes=Math.max(0,(data?.likes||1)-1);
     await db.from('posts').update({likes:newLikes}).eq('id',postId);
-    btn.style.background='none';btn.style.color='var(--muted)';btn.style.borderColor='var(--border)';
+    btn.style.borderColor='var(--border)';
     btn.textContent='❤️ '+newLikes;
     btn.onclick=()=>togglePostLike(postId,btn,false);
   } else {
@@ -3124,7 +3124,7 @@ async function togglePostLike(postId, btn, wasLiked){
     const{data}=await db.from('posts').select('likes').eq('id',postId).single();
     const newLikes=(data?.likes||0)+1;
     await db.from('posts').update({likes:newLikes}).eq('id',postId);
-    btn.style.background='var(--accent)';btn.style.color='#fff';btn.style.borderColor='var(--accent)';
+    btn.style.borderColor='var(--accent)';
     btn.textContent='❤️ '+newLikes;
     btn.onclick=()=>togglePostLike(postId,btn,true);
   }
