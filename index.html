@@ -3787,14 +3787,12 @@ async function loadMyRoutes(){
     const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;';
     const titleEl=document.createElement('div');titleEl.className='route-saved-title';titleEl.textContent=r.title;
     const shareBtn=document.createElement('button');
-    shareBtn.style.cssText='background:var(--cyan-l);border:1px solid var(--cyan);border-radius:10px;font-size:11px;color:var(--cyan);cursor:pointer;font-family:inherit;font-weight:700;padding:2px 8px;';
+    shareBtn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:700;padding:5px 10px;';
     shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
     const shareRouteBtn=document.createElement('button');shareRouteBtn.className='route-action-btn';
-    shareRouteBtn.style.cssText='background:var(--cyan-l);color:var(--cyan);border:1px solid var(--cyan);border-radius:var(--r-sm);padding:5px 10px;font-size:11px;font-family:inherit;cursor:pointer;';
+    shareRouteBtn.style.cssText='background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:700;padding:5px 10px;';
     shareRouteBtn.textContent=r.is_shared?'🔗 공유 취소':'🔗 루트 공유';
-    shareRouteBtn.style.color=r.is_shared?'var(--red)':'var(--cyan)';
-    shareRouteBtn.style.borderColor=r.is_shared?'var(--red)':'var(--cyan)';
-    shareRouteBtn.style.background=r.is_shared?'var(--red-l)':'var(--cyan-l)';
+    if(r.is_shared){shareRouteBtn.style.color='var(--accent)';shareRouteBtn.style.borderColor='var(--accent)';shareRouteBtn.style.background='var(--accent-l)';}
     shareRouteBtn.onclick=()=>shareRouteLink(r);
     titleRow.appendChild(shareRouteBtn);
     const editBtn=document.createElement('button');
