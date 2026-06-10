@@ -1499,13 +1499,12 @@ async function showDetail(p){
   const color=CAT_COLOR[p.cat]||'#e8006f';
   const dp=document.getElementById('detailContent');
   // 수정 버튼 - 본인/매니저/관리자만
-  let existEdit=document.getElementById('detailEditBtn');if(existEdit)existEdit.remove();
   const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
   if(canEditShop){
     const editShopBtn=document.createElement('button');
     editShopBtn.id='detailEditBtn';
     editShopBtn.className='da-btn';
-    editShopBtn.style.cssText='position:absolute;top:48px;right:14px;font-size:11px;padding:4px 10px;';
+    editShopBtn.style.cssText='position:absolute;top:76px;right:14px;font-size:11px;padding:4px 10px;';
     editShopBtn.textContent='✏️ 수정';
     editShopBtn.onclick=()=>openEditShop(p.id);
     document.getElementById('detailPanel').appendChild(editShopBtn);
@@ -1515,7 +1514,7 @@ async function showDetail(p){
     let existMgr=document.getElementById('detailMgrBtn');if(existMgr)existMgr.remove();
     const mgrBtn=document.createElement('button');
     mgrBtn.id='detailMgrBtn';mgrBtn.className='da-btn';
-    mgrBtn.style.cssText='position:absolute;top:48px;right:70px;font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border:1px solid var(--purple);border-radius:var(--r-sm);cursor:pointer;font-family:inherit;';
+    mgrBtn.style.cssText='position:absolute;top:48px;right:14px;font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border:1px solid var(--purple);border-radius:var(--r-sm);cursor:pointer;font-family:inherit;';
     mgrBtn.textContent='👑 매니저';
     mgrBtn.onclick=()=>assignShopManager(p.id);
     document.getElementById('detailPanel').appendChild(mgrBtn);
