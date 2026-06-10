@@ -4051,10 +4051,18 @@ async function submitShareRoute(){
   });
   if(error){alert('공유 실패: '+error.message);return;}
   closeOverlay('shareRouteOverlay');
-  alert('게시판에 공유됐어요! 🎉');
-}
-
-function viewRoute(shops){
+  closeOverlay('shareRouteOverlay');
+  closeRoutePanel();
+  // 해당 글로 이동
+  const{data:board}=await db.from('boards').select('*').eq('id',boardId).single();
+  const{data:newPost}=await db.from('posts').select('*').eq('user_id',currentUser.id).eq('board_id',boardId).order('created_at',{ascending:false}).limit(1).single();
+  if(board&&newPost){
+    switchTab('comm');
+    await selectBoard(board);
+    const{data:sub}=await db.from('sub_boards').select('*').eq('id',subId).single();
+    if(sub)await selectSub(sub);
+    setTimeout(()=>openPostDetail(newPost),300);
+  }
   clearRoutePreview();
   closeRoutePanel();
   // 지도 탭으로 전환
