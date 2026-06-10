@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소개 - 타쿠로드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Cute+Font&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ff;--surface:#fff;--surface2:#f5eeff;--border:#e8d5f5;--text:#1a0a2e;--muted:#9b7bb8;--accent:#e8006f;--accent-l:rgba(232,0,111,.1);--purple:#7c3aed;--purple-l:rgba(124,58,237,.1);--cyan:#0099cc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px;}
+a{color:var(--accent);text-decoration:none;}a:hover{text-decoration:underline;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.logo{font-family:'Cute Font',cursive;font-size:26px;color:var(--accent);letter-spacing:2px;}
+.logo-sub{font-size:13px;color:var(--muted);}
+.back-btn{margin-left:auto;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--text);}
+
+.hero{background:linear-gradient(135deg,var(--accent-l),var(--purple-l));padding:60px 24px;text-align:center;border-bottom:1px solid var(--border);}
+.hero-logo{font-family:'Cute Font',cursive;font-size:52px;color:var(--accent);letter-spacing:4px;-webkit-text-stroke:1px var(--accent);}
+.hero-tagline{font-size:18px;color:var(--text);margin-top:12px;font-weight:700;}
+.hero-desc{font-size:14px;color:var(--muted);margin-top:8px;}
+.hero-btn{display:inline-block;margin-top:24px;background:var(--accent);color:#fff;border:none;border-radius:24px;padding:12px 28px;font-size:15px;font-family:inherit;font-weight:700;cursor:pointer;text-decoration:none;}
+
+.container{max-width:720px;margin:0 auto;padding:40px 24px 80px;}
+
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:32px 0;}
+.feature-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
+.feature-icon{font-size:32px;margin-bottom:8px;}
+.feature-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+.feature-desc{font-size:13px;color:var(--muted);}
+
+h2{font-size:20px;font-weight:900;margin:40px 0 16px;}
+p{margin-bottom:12px;color:var(--text);}
+
+.cat-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.cat-tag{padding:5px 14px;border-radius:20px;font-size:13px;font-weight:700;border:1.5px solid;}
+
+footer{text-align:center;padding:32px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+footer a{color:var(--muted);margin:0 8px;}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">TAKUROAD</a>
+  <span class="logo-sub">타쿠로드</span>
+  <button class="back-btn" onclick="history.back()">← 돌아가기</button>
+</header>
+
+<div class="hero">
+  <div class="hero-logo">TAKUROAD</div>
+  <p class="hero-tagline">덕후의, 덕후에 의한, 덕후를 위한 성지순례 지도</p>
+  <p class="hero-desc">한국의 애니·오타쿠 쇼핑 명소를 한눈에 찾아보세요</p>
+  <a href="/" class="hero-btn">지도 보러 가기 →</a>
+</div>
+
+<div class="container">
+  <h2>타쿠로드가 뭐예요?</h2>
+  <p>타쿠로드(TAKUROAD)는 피규어, 애니 굿즈, 쿠지, TCG 카드, 동인지 등 오타쿠 문화와 관련된 쇼핑 명소를 지도에서 쉽게 찾을 수 있는 서비스예요.</p>
+  <p>단순한 지도를 넘어, 덕후들이 직접 샵을 등록하고 리뷰를 남기며 성지순례 루트를 공유할 수 있는 커뮤니티도 함께 운영하고 있어요.</p>
+
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🗺️</div>
+      <div class="feature-title">샵 지도</div>
+      <div class="feature-desc">카카오맵 기반 실시간 샵 위치 확인</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📍</div>
+      <div class="feature-title">루트 공유</div>
+      <div class="feature-desc">나만의 성지순례 루트 저장 & 공유</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💬</div>
+      <div class="feature-title">커뮤니티</div>
+      <div class="feature-desc">덕후들과 정보 교환 & 동행 모집</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛍️</div>
+      <div class="feature-title">팝업 정보</div>
+      <div class="feature-desc">한정 팝업스토어 & 이벤트 카페 모음</div>
+    </div>
+  </div>
+
+  <h2>어떤 샵이 있나요?</h2>
+  <div class="cat-grid">
+    <span class="cat-tag" style="color:#e8006f;border-color:#e8d5f5;">🎌 애니/웹툰</span>
+    <span class="cat-tag" style="color:#7c3aed;border-color:#e8d5f5;">🏆 피규어</span>
+    <span class="cat-tag" style="color:#b45309;border-color:#e8d5f5;">🎰 쿠지</span>
+    <span class="cat-tag" style="color:#e8006f;border-color:#e8d5f5;">☕ 팝업/카페</span>
+    <span class="cat-tag" style="color:#059669;border-color:#e8d5f5;">♻️ 중고/빈티지</span>
+    <span class="cat-tag" style="color:#0099cc;border-color:#e8d5f5;">🃏 카드/TCG</span>
+    <span class="cat-tag" style="color:#db2777;border-color:#e8d5f5;">📚 동인지</span>
+    <span class="cat-tag" style="color:#ea580c;border-color:#e8d5f5;">🎮 게임</span>
+    <span class="cat-tag" style="color:#7c3aed;border-color:#e8d5f5;">🔧 프라모델</span>
+  </div>
+
+  <h2>만든 사람</h2>
+  <p>타쿠로드는 덕후 문화를 사랑하는 개인 개발자가 만든 서비스예요. 더 많은 사람들이 쉽게 성지순례를 즐길 수 있도록 계속 발전시켜 나가고 있어요.</p>
+  <p>버그 제보, 샵 추가 요청, 기능 건의는 <a href="/contact.html">문의하기</a>를 통해 알려주세요!</p>
+</div>
+
+<footer>
+  <p>© 2026 TAKUROAD. All rights reserved.</p>
+  <p style="margin-top:8px;">
+    <a href="/">홈</a>
+    <a href="/about.html">소개</a>
+    <a href="/privacy.html">개인정보처리방침</a>
+    <a href="/terms.html">이용약관</a>
+    <a href="/contact.html">문의하기</a>
+  </p>
+</footer>
+</body>
+</html>

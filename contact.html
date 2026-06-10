@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문의하기 - 타쿠로드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Cute+Font&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf6ff;--surface:#fff;--surface2:#f5eeff;--border:#e8d5f5;--text:#1a0a2e;--muted:#9b7bb8;--accent:#e8006f;--accent-l:rgba(232,0,111,.1);--purple:#7c3aed;--purple-l:rgba(124,58,237,.1);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:15px;}
+a{color:var(--accent);text-decoration:none;}a:hover{text-decoration:underline;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;}
+.logo{font-family:'Cute Font',cursive;font-size:26px;color:var(--accent);letter-spacing:2px;}
+.logo-sub{font-size:13px;color:var(--muted);}
+.back-btn{margin-left:auto;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--text);}
+
+.container{max-width:600px;margin:0 auto;padding:40px 24px 80px;}
+h1{font-size:24px;font-weight:900;margin-bottom:8px;}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:40px;}
+
+.contact-cards{display:grid;gap:16px;margin-bottom:40px;}
+.contact-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:20px 24px;display:flex;align-items:center;gap:16px;}
+.contact-icon{font-size:28px;flex-shrink:0;}
+.contact-info{flex:1;}
+.contact-title{font-weight:700;font-size:15px;margin-bottom:2px;}
+.contact-desc{font-size:13px;color:var(--muted);}
+.contact-link{font-size:14px;color:var(--accent);font-weight:700;}
+
+.faq{margin-top:40px;}
+h2{font-size:20px;font-weight:900;margin-bottom:20px;}
+.faq-item{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+.faq-q{padding:16px 20px;font-weight:700;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
+.faq-q:hover{background:var(--surface2);}
+.faq-a{padding:0 20px 16px;font-size:14px;color:var(--muted);display:none;line-height:1.7;}
+.faq-item.open .faq-a{display:block;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+.faq-arrow{transition:transform .2s;font-size:12px;color:var(--muted);}
+
+footer{text-align:center;padding:32px 24px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+footer a{color:var(--muted);margin:0 8px;}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">TAKUROAD</a>
+  <span class="logo-sub">타쿠로드</span>
+  <button class="back-btn" onclick="history.back()">← 돌아가기</button>
+</header>
+
+<div class="container">
+  <h1>문의하기</h1>
+  <p class="subtitle">버그 제보, 샵 추가 요청, 기능 건의 등 무엇이든 편하게 보내주세요!</p>
+
+  <div class="contact-cards">
+    <div class="contact-card">
+      <div class="contact-icon">📧</div>
+      <div class="contact-info">
+        <div class="contact-title">이메일 문의</div>
+        <div class="contact-desc">가장 빠르게 답변드려요. 1~3일 내 회신합니다.</div>
+        <a class="contact-link" href="mailto:ttakuroad@gmail.com">ttakuroad@gmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq">
+    <h2>자주 묻는 질문</h2>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">샵을 등록하고 싶어요 <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">로그인 후 지도 화면에서 상단의 '샵 추가' 버튼을 누르면 직접 등록할 수 있어요. 정확한 위치와 카테고리를 선택해주세요!</div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">잘못된 샵 정보를 수정하고 싶어요 <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">본인이 등록한 샵은 샵 상세 화면에서 직접 수정할 수 있어요. 타인이 등록한 샵의 오류는 이메일로 제보해주시면 확인 후 수정해드릴게요.</div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">계정을 삭제하고 싶어요 <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">현재 앱 내 계정 삭제 기능은 준비 중이에요. 이메일로 계정 삭제를 요청해주시면 72시간 이내에 처리해드릴게요. 삭제 시 모든 게시글, 댓글, 루트 데이터가 영구 삭제됩니다.</div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">광고 게재 문의는 어떻게 하나요? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">타쿠로드는 현재 Google AdSense를 통한 광고만 운영하고 있어요. 별도 광고 제휴는 이메일로 문의해주세요.</div>
+    </div>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">앱은 없나요? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">현재는 웹 서비스로만 운영 중이에요. 모바일 브라우저에서도 편하게 이용할 수 있도록 최적화되어 있어요. 앱 출시는 추후 검토 예정이에요!</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 TAKUROAD. All rights reserved.</p>
+  <p style="margin-top:8px;">
+    <a href="/">홈</a>
+    <a href="/about.html">소개</a>
+    <a href="/privacy.html">개인정보처리방침</a>
+    <a href="/terms.html">이용약관</a>
+    <a href="/contact.html">문의하기</a>
+  </p>
+</footer>
+
+<script>
+// FAQ는 이미 onclick으로 처리됨
+</script>
+</body>
+</html>
