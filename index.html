@@ -3200,7 +3200,6 @@ async function loadComments(postId){
         nickSpan.style.cursor='pointer';nickSpan.onclick=openPopup;
       }
     } else {avatar.textContent='👤';}
-    } else {avatar.textContent='👤';}
     top.appendChild(avatar);top.appendChild(nickSpan);top.appendChild(dateSpan);
     const textDiv=document.createElement('div');textDiv.className='comment-text';textDiv.textContent=c.content;
     div.appendChild(top);div.appendChild(textDiv);
