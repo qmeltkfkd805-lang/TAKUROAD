@@ -3156,7 +3156,7 @@ async function openPostDetail(p){
     reportPostBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:8px 16px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--muted);';
     reportPostBtn.textContent='🚨 신고';
     reportPostBtn.onclick=()=>openPostReport(p.id,p.user_id);
-    btnWrap.appendChild(reportPostBtn);
+    shareWrap.appendChild(reportPostBtn);
   }
   shareWrap.appendChild(shareBtn);
   detail.appendChild(shareWrap);
