@@ -123,6 +123,8 @@ header{background:var(--surface);border-bottom:1.5px solid var(--border);padding
 
     <!-- 게시글 목록 -->
     <div id="tab-posts" style="display:none;">
+      <input id="postSearch" type="text" placeholder="제목, 작성자 검색…" oninput="filterPosts(this.value)"
+        style="width:100%;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;margin-bottom:16px;">
       <div id="postList" class="loading">불러오는 중…</div>
     </div>
   </div>
@@ -264,11 +266,16 @@ async function loadUsers(){
   renderUserList(users);
 }
 
-async function loadPosts(){
+let _allPosts=[];
+
+function filterPosts(q){
+  const filtered=q?_allPosts.filter(p=>(p.title||'').toLowerCase().includes(q.toLowerCase())||(p.nick||'').toLowerCase().includes(q.toLowerCase())):_allPosts;
+  renderPostList(filtered);
+}
+
+function renderPostList(posts){
   const el=document.getElementById('postList');
-  el.innerHTML='<div class="loading">불러오는 중…</div>';
-  const{data:posts}=await db.from('posts').select('*').order('created_at',{ascending:false}).limit(50);
-  if(!posts||!posts.length){el.innerHTML='<div class="empty">게시글이 없어요</div>';return;}
+  if(!posts.length){el.innerHTML='<div class="empty">검색 결과가 없어요</div>';return;}
   el.innerHTML='';
   posts.forEach(p=>{
     const row=document.createElement('div');
@@ -281,6 +288,15 @@ async function loadPosts(){
     row.appendChild(info);row.appendChild(delBtn);
     el.appendChild(row);
   });
+}
+
+async function loadPosts(){
+  const el=document.getElementById('postList');
+  el.innerHTML='<div class="loading">불러오는 중…</div>';
+  const{data:posts}=await db.from('posts').select('*').order('created_at',{ascending:false}).limit(100);
+  if(!posts||!posts.length){el.innerHTML='<div class="empty">게시글이 없어요</div>';return;}
+  _allPosts=posts;
+  renderPostList(posts);
 }
 
 async function adminDeletePost(postId, row){
