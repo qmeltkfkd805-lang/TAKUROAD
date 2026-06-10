@@ -3986,11 +3986,22 @@ async function loadSavedRoutes(){
 
 async function likeRoute(routeId,btn){
   if(!currentUser){alert('로그인이 필요해요');return;}
-  const{error}=await db.from('route_likes').insert({route_id:routeId,user_id:currentUser.id});
-  if(error)return;
-  const{data}=await db.from('routes').select('likes').eq('id',routeId).single();if(!data)return;
-  const n=(data.likes||0)+1;await db.from('routes').update({likes:n}).eq('id',routeId);
-  btn.textContent='❤️ '+n;btn.style.color='var(--accent)';btn.disabled=true;
+  if(!window._likedRoutes)window._likedRoutes=new Set();
+  const wasLiked=window._likedRoutes.has(routeId);
+  const{data}=await db.from('routes').select('likes').eq('id',routeId).single();
+  if(wasLiked){
+    window._likedRoutes.delete(routeId);
+    await db.from('route_likes').delete().eq('route_id',routeId).eq('user_id',currentUser.id);
+    const n=Math.max(0,(data?.likes||1)-1);
+    await db.from('routes').update({likes:n}).eq('id',routeId);
+    btn.textContent='❤️ '+n;btn.style.borderColor='var(--border)';
+  } else {
+    window._likedRoutes.add(routeId);
+    await db.from('route_likes').insert({route_id:routeId,user_id:currentUser.id});
+    const n=(data?.likes||0)+1;
+    await db.from('routes').update({likes:n}).eq('id',routeId);
+    btn.textContent='❤️ '+n;btn.style.borderColor='var(--accent)';
+  }
 }
 
 function handleEditRouteImg(event){
