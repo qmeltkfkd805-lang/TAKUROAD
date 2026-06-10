@@ -3276,7 +3276,7 @@ async function loadComments(postId){
     const dateSpan=document.createElement('span');dateSpan.className='comment-date';dateSpan.textContent=date;dateSpan.style.cssText='font-size:11px;color:var(--muted);';
     if(c.user_id){
       db.from('profiles').select('nickname,avatar_url').eq('id',c.user_id).maybeSingle().then(({data})=>{
-        if(data?.avatar_url){avatar.innerHTML='<img src="'+data.avatar_url+'"/>';}
+        if(data?.avatar_url){avatar.style.backgroundImage='url('+data.avatar_url+')';avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';avatar.innerHTML='';}
         else{avatar.textContent='👤';}
         if(data?.nickname)nickSpan.textContent=data.nickname;
       });
@@ -4311,6 +4311,18 @@ async function showUserPopup(e,userId,nick,avatarUrl){
   const y=Math.min(e.clientY,window.innerHeight-150);
   popup.style.left=x+'px';popup.style.top=y+'px';
   popup.classList.add('open');
+  // 스크롤하면 팝업 닫기
+  if(_popupScrollHandler){
+    window.removeEventListener('scroll',_popupScrollHandler,true);
+    document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));
+  }
+  _popupScrollHandler=()=>closeUserPopup();
+  setTimeout(()=>{
+    window.addEventListener('scroll',_popupScrollHandler,{once:true,capture:true});
+    document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>{
+      el.addEventListener('scroll',_popupScrollHandler,{once:true});
+    });
+  },100);
   // 구독 상태 확인
   const subBtn=document.getElementById('popupSubscribeBtn');
   if(subBtn&&currentUser){
