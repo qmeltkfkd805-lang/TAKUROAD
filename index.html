@@ -2954,9 +2954,9 @@ function openPostDetail(p){
     detail.appendChild(routeBox);
   }
   const likeBtn=document.createElement('button');
-  likeBtn.style.cssText='display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent-l)':'none')+';color:'+(liked?'var(--accent)':'var(--muted)')+';font-family:inherit;font-size:14px;font-weight:700;cursor:'+(liked?'default':'pointer')+';margin-bottom:4px;';
+  likeBtn.style.cssText='border-radius:20px;padding:8px 20px;font-size:14px;font-family:inherit;font-weight:700;cursor:pointer;border:1.5px solid '+(liked?'var(--accent)':'var(--border)')+';background:'+(liked?'var(--accent)':'none')+';color:'+(liked?'#fff':'var(--muted)')+';';
   likeBtn.textContent='❤️ '+(p.likes||0);
-  if(!liked)likeBtn.onclick=()=>likePost(p.id,likeBtn);
+  likeBtn.onclick=()=>togglePostLike(p.id,likeBtn,liked);
   // 관심 글 등록 버튼
   const bmBtn=document.createElement('button');
   bmBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);';
