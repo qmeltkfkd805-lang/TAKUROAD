@@ -3755,11 +3755,20 @@ function switchRouteTab(tab){
   if(tab==='mine')loadMyRoutes();
 }
 
-function shareRouteLink(r){
-  // 루트 공유 팝업
-  window._currentShareUrl=location.origin+location.pathname+'?route='+r.id;
-  window._currentSharePost={title:r.title};
-  openSharePopup();
+async function shareRouteLink(r){
+  if(!currentUser)return;
+  const isShared=r.is_shared;
+  if(isShared){
+    // 공유 취소
+    await db.from('routes').update({is_shared:false}).eq('id',r.id).eq('user_id',currentUser.id);
+    alert('공유가 취소됐어요.');
+  } else {
+    // 공유 등록
+    await db.from('routes').update({is_shared:true}).eq('id',r.id).eq('user_id',currentUser.id);
+    alert('공유된 루트에 등록됐어요! 🎉');
+  }
+  loadMyRoutes();
+  loadSavedRoutes();
 }
 
 async function loadMyRoutes(){
@@ -3782,7 +3791,10 @@ async function loadMyRoutes(){
     shareBtn.textContent='📢 게시판 공유';shareBtn.onclick=()=>openShareRoute(r);
     const shareRouteBtn=document.createElement('button');shareRouteBtn.className='route-action-btn';
     shareRouteBtn.style.cssText='background:var(--cyan-l);color:var(--cyan);border:1px solid var(--cyan);border-radius:var(--r-sm);padding:5px 10px;font-size:11px;font-family:inherit;cursor:pointer;';
-    shareRouteBtn.textContent='🔗 루트 공유';
+    shareRouteBtn.textContent=r.is_shared?'🔗 공유 취소':'🔗 루트 공유';
+    shareRouteBtn.style.color=r.is_shared?'var(--red)':'var(--cyan)';
+    shareRouteBtn.style.borderColor=r.is_shared?'var(--red)':'var(--cyan)';
+    shareRouteBtn.style.background=r.is_shared?'var(--red-l)':'var(--cyan-l)';
     shareRouteBtn.onclick=()=>shareRouteLink(r);
     titleRow.appendChild(shareRouteBtn);
     const editBtn=document.createElement('button');
@@ -3930,7 +3942,7 @@ async function loadSavedRoutes(){
     const likeBtn=document.createElement('button');
     likeBtn.style.cssText='background:none;border:none;font-size:13px;cursor:'+(liked?'default':'pointer')+';color:'+(liked?'var(--accent)':'var(--muted)');
     likeBtn.textContent='❤️ '+(r.likes||0);likeBtn.disabled=liked;
-    if(!liked)likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
+    likeBtn.onclick=()=>likeRoute(r.id,likeBtn);
     topRow.appendChild(infoDiv);topRow.appendChild(likeBtn);
     // 샵 태그
     const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
