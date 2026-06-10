@@ -2981,7 +2981,7 @@ async function openPostDetail(p){
   // 프로필 조회
   if(p.user_id){
     db.from('profiles').select('nickname,avatar_url').eq('id',p.user_id).maybeSingle().then(({data})=>{
-      if(data?.avatar_url){authorAvatar.innerHTML='<img src="'+data.avatar_url+'" style="width:100%;height:100%;object-fit:cover;"/>';}
+      if(data?.avatar_url){authorAvatar.innerHTML='<img src="'+data.avatar_url+'" style="width:40px;height:40px;object-fit:cover;border-radius:10px;display:block;"/>';}
       else{authorAvatar.textContent='👤';}
       if(data?.nickname)authorNick.textContent=data.nickname;
     });
