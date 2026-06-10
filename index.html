@@ -742,10 +742,10 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
     <button class="btn-submit" onclick="saveProfile()">저장하기</button>
     <button class="btn-logout" onclick="logout()">로그아웃</button>
     <button onclick="confirmDeleteAccount()" style="width:100%;margin-top:6px;background:none;border:none;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;padding:6px;text-decoration:underline;">회원탈퇴</button>
-    <button onclick="confirmDeleteAccount()" style="width:100%;margin-top:6px;background:none;border:none;color:var(--muted);font-size:12px;font-family:inherit;cursor:pointer;padding:6px;text-decoration:underline;">회원탈퇴</button>
     </div><!-- profileInfoTab end -->
     <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
-    <div id="profileBookmarksTab" style="display:none;" class="profile-content"></div>
+    <div id="profilePostsTab" style="display:none;" class="profile-content"></div>
+    <div id="profileCommentsTab" style="display:none;" class="profile-content"></div>
     <div id="profileFavBoardsTab" style="display:none;" class="profile-content"></div>
     <div id="profileSubscriptionsTab" style="display:none;" class="profile-content"></div>
     <div id="profileNotiTab" style="display:none;" class="profile-content"></div>
@@ -2199,8 +2199,7 @@ async function loadMySubscriptions(){
     const nick=document.createElement('span');nick.style.cssText='font-size:13px;font-weight:700;cursor:pointer;';nick.textContent=profile?.nickname||'(알수없음)';
     nick.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
     avatar.style.cursor='pointer';avatar.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
-    avatar.style.cursor='pointer';avatar.onclick=()=>{_popupTargetUserId=s.following_id;openUserPosts();};
-    unsubBtn.style.cssText='background:none;border:1px solid var(--border);border-radius:12px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;';
+    const unsubBtn=document.createElement('button');
     unsubBtn.textContent='구독취소';
     unsubBtn.onclick=async()=>{
       await db.from('subscriptions').delete().eq('follower_id',currentUser.id).eq('following_id',s.following_id);
