@@ -2651,6 +2651,7 @@ function updateMobileSubItem(el,isActive){
 }
 
 async function selectBoard(board, fromPopstate=false){
+  if(!board)return;
   currentBoard=board;currentSub=null;
 
   // 그리드 숨기고 상세 표시
@@ -2660,10 +2661,9 @@ async function selectBoard(board, fromPopstate=false){
   detailView.style.display='flex';
   // 모바일: 부모 overflow 풀기 + subBoardList flex row
   if(window.innerWidth<=600){
-    detailView.style.overflow='visible';
-    document.querySelector('.comm-view').style.overflow='visible';
-    document.querySelector('.comm-layout').style.overflow='visible';
-    const pa=document.getElementById('postArea');if(pa){pa.style.overflowY='auto';pa.style.overflowX='hidden';}
+    detailView.style.overflow='hidden';
+    const pa=document.getElementById('postArea');
+    if(pa){pa.style.overflowY='auto';pa.style.overflowX='hidden';pa.style.flex='1';}
     setTimeout(()=>{
       const sbl=document.getElementById('subBoardList');
       if(sbl){
