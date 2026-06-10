@@ -3018,6 +3018,7 @@ async function openPostDetail(p){
 
   // content에 이미지 없을 때만 별도 표시
   if(p.images&&p.images.length&&!body.querySelector('img')){
+    const imgs=document.createElement('div');imgs.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:14px;';
     p.images.forEach((src,i)=>{const img=document.createElement('img');img.className='post-img';img.src=src;img.onclick=()=>openImgFull(src,p.images,i);imgs.appendChild(img);});
     detail.appendChild(imgs);
   }
