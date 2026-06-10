@@ -2190,22 +2190,27 @@ async function loadMySubscriptions(){
   const{data:subs}=await db.from('subscriptions').select('following_id').eq('follower_id',currentUser.id);
   el.innerHTML='';
   if(!subs||!subs.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">구독 중인 사람이 없어요</div>';return;}
+  if(!subs||!subs.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:16px;text-align:center;">구독한 사람이 없어요</div>';return;}
   for(const s of subs){
     const{data:profile}=await db.from('profiles').select('nickname,avatar_url').eq('id',s.following_id).maybeSingle();
-    const div=document.createElement('div');div.className='fav-board-item';
-    const left=document.createElement('div');left.style.cssText='display:flex;align-items:center;gap:10px;';
-    const avatar=document.createElement('div');avatar.className='comment-avatar';
-    if(profile?.avatar_url){avatar.innerHTML='<img src="'+profile.avatar_url+'"/>';}else{avatar.textContent='👤';}
-    const nick=document.createElement('span');nick.style.cssText='font-size:13px;font-weight:700;cursor:pointer;';nick.textContent=profile?.nickname||'(알수없음)';
-    nick.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
-    avatar.style.cursor='pointer';avatar.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);gap:10px;';
+    // 왼쪽: 아바타 + 닉네임
+    const left=document.createElement('div');left.style.cssText='display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;';
+    const avatar=document.createElement('div');
+    avatar.style.cssText='width:36px;height:36px;border-radius:9px;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center;';
+    if(profile?.avatar_url){avatar.style.backgroundImage='url('+profile.avatar_url+')';} else{avatar.textContent='👤';}
+    const nick=document.createElement('span');nick.style.cssText='font-size:13px;font-weight:700;';nick.textContent=profile?.nickname||'(알수없음)';
+    left.appendChild(avatar);left.appendChild(nick);
+    left.onclick=()=>{closeOverlay('profileOverlay');_popupTargetUserId=s.following_id;openUserPosts();};
+    // 오른쪽: 구독취소 버튼
     const unsubBtn=document.createElement('button');
     unsubBtn.style.cssText='background:none;border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;color:var(--muted);flex-shrink:0;';
+    unsubBtn.textContent='구독취소';
     unsubBtn.onclick=async()=>{
       await db.from('subscriptions').delete().eq('follower_id',currentUser.id).eq('following_id',s.following_id);
       div.remove();
     };
-    left.appendChild(avatar);left.appendChild(nick);
     div.appendChild(left);div.appendChild(unsubBtn);
     el.appendChild(div);
   }
