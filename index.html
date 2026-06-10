@@ -1915,6 +1915,7 @@ function closeSearchDrop(){document.getElementById('searchDropdown').classList.r
 function switchTab(tab){
   const isMap=tab==='map';
   localStorage.setItem('takuroad_tab', tab);
+  history.pushState({view:tab},'',location.pathname+(tab==='comm'?'?tab=comm':''));
   if(isMap&&map){setTimeout(()=>{map.relayout();},100);}
   // 커뮤니티로 전환 시 샵 세부창 닫기
   if(!isMap){
@@ -2681,18 +2682,34 @@ async function selectBoard(board){
 
 window.addEventListener('popstate', function(e){
   const state=e.state||{};
-  if(state.view==='board'){
-    // 게시판 상세로 복원
+  // 모바일 글 전체화면 닫기
+  const mpv=document.getElementById('mobilePostView');
+  if(mpv&&mpv.classList.contains('open')){
+    closeMobilePostView();
+    return;
+  }
+  if(state.view==='post'){
+    // 글에서 뒤로가기 = 세부게시판 목록
+    const pa=document.getElementById('postArea');
+    if(pa){pa.innerHTML='<div class="post-table" id="postTable"></div>';}
+    removePostBottomBar();
+    if(currentSub)selectSub(currentSub,false);
+    else selectSubAll(false);
+  } else if(state.view==='sub'||state.view==='subAll'){
+    // 세부게시판에서 뒤로가기 = 게시판 상세
     if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
       selectBoard(window._boardCache[state.boardId]);
     }
-  } else if(state.view==='list'){
+  } else if(state.view==='board'){
+    if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
+      selectBoard(window._boardCache[state.boardId]);
+    }
+  } else if(state.view==='list'||!state.view){
     backToBoards(true);
-  } else if(state.view==='post'){
-    // 글에서 뒤로가기 = 게시판 목록
-    const pa=document.getElementById('postArea');
-    if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
-    loadBoardPosts();
+  } else if(state.view==='map'){
+    switchTab('map');
+  } else if(state.view==='comm'){
+    switchTab('comm');
   }
 });
 
@@ -3052,6 +3069,8 @@ async function openPostDetail(p){
   detail.appendChild(cs);
 
   postArea.innerHTML='';
+  // 글 상세 history
+  history.pushState({view:'post',postId:p.id},'',location.pathname+'?board='+encodeURIComponent(currentBoard?currentBoard.name:'')+(currentSub?'&sub='+encodeURIComponent(currentSub.name):'')+'&post='+p.id);
   // 모바일이면 전체화면으로
   if(window.innerWidth<=600){
   
