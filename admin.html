@@ -136,15 +136,6 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 
-function switchTab(tab, btn){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.style.display='none');
-  document.getElementById('tab-'+tab).style.display='block';
-  if(tab==='users')loadUsers();
-  if(tab==='posts')loadPosts();
-}
-
 async function init(){
   const{data:{user}}=await db.auth.getUser();
   if(!user||user.email!==ADMIN_EMAIL){
@@ -265,7 +256,6 @@ function renderUserList(users){
 }
 
 async function loadUsers(){
-async function loadUsers(){
   const el=document.getElementById('userList');
   el.innerHTML='<div class="loading">불러오는 중…</div>';
   const{data:users}=await db.from('profiles').select('*').order('created_at',{ascending:false});
@@ -298,6 +288,15 @@ async function adminDeletePost(postId, row){
   await db.from('posts').delete().eq('id',postId);
   row.remove();
   loadStats();
+}
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>el.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  if(tab==='users')loadUsers();
+  if(tab==='posts')loadPosts();
 }
 
 init();
