@@ -517,7 +517,7 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
       .post-bottom-bar{display:flex!important;}
     }
     @media(min-width:601px){
-      .post-row-comment{display:none;}
+      .post-row-comment{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;height:44px;background:var(--surface2);border-radius:8px;font-size:13px;font-weight:700;flex-shrink:0;}
       .post-bottom-bar{display:none!important;}
     }
     .post-bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:none;align-items:center;padding:8px 0;z-index:200;}
