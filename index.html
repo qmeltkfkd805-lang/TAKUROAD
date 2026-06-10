@@ -4295,7 +4295,7 @@ async function showUserPopup(e,userId,nick,avatarUrl){
   }
 }
 
-function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');}
+function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){document.removeEventListener('scroll',_popupScrollHandler,true);_popupScrollHandler=null;}_popupTargetEl=null;}
 
 async function popupSubscribe(){
   if(!currentUser){alert('로그인이 필요해요');return;}
