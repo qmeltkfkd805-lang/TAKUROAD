@@ -3789,9 +3789,9 @@ async function loadMyRoutes(){
     const delBtn=document.createElement('button');
     delBtn.style.cssText='background:var(--red-l);border:1px solid var(--red);border-radius:10px;font-size:11px;color:var(--red);cursor:pointer;font-family:inherit;padding:2px 8px;';
     delBtn.textContent='🗑️ 삭제';delBtn.onclick=()=>deleteRoute(r.id,card);
-    titleRow.appendChild(titleEl);titleRow.appendChild(shareBtn);titleRow.appendChild(editBtn);titleRow.appendChild(delBtn);
     titleRow.appendChild(titleEl);titleRow.appendChild(shareBtn);titleRow.appendChild(shareRouteBtn);titleRow.appendChild(editBtn);titleRow.appendChild(delBtn);
-    shops.forEach((s,i)=>{const tag=document.createElement('span');tag.className='route-saved-tag';tag.textContent=(i+1)+'. '+s.name;tagsDiv.appendChild(tag);});
+    const metaEl=document.createElement('div');metaEl.className='route-saved-meta';metaEl.textContent=r.nickname+' · '+(r.likes||0)+' ❤️';
+    const tagsDiv=document.createElement('div');tagsDiv.className='route-saved-shops';
     const viewBtn=document.createElement('button');
     viewBtn.style.cssText='width:100%;margin-top:8px;background:var(--purple-l);color:var(--purple);border:1.5px solid var(--purple);border-radius:var(--r-sm);padding:7px;font-size:12px;font-family:inherit;font-weight:700;cursor:pointer;';
     // 루트 이미지 표시
