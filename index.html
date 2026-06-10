@@ -2663,6 +2663,7 @@ async function selectBoard(board, fromPopstate=false){
     detailView.style.overflow='visible';
     document.querySelector('.comm-view').style.overflow='visible';
     document.querySelector('.comm-layout').style.overflow='visible';
+    const pa=document.getElementById('postArea');if(pa){pa.style.overflowY='auto';pa.style.overflowX='hidden';}
     setTimeout(()=>{
       const sbl=document.getElementById('subBoardList');
       if(sbl){
