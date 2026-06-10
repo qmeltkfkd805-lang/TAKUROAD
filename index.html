@@ -3911,7 +3911,7 @@ async function saveRoute(){
   }
   const{error}=await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title,description:desc,shop_ids:shopIds,likes:0,images:imageUrls.length?imageUrls:null,is_shared:false});
   if(error){alert('저장 실패: '+error.message);return;}
-  alert('루트가 공유됐어요! 🎉');
+  alert('내 루트에 저장됐어요! 🎉');
   currentRoute=[];_routeImgFiles=[];
   document.getElementById('routeTitle').value='';
   document.getElementById('routeDesc').value='';
@@ -4087,10 +4087,6 @@ async function submitShareRoute(){
     route_data:r.shop_ids
   }).select().single();
   if(error){alert('공유 실패: '+error.message);return;}
-  // routes 테이블에 없으면 추가
-  if(!r.id||typeof r.id==='undefined'){
-    await db.from('routes').insert({user_id:currentUser.id,nickname:nick,title:r.title,description:r.description||'',shop_ids:r.shop_ids,likes:0,images:r.images||null});
-  }
   if(newPost){
     const{data:board}=await db.from('boards').select('*').eq('id',boardId).single();
     const{data:sub}=await db.from('sub_boards').select('*').eq('id',subId).single();
