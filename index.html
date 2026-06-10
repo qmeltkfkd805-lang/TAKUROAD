@@ -2755,7 +2755,7 @@ async function saveDesc(){
   closeOverlay('descOverlay');
 }
 
-function selectSubAll(pushHistory){
+function selectSubAll(pushHistory=true,fromPopstate=false){
   currentSub=null;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>{el.classList.remove('active');updateMobileSubItem(el,false);});
   const el=document.getElementById('sub-all');if(el){el.classList.add('active');updateMobileSubItem(el,true);}
@@ -2796,7 +2796,7 @@ async function selectSubPopular(){
   });
 }
 
-function selectSub(sub){
+function selectSub(sub,pushHistory=true,fromPopstate=false){
   currentSub=sub;window._popularMode=false;
   document.querySelectorAll('.sub-item').forEach(el=>{el.classList.remove('active');updateMobileSubItem(el,false);});
   const el=document.getElementById('sub-'+sub.id);if(el){el.classList.add('active');updateMobileSubItem(el,true);}
