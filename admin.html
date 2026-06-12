@@ -209,7 +209,7 @@ async function renderReports(reports, elId, isResolved){
     card.className='report-card'+(isResolved?' resolved':'');
     card.innerHTML=`
       <div class="report-top">
-        <span class="report-type">${r.target_type==='post'?'📝 게시글':'👤 유저'}</span>
+        <span class="report-type">${typeLabel}</span>
         <div class="report-reason">${r.reason||'(사유 없음)'}</div>
       </div>
       ${postInfo}
