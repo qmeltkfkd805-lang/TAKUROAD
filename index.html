@@ -3735,12 +3735,15 @@ async function loadNotifications(){
         // 클릭 시 해당 위치로 이동
         closeNotifPanel();
         if(item.type==='shop_manager'){
-          // 샵 이름 추출 후 검색해서 열기
-          switchTab('map');
           const shopName=item.message.match(/\[(.+?)\]/)?.[1];
+          switchTab('map');
           if(shopName){
-            const found=places&&places.find(p=>p.name===shopName);
-            if(found){setTimeout(()=>{selectPlace(found.id);},400);}
+            const tryFind=()=>{
+              const found=places&&places.find(p=>p.name===shopName);
+              if(found){selectPlace(found.id);}
+              else{setTimeout(tryFind,300);}
+            };
+            setTimeout(tryFind,500);
           }
         } else if(item.post_id){
           // 글로 이동
