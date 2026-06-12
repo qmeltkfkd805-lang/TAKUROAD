@@ -1263,11 +1263,11 @@ async function loadShops(){
       startDate:s.start_date,endDate:s.end_date,hours:s.hours,
       eventInfo:s.event_info,addedBy:s.added_by,addedNickname:s.added_nickname,managerId:s.manager_id
     }));
-    // DUMMY 중 DB에 없는 것만 유지 (id가 숫자인 것)
     // DUMMY 중 DB에 없는 이름만 유지
     const dbNames=new Set(dbPlaces.map(p=>p.name));
     const dummyOnly=DUMMY.filter(d=>typeof d.id==='number'&&!dbNames.has(d.name));
     places=[...dummyOnly,...dbPlaces];
+  }
   renderAll();
 }
 
