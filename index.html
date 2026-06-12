@@ -1750,6 +1750,7 @@ async function deleteShop(id){
 }
 
 async function assignShopManager(shopId){
+  if(typeof shopId==='number'){alert('이 샵은 DB에 등록된 샵이 아니에요. 샵을 직접 등록 후 매니저를 임명해주세요.');return;}
   const nick=prompt('매니저로 임명할 사용자의 닉네임을 입력하세요:');
   if(!nick)return;
   const{data:results}=await db.from('profiles').select('id,nickname').ilike('nickname','%'+nick+'%').limit(5);
