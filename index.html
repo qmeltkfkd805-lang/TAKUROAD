@@ -4860,8 +4860,7 @@ async function openChatRoom(chatId,partnerNick,postTitle){
       if(!reason)return;
       // 채팅 내용 수집
       const{data:msgs}=await db.from('chat_messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true});
-      const chatLog=msgs?.map(m=>(m.user_id===currentUser.id?'나':'상대')+': '+m.content).join('
-');
+      const chatLog=msgs?.map(m=>(m.user_id===currentUser.id?'나':'상대')+': '+m.content).join('\n');
       await db.from('reports').insert({
         reporter_id:currentUser.id,
         target_user_id:null,
