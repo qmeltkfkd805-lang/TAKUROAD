@@ -215,7 +215,7 @@ async function renderReports(reports, elId, isResolved){
     card.innerHTML=`
       <div class="report-top">
         <span class="report-type">${typeLabel}</span>
-        <div class="report-reason">${r.reason||'(사유 없음)'}</div>
+        <div class="report-reason">${r._mainReason||r.reason||'(사유 없음)'}</div>
       </div>
       ${postInfo}
       <div class="report-meta">
