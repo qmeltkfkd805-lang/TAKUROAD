@@ -1498,37 +1498,49 @@ async function selectPlace(id){
 async function showDetail(p){
   const color=CAT_COLOR[p.cat]||'#e8006f';
   const dp=document.getElementById('detailContent');
-  // 버튼 행 (수정/매니저/삭제)
-  let existBtnRow=document.getElementById('shopActionBtns');if(existBtnRow)existBtnRow.remove();
-  const btnRow=document.createElement('div');
-  btnRow.id='shopActionBtns';
-  btnRow.style.cssText='position:absolute;top:48px;right:14px;display:flex;gap:6px;';
-  if(isAdmin){
-    const mgrBtn=document.createElement('button');
-    mgrBtn.className='da-btn';
-    mgrBtn.style.cssText='font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border-color:var(--purple);';
-    mgrBtn.textContent='👑 매니저';
-    mgrBtn.onclick=()=>assignShopManager(p.id);
-    btnRow.appendChild(mgrBtn);
-  }
+  // ⋮ 더보기 버튼
+  let existMore=document.getElementById('shopMoreBtn');if(existMore)existMore.remove();
+  let existMoreMenu=document.getElementById('shopMoreMenu');if(existMoreMenu)existMoreMenu.remove();
   const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
-  if(canEditShop){
-    const editBtn=document.createElement('button');
-    editBtn.className='da-btn';
-    editBtn.style.cssText='font-size:11px;padding:4px 10px;';
-    editBtn.textContent='✏️ 수정';
-    editBtn.onclick=()=>openEditShop(p.id);
-    btnRow.appendChild(editBtn);
+  const canDeleteShop=currentUser&&(p.addedBy===currentUser.id||isAdmin);
+  if(canEditShop||canDeleteShop||isAdmin){
+    const moreBtn=document.createElement('button');
+    moreBtn.id='shopMoreBtn';
+    moreBtn.style.cssText='position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;line-height:1;';
+    moreBtn.textContent='⋮';
+    moreBtn.onclick=(e)=>{
+      e.stopPropagation();
+      let menu=document.getElementById('shopMoreMenu');
+      if(menu){menu.remove();return;}
+      menu=document.createElement('div');
+      menu.id='shopMoreMenu';
+      menu.style.cssText='position:absolute;top:40px;right:14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--sh-md);z-index:10;min-width:120px;overflow:hidden;';
+      if(isAdmin){
+        const m1=document.createElement('button');
+        m1.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;';
+        m1.textContent='👑 매니저 임명';m1.onmouseenter=()=>m1.style.background='var(--surface2)';m1.onmouseleave=()=>m1.style.background='none';
+        m1.onclick=()=>{menu.remove();assignShopManager(p.id);};
+        menu.appendChild(m1);
+      }
+      if(canEditShop){
+        const m2=document.createElement('button');
+        m2.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;';
+        m2.textContent='✏️ 수정';m2.onmouseenter=()=>m2.style.background='var(--surface2)';m2.onmouseleave=()=>m2.style.background='none';
+        m2.onclick=()=>{menu.remove();openEditShop(p.id);};
+        menu.appendChild(m2);
+      }
+      if(canDeleteShop){
+        const m3=document.createElement('button');
+        m3.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--red);display:flex;align-items:center;gap:8px;';
+        m3.textContent='🗑️ 삭제';m3.onmouseenter=()=>m3.style.background='var(--red-l)';m3.onmouseleave=()=>m3.style.background='none';
+        m3.onclick=()=>{menu.remove();deleteShop(p.id);};
+        menu.appendChild(m3);
+      }
+      document.getElementById('detailPanel').appendChild(menu);
+      setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
+    };
+    document.getElementById('detailPanel').appendChild(moreBtn);
   }
-  if(currentUser&&(p.addedBy===currentUser.id||isAdmin)){
-    const delBtn=document.createElement('button');
-    delBtn.className='da-btn';
-    delBtn.style.cssText='font-size:11px;padding:4px 10px;background:var(--red-l);color:var(--red);border-color:var(--red);';
-    delBtn.textContent='🗑️ 삭제';
-    delBtn.onclick=()=>deleteShop(p.id);
-    btnRow.appendChild(delBtn);
-  }
-  if(btnRow.children.length>0)document.getElementById('detailPanel').appendChild(btnRow);
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
