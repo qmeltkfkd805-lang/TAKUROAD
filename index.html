@@ -4776,19 +4776,36 @@ async function openChatList(){
     const right=document.createElement('div');right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;gap:4px;';
     right.innerHTML='<div class="chat-list-time">'+time+'</div>';
     if(unread>0){const badge=document.createElement('div');badge.className='chat-unread';badge.textContent=unread;right.appendChild(badge);}
-    // 나가기 버튼
-    const leaveBtn=document.createElement('button');
-    leaveBtn.style.cssText='background:none;border:none;font-size:13px;cursor:pointer;color:var(--muted);padding:4px 8px;flex-shrink:0;';
-    leaveBtn.textContent='나가기';
-    leaveBtn.onclick=async(e)=>{
+    // ⋮ 버튼
+    const moreBtn=document.createElement('button');
+    moreBtn.style.cssText='background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:4px 6px;flex-shrink:0;line-height:1;';
+    moreBtn.textContent='⋮';
+    moreBtn.onclick=(e)=>{
       e.stopPropagation();
-      if(!confirm(nick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
-      await db.from('chat_messages').delete().eq('chat_id',chat.id);
-      await db.from('chats').delete().eq('id',chat.id);
-      item.remove();
-      loadUnreadCount();
+      const existing=document.getElementById('chatItemMenu');
+      if(existing)existing.remove();
+      const menu=document.createElement('div');
+      menu.id='chatItemMenu';
+      const rect=moreBtn.getBoundingClientRect();
+      menu.style.cssText='position:fixed;top:'+(rect.bottom+4)+'px;right:'+(window.innerWidth-rect.right)+'px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--sh-md);z-index:9999;min-width:120px;overflow:hidden;';
+      const leaveItem=document.createElement('button');
+      leaveItem.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--red);';
+      leaveItem.textContent='🚪 나가기';
+      leaveItem.onmouseenter=()=>leaveItem.style.background='var(--red-l)';
+      leaveItem.onmouseleave=()=>leaveItem.style.background='none';
+      leaveItem.onclick=async()=>{
+        menu.remove();
+        if(!confirm(nick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
+        await db.from('chat_messages').delete().eq('chat_id',chat.id);
+        await db.from('chats').delete().eq('id',chat.id);
+        item.remove();
+        loadUnreadCount();
+      };
+      menu.appendChild(leaveItem);
+      document.body.appendChild(menu);
+      setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
     };
-    right.appendChild(leaveBtn);
+    right.appendChild(moreBtn);
     item.appendChild(avatar);item.appendChild(info);item.appendChild(right);
     item.onclick=()=>openChatRoom(chat.id,nick,'');
     body.appendChild(item);
@@ -4800,21 +4817,64 @@ function closeChatList(){document.getElementById('chatListOverlay').classList.re
 async function openChatRoom(chatId,partnerNick,postTitle){
   _currentChatId=chatId;
   document.getElementById('chatRoomTitle').textContent=partnerNick;
-  // 나가기 버튼
-  let leaveRoomBtn=document.getElementById('chatLeaveBtn');
-  if(!leaveRoomBtn){
-    leaveRoomBtn=document.createElement('button');
-    leaveRoomBtn.id='chatLeaveBtn';
-    leaveRoomBtn.style.cssText='background:none;border:none;font-size:12px;cursor:pointer;color:var(--muted);padding:4px 8px;margin-left:auto;';
-    leaveRoomBtn.textContent='나가기';
-    document.getElementById('chatRoomTitle').parentElement.appendChild(leaveRoomBtn);
+  // 채팅방 ⋮ 버튼
+  let chatMoreBtn=document.getElementById('chatRoomMoreBtn');
+  if(!chatMoreBtn){
+    chatMoreBtn=document.createElement('button');
+    chatMoreBtn.id='chatRoomMoreBtn';
+    chatMoreBtn.style.cssText='background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:2px 8px;line-height:1;margin-left:auto;';
+    chatMoreBtn.textContent='⋮';
+    document.getElementById('chatRoomTitle').parentElement.appendChild(chatMoreBtn);
   }
-  leaveRoomBtn.onclick=async()=>{
-    if(!confirm(partnerNick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
-    await db.from('chat_messages').delete().eq('chat_id',chatId);
-    await db.from('chats').delete().eq('id',chatId);
-    closeChatRoom();
-    openChatList();
+  chatMoreBtn.onclick=(e)=>{
+    e.stopPropagation();
+    const existing=document.getElementById('chatRoomMenu');
+    if(existing){existing.remove();return;}
+    const menu=document.createElement('div');
+    menu.id='chatRoomMenu';
+    const rect=chatMoreBtn.getBoundingClientRect();
+    menu.style.cssText='position:fixed;top:'+(rect.bottom+4)+'px;right:12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--sh-md);z-index:9999;min-width:130px;overflow:hidden;';
+    const leaveItem=document.createElement('button');
+    leaveItem.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--red);';
+    leaveItem.textContent='🚪 채팅방 나가기';
+    leaveItem.onmouseenter=()=>leaveItem.style.background='var(--red-l)';
+    leaveItem.onmouseleave=()=>leaveItem.style.background='none';
+    leaveItem.onclick=async()=>{
+      menu.remove();
+      if(!confirm(partnerNick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
+      await db.from('chat_messages').delete().eq('chat_id',chatId);
+      await db.from('chats').delete().eq('id',chatId);
+      closeChatRoom();
+      openChatList();
+    };
+    menu.appendChild(leaveItem);
+    // 신고하기
+    const reportItem=document.createElement('button');
+    reportItem.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--muted);';
+    reportItem.textContent='🚨 신고하기';
+    reportItem.onmouseenter=()=>reportItem.style.background='var(--surface2)';
+    reportItem.onmouseleave=()=>reportItem.style.background='none';
+    reportItem.onclick=async()=>{
+      menu.remove();
+      const reason=prompt('신고 사유를 입력해주세요:');
+      if(!reason)return;
+      // 채팅 내용 수집
+      const{data:msgs}=await db.from('chat_messages').select('*').eq('chat_id',chatId).order('created_at',{ascending:true});
+      const chatLog=msgs?.map(m=>(m.user_id===currentUser.id?'나':'상대')+': '+m.content).join('
+');
+      await db.from('reports').insert({
+        reporter_id:currentUser.id,
+        target_user_id:null,
+        target_id:chatId,
+        target_type:'chat',
+        reason:reason+'\n\n[채팅 내용]\n'+chatLog,
+        status:'pending'
+      });
+      alert('신고가 접수됐어요. 검토 후 조치할게요.');
+    };
+    menu.appendChild(reportItem);
+    document.body.appendChild(menu);
+    setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
   };
   const postRef=document.getElementById('chatPostRef');
   if(postTitle){postRef.textContent='📦 '+postTitle;postRef.style.display='block';}
