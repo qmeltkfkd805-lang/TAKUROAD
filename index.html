@@ -3444,6 +3444,17 @@ async function loadComments(postId){
       delBtn.textContent='삭제';
       delBtn.onclick=()=>deleteComment(c.id,postId);
       actionRow.appendChild(delBtn);
+    } else if(currentUser){
+      const repBtn=document.createElement('button');
+      repBtn.style.cssText='background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;';
+      repBtn.textContent='🚨 신고';
+      repBtn.onclick=async()=>{
+        const reason=prompt('신고 사유를 입력해주세요:');
+        if(!reason)return;
+        await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:c.user_id,target_id:c.id,target_type:'comment',reason,status:'pending'});
+        alert('신고가 접수됐어요.');
+      };
+      actionRow.appendChild(repBtn);
     }
     div.appendChild(actionRow);
     list2.appendChild(div);
