@@ -1267,7 +1267,8 @@ async function loadShops(){
     // DUMMY 중 DB에 없는 이름만 유지
     const dbNames=new Set(dbPlaces.map(p=>p.name));
     const dummyOnly=DUMMY.filter(d=>typeof d.id==='number'&&!dbNames.has(d.name));
-  }
+    const dummyOnly=DUMMY.filter(d=>typeof d.id==='number'&&!dbNames.has(d.name));
+    places=[...dummyOnly,...dbPlaces];
   renderAll();
 }
 
