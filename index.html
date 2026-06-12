@@ -4802,6 +4802,22 @@ async function openChatList(){
         loadUnreadCount();
       };
       menu.appendChild(leaveItem);
+      // 신고하기
+      const reportListItem=document.createElement('button');
+      reportListItem.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--muted);';
+      reportListItem.textContent='🚨 신고하기';
+      reportListItem.onmouseenter=()=>reportListItem.style.background='var(--surface2)';
+      reportListItem.onmouseleave=()=>reportListItem.style.background='none';
+      reportListItem.onclick=async()=>{
+        menu.remove();
+        const reason=prompt('신고 사유를 입력해주세요:');
+        if(!reason)return;
+        const{data:msgs}=await db.from('chat_messages').select('*').eq('chat_id',chat.id).order('created_at',{ascending:true});
+        const chatLog=msgs?.map(m=>(m.user_id===currentUser.id?'나':'상대')+': '+m.content).join('\n');
+        await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:null,target_id:chat.id,target_type:'chat',reason:reason+'\n\n[채팅 내용]\n'+chatLog,status:'pending'});
+        alert('신고가 접수됐어요.');
+      };
+      menu.appendChild(reportListItem);
       document.body.appendChild(menu);
       setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
     };
