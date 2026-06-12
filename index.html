@@ -1502,7 +1502,7 @@ async function showDetail(p){
   const dp=document.getElementById('detailContent');
   // ⋮ 더보기 버튼
   const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
-  const canDeleteShop=currentUser&&(p.addedBy===currentUser.id||isAdmin);
+  const canDeleteShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
   const moreBtn=document.getElementById('shopMoreBtn');
   const moreMenu=document.getElementById('shopMoreMenu');
   moreMenu.innerHTML='';
