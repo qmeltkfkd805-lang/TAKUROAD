@@ -4776,6 +4776,19 @@ async function openChatList(){
     const right=document.createElement('div');right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;gap:4px;';
     right.innerHTML='<div class="chat-list-time">'+time+'</div>';
     if(unread>0){const badge=document.createElement('div');badge.className='chat-unread';badge.textContent=unread;right.appendChild(badge);}
+    // 나가기 버튼
+    const leaveBtn=document.createElement('button');
+    leaveBtn.style.cssText='background:none;border:none;font-size:13px;cursor:pointer;color:var(--muted);padding:4px 8px;flex-shrink:0;';
+    leaveBtn.textContent='나가기';
+    leaveBtn.onclick=async(e)=>{
+      e.stopPropagation();
+      if(!confirm(nick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
+      await db.from('chat_messages').delete().eq('chat_id',chat.id);
+      await db.from('chats').delete().eq('id',chat.id);
+      item.remove();
+      loadUnreadCount();
+    };
+    right.appendChild(leaveBtn);
     item.appendChild(avatar);item.appendChild(info);item.appendChild(right);
     item.onclick=()=>openChatRoom(chat.id,nick,'');
     body.appendChild(item);
@@ -4787,6 +4800,22 @@ function closeChatList(){document.getElementById('chatListOverlay').classList.re
 async function openChatRoom(chatId,partnerNick,postTitle){
   _currentChatId=chatId;
   document.getElementById('chatRoomTitle').textContent=partnerNick;
+  // 나가기 버튼
+  let leaveRoomBtn=document.getElementById('chatLeaveBtn');
+  if(!leaveRoomBtn){
+    leaveRoomBtn=document.createElement('button');
+    leaveRoomBtn.id='chatLeaveBtn';
+    leaveRoomBtn.style.cssText='background:none;border:none;font-size:12px;cursor:pointer;color:var(--muted);padding:4px 8px;margin-left:auto;';
+    leaveRoomBtn.textContent='나가기';
+    document.getElementById('chatRoomTitle').parentElement.appendChild(leaveRoomBtn);
+  }
+  leaveRoomBtn.onclick=async()=>{
+    if(!confirm(partnerNick+'님과의 채팅방을 나갈까요? 대화 내용이 모두 삭제돼요.'))return;
+    await db.from('chat_messages').delete().eq('chat_id',chatId);
+    await db.from('chats').delete().eq('id',chatId);
+    closeChatRoom();
+    openChatList();
+  };
   const postRef=document.getElementById('chatPostRef');
   if(postTitle){postRef.textContent='📦 '+postTitle;postRef.style.display='block';}
   else{postRef.style.display='none';}
