@@ -200,9 +200,14 @@ async function renderReports(reports, elId, isResolved){
       r.target_user_id?db.from('profiles').select('nickname').eq('id',r.target_user_id).maybeSingle():{data:null}
     ]);
     // 신고된 글이면 글 정보도
+    const typeLabel=r.target_type==='post'?'📝 게시글':r.target_type==='chat'?'💬 채팅':'👤 유저';
+    // 신고된 글이면 글 정보도
     let postInfo='';
-    if(r.target_type==='post'&&r.target_id){
-      const{data:post}=await db.from('posts').select('title').eq('id',r.target_id).maybeSingle();
+    if(r.target_type==='chat'){
+      const chatContent=(r.reason||'').split('[채팅 내용]')[1]||'';
+      const mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
+      postInfo='<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;max-height:150px;overflow-y:auto;">'+chatContent.trim()+'</div>';
+    } else if(r.target_type==='post'&&r.target_id){
       if(post)postInfo='<div style="font-size:12px;color:var(--muted);margin-top:4px;">📝 신고된 글: '+post.title+'</div>';
     }
     const card=document.createElement('div');
