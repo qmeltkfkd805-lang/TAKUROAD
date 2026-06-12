@@ -601,6 +601,8 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;ba
   <div class="pick-mode-bar" id="pickModeBar">📍 지도를 클릭해 위치를 선택하세요 <button onclick="cancelPickMode()">취소</button></div>
   <div class="detail-panel" id="detailPanel">
     <button class="detail-close" onclick="closeDetail()">✕</button>
+    <button id="shopMoreBtn" style="display:none;position:absolute;top:14px;right:44px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);padding:2px 6px;line-height:1;" onclick="toggleShopMoreMenu()">⋮</button>
+    <div id="shopMoreMenu" style="display:none;position:absolute;top:44px;right:14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--sh-md);z-index:10;min-width:130px;overflow:hidden;"></div>
     <div id="detailContent"></div>
   </div>
 </div>
@@ -1499,47 +1501,37 @@ async function showDetail(p){
   const color=CAT_COLOR[p.cat]||'#e8006f';
   const dp=document.getElementById('detailContent');
   // ⋮ 더보기 버튼
-  let existMore=document.getElementById('shopMoreBtn');if(existMore)existMore.remove();
-  let existMoreMenu=document.getElementById('shopMoreMenu');if(existMoreMenu)existMoreMenu.remove();
   const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
   const canDeleteShop=currentUser&&(p.addedBy===currentUser.id||isAdmin);
+  const moreBtn=document.getElementById('shopMoreBtn');
+  const moreMenu=document.getElementById('shopMoreMenu');
+  moreMenu.innerHTML='';
+  window._shopMoreP=p;
   if(canEditShop||canDeleteShop||isAdmin){
-    const moreBtn=document.createElement('button');
-    moreBtn.id='shopMoreBtn';
-    moreBtn.style.cssText='position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px;line-height:1;';
-    moreBtn.textContent='⋮';
-    moreBtn.onclick=(e)=>{
-      e.stopPropagation();
-      let menu=document.getElementById('shopMoreMenu');
-      if(menu){menu.remove();return;}
-      menu=document.createElement('div');
-      menu.id='shopMoreMenu';
-      menu.style.cssText='position:absolute;top:40px;right:14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);box-shadow:var(--sh-md);z-index:10;min-width:120px;overflow:hidden;';
-      if(isAdmin){
-        const m1=document.createElement('button');
-        m1.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;';
-        m1.textContent='👑 매니저 임명';m1.onmouseenter=()=>m1.style.background='var(--surface2)';m1.onmouseleave=()=>m1.style.background='none';
-        m1.onclick=()=>{menu.remove();assignShopManager(p.id);};
-        menu.appendChild(m1);
-      }
-      if(canEditShop){
-        const m2=document.createElement('button');
-        m2.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:8px;';
-        m2.textContent='✏️ 수정';m2.onmouseenter=()=>m2.style.background='var(--surface2)';m2.onmouseleave=()=>m2.style.background='none';
-        m2.onclick=()=>{menu.remove();openEditShop(p.id);};
-        menu.appendChild(m2);
-      }
-      if(canDeleteShop){
-        const m3=document.createElement('button');
-        m3.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--red);display:flex;align-items:center;gap:8px;';
-        m3.textContent='🗑️ 삭제';m3.onmouseenter=()=>m3.style.background='var(--red-l)';m3.onmouseleave=()=>m3.style.background='none';
-        m3.onclick=()=>{menu.remove();deleteShop(p.id);};
-        menu.appendChild(m3);
-      }
-      document.getElementById('detailPanel').appendChild(menu);
-      setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
-    };
-    document.getElementById('detailPanel').appendChild(moreBtn);
+    moreBtn.style.display='block';
+    if(isAdmin){
+      const m1=document.createElement('button');
+      m1.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;';
+      m1.textContent='👑 매니저 임명';m1.onmouseenter=()=>m1.style.background='var(--surface2)';m1.onmouseleave=()=>m1.style.background='none';
+      m1.onclick=()=>{moreMenu.style.display='none';assignShopManager(p.id);};
+      moreMenu.appendChild(m1);
+    }
+    if(canEditShop){
+      const m2=document.createElement('button');
+      m2.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;';
+      m2.textContent='✏️ 수정';m2.onmouseenter=()=>m2.style.background='var(--surface2)';m2.onmouseleave=()=>m2.style.background='none';
+      m2.onclick=()=>{moreMenu.style.display='none';openEditShop(p.id);};
+      moreMenu.appendChild(m2);
+    }
+    if(canDeleteShop){
+      const m3=document.createElement('button');
+      m3.style.cssText='width:100%;padding:10px 16px;text-align:left;background:none;border:none;font-size:13px;font-family:inherit;cursor:pointer;color:var(--red);';
+      m3.textContent='🗑️ 삭제';m3.onmouseenter=()=>m3.style.background='var(--red-l)';m3.onmouseleave=()=>m3.style.background='none';
+      m3.onclick=()=>{moreMenu.style.display='none';deleteShop(p.id);};
+      moreMenu.appendChild(m3);
+    }
+  } else {
+    moreBtn.style.display='none';
   }
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
@@ -1924,6 +1916,12 @@ async function likeReview(id,el){
   const n=(data.likes||0)+1;await db.from('reviews').update({likes:n}).eq('id',id);el.textContent='❤️ '+n;
 }
 function starStr(n){n=Math.max(0,Math.min(5,n));return'★'.repeat(n)+'☆'.repeat(5-n);}
+function toggleShopMoreMenu(){
+  const menu=document.getElementById('shopMoreMenu');
+  if(menu.style.display==='block'){menu.style.display='none';}
+  else{menu.style.display='block';setTimeout(()=>document.addEventListener('click',()=>{menu.style.display='none';},{once:true}),0);}
+}
+
 function closeDetail(){document.getElementById('detailPanel').classList.remove('open');activePlaceId=null;document.querySelectorAll('.shop-card').forEach(c=>c.classList.remove('active'));}
 
 function filterCat(cat,btn){
