@@ -1498,38 +1498,37 @@ async function selectPlace(id){
 async function showDetail(p){
   const color=CAT_COLOR[p.cat]||'#e8006f';
   const dp=document.getElementById('detailContent');
-  // 수정 버튼 - 본인/매니저/관리자만
-  const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
-  if(canEditShop){
-    const editShopBtn=document.createElement('button');
-    editShopBtn.id='detailEditBtn';
-    editShopBtn.className='da-btn';
-    editShopBtn.style.cssText='position:absolute;top:76px;right:14px;font-size:11px;padding:4px 10px;';
-    editShopBtn.textContent='✏️ 수정';
-    editShopBtn.onclick=()=>openEditShop(p.id);
-    document.getElementById('detailPanel').appendChild(editShopBtn);
-  }
-  // 매니저 임명 버튼 (슈퍼계정만)
+  // 버튼 행 (수정/매니저/삭제)
+  let existBtnRow=document.getElementById('shopActionBtns');if(existBtnRow)existBtnRow.remove();
+  const btnRow=document.createElement('div');
+  btnRow.id='shopActionBtns';
+  btnRow.style.cssText='position:absolute;top:48px;right:14px;display:flex;gap:6px;';
   if(isAdmin){
-    let existMgr=document.getElementById('detailMgrBtn');if(existMgr)existMgr.remove();
     const mgrBtn=document.createElement('button');
-    mgrBtn.id='detailMgrBtn';mgrBtn.className='da-btn';
-    mgrBtn.style.cssText='position:absolute;top:48px;right:14px;font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border:1px solid var(--purple);border-radius:var(--r-sm);cursor:pointer;font-family:inherit;';
+    mgrBtn.className='da-btn';
+    mgrBtn.style.cssText='font-size:11px;padding:4px 10px;background:var(--purple-l);color:var(--purple);border-color:var(--purple);';
     mgrBtn.textContent='👑 매니저';
     mgrBtn.onclick=()=>assignShopManager(p.id);
-    document.getElementById('detailPanel').appendChild(mgrBtn);
+    btnRow.appendChild(mgrBtn);
   }
-  // 삭제 버튼 (본인이 추가한 샵만)
-  if(currentUser&&p.addedBy===currentUser.id){
-    let existDel=document.getElementById('detailDelBtn');if(existDel)existDel.remove();
-    const delShopBtn=document.createElement('button');
-    delShopBtn.id='detailDelBtn';
-    delShopBtn.className='da-btn';
-    delShopBtn.style.cssText='position:absolute;top:84px;right:14px;font-size:11px;padding:4px 10px;background:var(--red-l);color:var(--red);border-color:var(--red);';
-    delShopBtn.textContent='🗑️ 삭제';
-    delShopBtn.onclick=()=>deleteShop(p.id);
-    document.getElementById('detailPanel').appendChild(delShopBtn);
+  const canEditShop=currentUser&&(p.addedBy===currentUser.id||p.managerId===currentUser.id||isAdmin);
+  if(canEditShop){
+    const editBtn=document.createElement('button');
+    editBtn.className='da-btn';
+    editBtn.style.cssText='font-size:11px;padding:4px 10px;';
+    editBtn.textContent='✏️ 수정';
+    editBtn.onclick=()=>openEditShop(p.id);
+    btnRow.appendChild(editBtn);
   }
+  if(currentUser&&(p.addedBy===currentUser.id||isAdmin)){
+    const delBtn=document.createElement('button');
+    delBtn.className='da-btn';
+    delBtn.style.cssText='font-size:11px;padding:4px 10px;background:var(--red-l);color:var(--red);border-color:var(--red);';
+    delBtn.textContent='🗑️ 삭제';
+    delBtn.onclick=()=>deleteShop(p.id);
+    btnRow.appendChild(delBtn);
+  }
+  if(btnRow.children.length>0)document.getElementById('detailPanel').appendChild(btnRow);
   dp.innerHTML='<div class="detail-cat" style="color:'+color+'">'+CAT_ICON[p.cat]+' <strong>'+p.cat+'</strong></div>'
     +'<div class="detail-name">'+p.name+'</div>'
     +'<div class="detail-addr">📍 '+p.addr+'</div>'
@@ -1750,15 +1749,14 @@ async function deleteShop(id){
 }
 
 async function assignShopManager(shopId){
-  if(typeof shopId==='number'){alert('이 샵은 DB에 등록된 샵이 아니에요. 샵을 직접 등록 후 매니저를 임명해주세요.');return;}
   const nick=prompt('매니저로 임명할 사용자의 닉네임을 입력하세요:');
   if(!nick)return;
   const{data:results}=await db.from('profiles').select('id,nickname').ilike('nickname','%'+nick+'%').limit(5);
   if(!results||!results.length){alert('해당 닉네임을 찾을 수 없어요.');return;}
   if(results.length===1){
     if(!confirm(results[0].nickname+'님을 이 샵의 매니저로 임명할까요?'))return;
-    await db.from('shops').update({manager_id:results[0].id}).eq('id',shopId);
-    await db.from('notifications').insert({user_id:results[0].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:shopId});
+    if(typeof shopId!=='number')await db.from('shops').update({manager_id:results[0].id}).eq('id',shopId);
+    await db.from('notifications').insert({user_id:results[0].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
     alert('매니저 임명 완료! 🎉');
     return;
   }
@@ -1766,8 +1764,8 @@ async function assignShopManager(shopId){
   const idx=parseInt(prompt('여러 명이 검색됐어요. 번호를 입력하세요:\n'+names));
   if(isNaN(idx)||!results[idx])return;
   if(!confirm(results[idx].nickname+'님을 매니저로 임명할까요?'))return;
-  await db.from('shops').update({manager_id:results[idx].id}).eq('id',shopId);
-  await db.from('notifications').insert({user_id:results[idx].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:shopId});
+  if(typeof shopId!=='number')await db.from('shops').update({manager_id:results[idx].id}).eq('id',shopId);
+  await db.from('notifications').insert({user_id:results[idx].id,type:'shop_manager',message:'🏪 샵 매니저로 임명됐어요! 샵 정보를 수정하고 관리할 수 있어요.',post_id:null});
   alert('매니저 임명 완료! 🎉');
 }
 
