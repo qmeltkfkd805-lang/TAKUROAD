@@ -374,6 +374,7 @@ async function loadArchive(){
     const{data:reporter}=await db.from('profiles').select('nickname').eq('id',r.reporter_id).maybeSingle();
     const d=new Date(r.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
     const mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
+    const chatContent=r.target_type==='chat'?(r.reason||'').split('[채팅 내용]')[1]||'':'';
     const card=document.createElement('div');
     card.className='report-card resolved';
     card.style.opacity='0.8';
@@ -383,6 +384,7 @@ async function loadArchive(){
         <span style="font-size:11px;font-weight:700;color:var(--green);">${statusLabel}</span>
         <div class="report-reason" style="flex:1;">${mainReason||'(사유 없음)'}</div>
       </div>
+      ${chatContent?`<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;max-height:150px;overflow-y:auto;"><strong>💬 채팅 내용</strong><br>${chatContent.trim()}</div>`:''}
       <div class="report-meta">신고자: <strong>${reporter?.nickname||'(알수없음)'}</strong> · ${d}</div>
     `;
     el.appendChild(card);
