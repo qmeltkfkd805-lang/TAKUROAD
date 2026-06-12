@@ -205,10 +205,10 @@ async function renderReports(reports, elId, isResolved){
     let postInfo='';
     if(r.target_type==='chat'){
       const chatContent=(r.reason||'').split('[채팅 내용]')[1]||'';
-      const mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
-      postInfo='<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;max-height:150px;overflow-y:auto;">'+chatContent.trim()+'</div>';
+      r._mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
+      postInfo='<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;max-height:150px;overflow-y:auto;"><strong>💬 채팅 내용</strong><br>'+chatContent.trim()+'</div>';
     } else if(r.target_type==='post'&&r.target_id){
-      if(post)postInfo='<div style="font-size:12px;color:var(--muted);margin-top:4px;">📝 신고된 글: '+post.title+'</div>';
+      const{data:post}=await db.from('posts').select('title').eq('id',r.target_id).maybeSingle();
     }
     const card=document.createElement('div');
     card.className='report-card'+(isResolved?' resolved':'');
