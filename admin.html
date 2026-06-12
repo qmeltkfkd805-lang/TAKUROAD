@@ -109,6 +109,7 @@ header{background:var(--surface);border-bottom:1.5px solid var(--border);padding
       <button class="tab-btn" onclick="switchTab('users', this)">👥 회원 목록</button>
       <button class="tab-btn" onclick="switchTab('posts', this)">📝 게시글 목록</button>
       <button class="tab-btn" onclick="switchTab('shops', this)">🏪 샵 목록</button>
+      <button class="tab-btn" onclick="switchTab('archive', this)">📋 신고 내역</button>
     </div>
 
     <!-- 신고 목록 -->
@@ -117,10 +118,7 @@ header{background:var(--surface);border-bottom:1.5px solid var(--border);padding
         <div class="section-title">미처리 신고 <span class="badge" id="reportCount">0</span></div>
         <div id="reportList" class="loading">불러오는 중…</div>
       </div>
-      <div class="section">
-        <div class="section-title">처리 완료 <span class="badge badge-green">완료</span></div>
-        <div id="resolvedList" class="loading">불러오는 중…</div>
-      </div>
+
     </div>
 
     <!-- 회원 목록 -->
@@ -135,6 +133,12 @@ header{background:var(--surface);border-bottom:1.5px solid var(--border);padding
       <input id="shopSearch" type="text" placeholder="샵 이름, 주소 검색…" oninput="filterShops(this.value)"
         style="width:100%;padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:inherit;background:var(--surface);color:var(--text);outline:none;margin-bottom:16px;">
       <div id="shopList" class="loading">불러오는 중…</div>
+    </div>
+
+    <!-- 신고 내역 아카이브 -->
+    <div id="tab-archive" style="display:none;">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">처리 완료·무시된 모든 신고 내역이에요. 삭제되지 않고 영구 보관돼요.</p>
+      <div id="archiveList" class="loading">불러오는 중…</div>
     </div>
 
     <!-- 게시글 목록 -->
@@ -180,13 +184,15 @@ async function loadStats(){
 }
 
 async function loadReports(){
+  // 24시간 지난 처리완료/무시 신고 자동 삭제 (보관 안 된 것만)
+  const yesterday=new Date(Date.now()-24*60*60*1000).toISOString();
+  await db.from('reports').delete().in('status',['resolved','dismissed']).eq('is_archived',false).lt('created_at',yesterday);
   const{data:reports}=await db.from('reports').select('*').order('created_at',{ascending:false});
   const pending=(reports||[]).filter(r=>r.status!=='resolved');
   const resolved=(reports||[]).filter(r=>r.status==='resolved');
   document.getElementById('reportCount').textContent=pending.length;
 
   renderReports(pending, 'reportList', false);
-  renderReports(resolved, 'resolvedList', true);
 }
 
 async function renderReports(reports, elId, isResolved){
@@ -226,11 +232,18 @@ async function renderReports(reports, elId, isResolved){
       ${!isResolved?`<div class="report-actions">
         ${r.target_type==='post'&&r.target_id?`<button class="btn btn-red" onclick="deleteReportedPost('${r.id}','${r.target_id}',this.closest('.report-card'))">🗑️ 게시글 삭제</button>`:''}
         <button class="btn btn-green" onclick="resolveReport('${r.id}',this.closest('.report-card'))">✅ 처리 완료</button>
+        <button class="btn" style="background:var(--purple-l);color:var(--purple);border-color:var(--purple);" onclick="archiveReport('${r.id}',this.closest('.report-card'))">📋 보관</button>
         <button class="btn btn-gray" onclick="dismissReport('${r.id}',this.closest('.report-card'))">무시</button>
       </div>`:''}
     `;
     el.appendChild(card);
   }
+}
+
+async function archiveReport(reportId, card){
+  await db.from('reports').update({status:'resolved', is_archived:true}).eq('id',reportId);
+  card.classList.add('resolved');
+  setTimeout(()=>loadReports(),500);
 }
 
 async function resolveReport(reportId, card){
@@ -349,6 +362,33 @@ function renderShopList(shops){
   });
 }
 
+async function loadArchive(){
+  const el=document.getElementById('archiveList');
+  el.innerHTML='<div class="loading">불러오는 중…</div>';
+  const{data:reports}=await db.from('reports').select('*').eq('is_archived',true).order('created_at',{ascending:false});
+  if(!reports||!reports.length){el.innerHTML='<div class="empty">처리된 신고가 없어요</div>';return;}
+  el.innerHTML='';
+  for(const r of reports){
+    const typeLabel=r.target_type==='post'?'📝 게시글':r.target_type==='chat'?'💬 채팅':'👤 유저';
+    const statusLabel=r.status==='resolved'?'✅ 처리완료':'⛔ 무시';
+    const{data:reporter}=await db.from('profiles').select('nickname').eq('id',r.reporter_id).maybeSingle();
+    const d=new Date(r.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
+    const card=document.createElement('div');
+    card.className='report-card resolved';
+    card.style.opacity='0.8';
+    card.innerHTML=`
+      <div class="report-top">
+        <span class="report-type">${typeLabel}</span>
+        <span style="font-size:11px;font-weight:700;color:var(--green);">${statusLabel}</span>
+        <div class="report-reason" style="flex:1;">${mainReason||'(사유 없음)'}</div>
+      </div>
+      <div class="report-meta">신고자: <strong>${reporter?.nickname||'(알수없음)'}</strong> · ${d}</div>
+    `;
+    el.appendChild(card);
+  }
+}
+
 async function loadShops(){
   const el=document.getElementById('shopList');
   el.innerHTML='<div class="loading">불러오는 중…</div>';
@@ -373,6 +413,7 @@ function switchTab(tab, btn){
   if(tab==='users')loadUsers();
   if(tab==='posts')loadPosts();
   if(tab==='shops')loadShops();
+  if(tab==='archive')loadArchive();
 }
 
 init();
