@@ -3732,6 +3732,13 @@ async function loadNotifications(){
       div.className='notif-item'+(item.is_read?'':' unread');
       const date=new Date(item.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
       div.innerHTML='<div class="notif-msg">'+item.message+'</div><div class="notif-time">'+date+'</div>';
+      // 삭제 버튼
+      const delBtn=document.createElement('button');
+      delBtn.style.cssText='position:absolute;top:8px;right:8px;background:none;border:none;font-size:14px;cursor:pointer;color:var(--muted);padding:2px 4px;line-height:1;';
+      delBtn.textContent='✕';
+      delBtn.onclick=async(e)=>{e.stopPropagation();await db.from('notifications').delete().eq('id',item.id);div.remove();};
+      div.style.position='relative';
+      div.appendChild(delBtn);
       div.onclick=async()=>{
         await db.from('notifications').update({is_read:true}).eq('id',item.id);
         div.classList.remove('unread');
