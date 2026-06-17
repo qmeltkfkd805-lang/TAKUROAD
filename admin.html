@@ -209,7 +209,12 @@ async function renderReports(reports, elId, isResolved){
     const typeLabel=r.target_type==='post'?'📝 게시글':r.target_type==='chat'?'💬 채팅':r.target_type==='comment'?'💬 댓글':'👤 유저';
     // 신고된 글이면 글 정보도
     let postInfo='';
-    if(r.target_type==='chat'){
+    if(r.target_type==='comment'){
+      const commentContent=(r.reason||'').split('[신고된 댓글 내용]')[1]||'';
+      const mainCommentReason=(r.reason||'').split('\n\n[신고된 댓글 내용]')[0];
+      if(commentContent)postInfo='<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;"><strong>💬 신고된 댓글</strong><br>'+commentContent.trim()+'</div>';
+      r._mainReason=mainCommentReason;
+    } else if(r.target_type==='chat'){
       const chatContent=(r.reason||'').split('[채팅 내용]')[1]||'';
       r._mainReason=(r.reason||'').split('\n\n[채팅 내용]')[0];
       postInfo='<div style="font-size:12px;background:var(--surface2);padding:8px;border-radius:6px;margin-top:6px;white-space:pre-wrap;max-height:150px;overflow-y:auto;"><strong>💬 채팅 내용</strong><br>'+chatContent.trim()+'</div>';
