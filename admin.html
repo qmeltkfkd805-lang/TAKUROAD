@@ -235,8 +235,8 @@ async function renderReports(reports, elId, isResolved){
         ${new Date(r.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
       </div>
       ${!isResolved?`<div class="report-actions">
-      ${!isResolved?`<div class="report-actions">
         ${r.target_type==='comment'&&r.target_id?`<button class="btn" style="background:var(--cyan-l);color:var(--cyan);border-color:var(--cyan);" onclick="goToComment('${r.target_id}')">💬 댓글 보기</button>`:''}
+        ${r.target_type==='post'&&r.target_id?`<button class="btn btn-red" onclick="deleteReportedPost('${r.id}','${r.target_id}',this.closest('.report-card'))">🗑️ 게시글 삭제</button>`:''}
         <button class="btn btn-green" onclick="resolveReport('${r.id}',this.closest('.report-card'))">✅ 처리 완료</button>
         <button class="btn" style="background:var(--purple-l);color:var(--purple);border-color:var(--purple);" onclick="archiveReport('${r.id}',this.closest('.report-card'))">📋 보관</button>
         <button class="btn btn-gray" onclick="dismissReport('${r.id}',this.closest('.report-card'))">무시</button>
