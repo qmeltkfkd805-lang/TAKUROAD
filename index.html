@@ -2825,12 +2825,16 @@ window.addEventListener('popstate', function(e){
     return;
   }
   if(state.view==='post'){
+  if(state.view==='post'){
     // 글에서 뒤로가기 = 세부게시판 목록
+    const mpv2=document.getElementById('mobilePostView');
+    if(mpv2)mpv2.classList.remove('open');
     const pa=document.getElementById('postArea');
     if(pa){pa.innerHTML='<div class="post-table" id="postTable"></div>';}
     removePostBottomBar();
     if(currentSub)selectSub(currentSub,false,true);
-    else selectSubAll(false, true);
+    else selectSubAll(false,true);
+    loadBoardPosts();
   } else if(state.view==='sub'||state.view==='subAll'){
     // 세부게시판에서 뒤로가기 = 게시판 상세
     if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
