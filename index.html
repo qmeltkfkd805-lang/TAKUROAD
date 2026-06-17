@@ -1286,7 +1286,15 @@ window.onload=function(){
           await selectBoard(board);
           if(subName){
             const{data:sub}=await db.from('sub_boards').select('*').eq('name',subName).eq('board_id',board.id).single();
-            if(sub)selectSub(sub);
+            if(sub)await selectSub(sub);
+          }
+          // post 파라미터 처리
+          const postId=params.get('post');
+          if(postId){
+            setTimeout(async()=>{
+              const{data:post}=await db.from('posts').select('*').eq('id',postId).single();
+              if(post)openPostDetail(post);
+            },500);
           }
         }
       } else if(st.boardId){
