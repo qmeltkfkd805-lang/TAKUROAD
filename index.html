@@ -4624,7 +4624,7 @@ async function openUserPosts(){
   });
 }
 
-function closeUserPopup(){window._reportCommentId=null;window._reportCommentContent=null;document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){window.removeEventListener('scroll',_popupScrollHandler,true);document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));_popupScrollHandler=null;}_popupTargetEl=null;}
+function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){window.removeEventListener('scroll',_popupScrollHandler,true);document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));_popupScrollHandler=null;}_popupTargetEl=null;}
 
 async function popupSubscribe(){
   if(!currentUser){alert('로그인이 필요해요');return;}
