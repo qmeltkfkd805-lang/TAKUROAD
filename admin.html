@@ -251,6 +251,14 @@ async function archiveReport(reportId, card){
   setTimeout(()=>loadReports(),500);
 }
 
+async function goToComment(commentId){
+  const{data:comment}=await db.from('comments').select('post_id').eq('id',commentId).single();
+  if(!comment){alert('댓글을 찾을 수 없어요.');return;}
+  const{data:post}=await db.from('posts').select('*').eq('id',comment.post_id).single();
+  if(!post){alert('게시글을 찾을 수 없어요.');return;}
+  window.open('https://takuroad.jonjonnni.com?post='+post.id,'_blank');
+}
+
 async function resolveReport(reportId, card){
   await db.from('reports').update({status:'resolved'}).eq('id',reportId);
   card.classList.add('resolved');
