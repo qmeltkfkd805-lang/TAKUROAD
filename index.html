@@ -3422,7 +3422,7 @@ async function loadComments(postId){
         if(data?.nickname)nickSpan.textContent=data.nickname;
       });
       if(!isMine){
-        const openPopup=(e)=>{e.stopPropagation();db.from('profiles').select('nickname,avatar_url').eq('id',c.user_id).maybeSingle().then(({data})=>{showUserPopup(e,c.user_id,data?.nickname||c.nick,data?.avatar_url);});};
+        const openPopup=(e)=>{e.stopPropagation();window._reportCommentId=c.id;window._reportCommentContent=c.content;db.from('profiles').select('nickname,avatar_url').eq('id',c.user_id).maybeSingle().then(({data})=>{showUserPopup(e,c.user_id,data?.nickname||c.nick,data?.avatar_url);});};
         avatar.onclick=openPopup;
         nickSpan.onclick=openPopup;nickSpan.style.cursor='pointer';
       }
@@ -3445,18 +3445,6 @@ async function loadComments(postId){
       delBtn.textContent='삭제';
       delBtn.onclick=()=>deleteComment(c.id,postId);
       actionRow.appendChild(delBtn);
-    }
-    if(!isMine&&currentUser){
-      const repBtn=document.createElement('button');
-      repBtn.style.cssText='background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;';
-      repBtn.textContent='🚨 신고';
-      repBtn.onclick=async()=>{
-        const reason=prompt('신고 사유를 입력해주세요:');
-        if(!reason)return;
-        await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:c.user_id,target_id:c.id,target_type:'comment',reason,status:'pending'});
-        alert('신고가 접수됐어요.');
-      };
-      actionRow.appendChild(repBtn);
     }
     div.appendChild(actionRow);
     list2.appendChild(div);
@@ -4636,7 +4624,7 @@ async function openUserPosts(){
   });
 }
 
-function closeUserPopup(){document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){window.removeEventListener('scroll',_popupScrollHandler,true);document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));_popupScrollHandler=null;}_popupTargetEl=null;}
+function closeUserPopup(){window._reportCommentId=null;window._reportCommentContent=null;document.getElementById('userPopup').classList.remove('open');if(_popupScrollHandler){window.removeEventListener('scroll',_popupScrollHandler,true);document.querySelectorAll('.post-area,.post-detail,.mobile-post-body').forEach(el=>el.removeEventListener('scroll',_popupScrollHandler));_popupScrollHandler=null;}_popupTargetEl=null;}
 
 async function popupSubscribe(){
   if(!currentUser){alert('로그인이 필요해요');return;}
@@ -4680,6 +4668,10 @@ async function submitReport(){
   if(_reportPostId){
     await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_reportPostUserId,target_id:_reportPostId,reason,status:'pending',target_type:'post'});
     _reportPostId=null;_reportPostUserId=null;
+  } else if(window._reportCommentId){
+    const commentInfo=window._reportCommentContent?'\n\n[신고된 댓글 내용]\n'+window._reportCommentContent:'';
+    await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_popupTargetUserId,target_id:window._reportCommentId,target_type:'comment',reason:reason+commentInfo,status:'pending'});
+    window._reportCommentId=null;window._reportCommentContent=null;
   } else {
     await db.from('reports').insert({reporter_id:currentUser.id,target_user_id:_popupTargetUserId,reason,status:'pending',target_type:'user'});
   }
