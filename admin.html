@@ -257,7 +257,12 @@ async function goToComment(commentId){
   if(!comment){alert('댓글을 찾을 수 없어요.');return;}
   const{data:post}=await db.from('posts').select('*').eq('id',comment.post_id).single();
   if(!post){alert('게시글을 찾을 수 없어요.');return;}
-  window.open('https://takuroad.jonjonnni.com?post='+post.id,'_blank');
+  const{data:board}=await db.from('boards').select('name').eq('id',post.board_id).single();
+  const{data:sub}=post.sub_board_id?await db.from('sub_boards').select('name').eq('id',post.sub_board_id).single():{data:null};
+  let url='https://takuroad.jonjonnni.com?board='+encodeURIComponent(board?.name||'');
+  if(sub)url+='&sub='+encodeURIComponent(sub.name);
+  url+='&post='+post.id+'#comment-'+commentId;
+  window.open(url,'_blank');
 }
 
 async function resolveReport(reportId, card){
