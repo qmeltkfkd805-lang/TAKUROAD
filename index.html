@@ -2835,11 +2835,12 @@ window.addEventListener('popstate', function(e){
     else selectSubAll(false,true);
     loadBoardPosts();
   } else if(state.view==='sub'||state.view==='subAll'){
-    // 직전이 post였으면 글 목록 다시 로드
     if(currentBoard){
-      const pa=document.getElementById('postArea');
-      if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
-      loadBoardPosts();
+      setTimeout(()=>{
+        const pa=document.getElementById('postArea');
+        if(pa)pa.innerHTML='<div class="post-table" id="postTable"></div>';
+        loadBoardPosts();
+      },200);
     } else if(state.boardId&&window._boardCache&&window._boardCache[state.boardId]){
       selectBoard(window._boardCache[state.boardId], true);
     }
